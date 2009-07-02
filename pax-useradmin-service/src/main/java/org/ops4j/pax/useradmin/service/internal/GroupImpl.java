@@ -67,7 +67,7 @@ public class GroupImpl extends UserImpl implements Group {
     public Role[] getMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
-            Collection<Role> roles = storageProvider.getMembers(this);
+            Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
             return (Role[]) Collections.unmodifiableCollection(roles).toArray();
         } catch (StorageException e) {
             getAdmin().logMessage(
@@ -81,7 +81,7 @@ public class GroupImpl extends UserImpl implements Group {
     public Role[] getRequiredMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
-            Collection<Role> roles = storageProvider.getRequiredMembers(this);
+            Collection<Role> roles = storageProvider.getRequiredMembers(getAdmin(), this);
             return (Role[]) Collections.unmodifiableCollection(roles).toArray();
         } catch (StorageException e) {
             getAdmin().logMessage(

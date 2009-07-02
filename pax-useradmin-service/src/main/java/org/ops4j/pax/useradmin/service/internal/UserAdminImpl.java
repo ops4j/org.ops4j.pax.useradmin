@@ -133,11 +133,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             Role role = null;
             switch (type) {
                 case org.osgi.service.useradmin.Role.USER:
-                    role = storageProvider.createUser(name);
+                    role = storageProvider.createUser(this, name);
                     break;
 
                 case org.osgi.service.useradmin.Role.GROUP:
-                    role = storageProvider.createGroup(name);
+                    role = storageProvider.createGroup(this, name);
                     break;
 
                 default:
@@ -176,7 +176,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         //
         try {
             StorageProvider storage = getStorageProvider();
-            return storage.getRole(name);
+            return storage.getRole(this, name);
         } catch (StorageException e) {
             logMessage(this, "error when looking up role: " + e.getMessage(), LogService.LOG_ERROR);
         }
@@ -189,7 +189,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
         try {
             StorageProvider storage = getStorageProvider();
-            Collection<Role> roles = storage.findRoles(filter);
+            Collection<Role> roles = storage.findRoles(this, filter);
             if (!roles.isEmpty()) {
                 return (Role[]) Collections.unmodifiableCollection(roles).toArray();
             }
@@ -208,7 +208,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
         try {
             StorageProvider storage = getStorageProvider();
-            User user = storage.getUser(key, value);
+            User user = storage.getUser(this, key, value);
             return user;
         } catch (StorageException e) {
             logMessage(this,   "error when looking up user with attribute '" + key + "' = '" + value
@@ -241,7 +241,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == storageProvider) {
             throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
         }
-        storageProvider.setFactory(this);
         return storageProvider;
     }
 

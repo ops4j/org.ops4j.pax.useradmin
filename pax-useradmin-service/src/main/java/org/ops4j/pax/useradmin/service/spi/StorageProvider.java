@@ -17,19 +17,17 @@ public interface StorageProvider {
     public static String PROP_ROLE_NAME = "org.ops4j.pax.useradmin.role.name";
     public static String PROP_ROLE_TYPE = "org.ops4j.pax.useradmin.role.type";
 
-    void setFactory(UserAdminFactory factory);
-    
     // role management
     
-    User createUser(String name) throws StorageException;
-    Group createGroup(String name) throws StorageException;
+    User createUser(UserAdminFactory factory, String name) throws StorageException;
+    Group createGroup(UserAdminFactory factory, String name) throws StorageException;
     void deleteRole(Role role) throws StorageException;
 
     // group management
     
-    Collection<Role> getMembers(Group group) throws StorageException;
+    Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException;
 
-    Collection<Role> getRequiredMembers(Group group) throws StorageException;
+    Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException;
 
     void addMember(Group group, Role role) throws StorageException;
 
@@ -59,8 +57,8 @@ public interface StorageProvider {
 
     // getters & finders
     
-    Role getRole(String name) throws StorageException;
-    User getUser(String key, String value) throws StorageException;
+    Role getRole(UserAdminFactory factory, String name) throws StorageException;
+    User getUser(UserAdminFactory factory, String key, String value) throws StorageException;
 
-    Collection<Role> findRoles(String filter) throws StorageException;
+    Collection<Role> findRoles(UserAdminFactory factory, String filter) throws StorageException;
 }
