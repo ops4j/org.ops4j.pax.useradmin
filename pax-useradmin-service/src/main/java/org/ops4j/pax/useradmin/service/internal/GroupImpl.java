@@ -1,6 +1,5 @@
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -21,86 +20,76 @@ public class GroupImpl extends UserImpl implements Group {
     }
 
     public boolean addMember(Role role) {
-        if (role == null) {
-            return (false);
+        if (role != null) {
+            try {
+                StorageProvider storageProvider = getAdmin().getStorageProvider();
+                storageProvider.addMember(this, role);
+                return true;
+            } catch (StorageException e) {
+                getAdmin().logMessage(this,
+                                        "error when adding basic member to group '" + getName() + "':"
+                                      + e.getMessage(), LogService.LOG_ERROR);
+            }
         }
-        try {
-            StorageProvider storageProvider = getAdmin().getStorageProvider();
-            storageProvider.addMember(this, role);
-        } catch (StorageException e) {
-            getAdmin().logMessage(this,
-                                  "error when adding basic member to group: " + e.getMessage(),
-                                  LogService.LOG_ERROR);
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public boolean addRequiredMember(Role role) {
-        if (role == null) {
-            return (false);
+        if (role != null) {
+            try {
+                StorageProvider storageProvider = getAdmin().getStorageProvider();
+                storageProvider.addRequiredMember(this, role);
+                return true;
+            } catch (StorageException e) {
+                getAdmin().logMessage(this,
+                                        "error when adding required member to group '" + getName() + "':"
+                                      + e.getMessage(), LogService.LOG_ERROR);
+            }
         }
-        try {
-            StorageProvider storageProvider = getAdmin().getStorageProvider();
-            storageProvider.addRequiredMember(this, role);
-        } catch (StorageException e) {
-            getAdmin().logMessage(this,
-                                  "error when adding required member to group: " + e.getMessage(),
-                                  LogService.LOG_ERROR);
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public boolean removeMember(Role role) {
-        if (role == null) {
-            return (false);
+        if (role != null) {
+            try {
+                StorageProvider storageProvider = getAdmin().getStorageProvider();
+                storageProvider.removeMember(this, role);
+                return true;
+            } catch (StorageException e) {
+                getAdmin().logMessage(this,
+                                        "error when removing member from group '" + getName() + "':"
+                                      + e.getMessage(), LogService.LOG_ERROR);
+            }
         }
-        try {
-            StorageProvider storageProvider = getAdmin().getStorageProvider();
-            storageProvider.removeMember(this, role);
-        } catch (StorageException e) {
-            getAdmin().logMessage(this, "error when removing member from group: " + e.getMessage(),
-                                  LogService.LOG_ERROR);
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public Role[] getMembers() {
-        ArrayList<Role> roles = new ArrayList<Role>();
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
-            Collection<String> roleNames = storageProvider.getMembers(this);
-            //
-            for (String roleName : roleNames) {
-                Map<String, String> properties = storageProvider.getRole(roleName);
-                roles.add(getAdmin().createRole(properties));
-            }
+            Collection<Role> roles = storageProvider.getMembers(this);
+            return (Role[]) Collections.unmodifiableCollection(roles).toArray();
         } catch (StorageException e) {
-            getAdmin().logMessage(this, "error when retrieving members of group: " + e.getMessage(),
-                                  LogService.LOG_ERROR);
-            return null;
+            getAdmin().logMessage(
+                                  this,
+                                   "error when retrieving basic members of group '" + getName() + "':"
+                                  + e.getMessage(), LogService.LOG_ERROR);
         }
-        return (Role[]) Collections.unmodifiableCollection(roles).toArray();
+        return null;
     }
 
     public Role[] getRequiredMembers() {
-        ArrayList<Role> roles = new ArrayList<Role>();
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
-            Collection<String> roleNames = storageProvider.getRequiredMembers(this);
-            //
-            for (String roleName : roleNames) {
-                Map<String, String> properties = storageProvider.getRole(roleName);
-                roles.add(getAdmin().createRole(properties));
-            }
+            Collection<Role> roles = storageProvider.getRequiredMembers(this);
+            return (Role[]) Collections.unmodifiableCollection(roles).toArray();
         } catch (StorageException e) {
-            getAdmin().logMessage(this, "error when retrieving members of group: " + e.getMessage(),
-                                  LogService.LOG_ERROR);
-            return null;
+            getAdmin().logMessage(
+                                  this,
+                                    "error when retrieving required members of group '" + getName()
+                                  + "':" + e.getMessage(), LogService.LOG_ERROR);
         }
-        return (Role[]) Collections.unmodifiableCollection(roles).toArray();
+        return null;
     }
 
     public int getType() {

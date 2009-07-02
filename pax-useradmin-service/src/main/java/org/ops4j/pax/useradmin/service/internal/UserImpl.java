@@ -24,18 +24,13 @@ public class UserImpl extends RoleImpl implements User {
     }
 
     public boolean hasCredential(String key, Object value) {
-        if (null == key || null == value || !(value instanceof String || value instanceof byte[])) {
-            return false;
-        }
-        //
-        for (Object credential : m_credentials.keySet()) {
-            if (((String) credential).equals(key)) {
-
-                Object credentialValue = m_credentials.get(key);
-                if (null != credentialValue && credentialValue.equals(value)) {
-                    return true;
+        if (null != key && null != value && (value instanceof String || value instanceof byte[])) {
+            for (Object credential : m_credentials.keySet()) {
+                if (((String) credential).equals(key)) {
+                    // check this credential
+                    Object credentialValue = m_credentials.get(key);
+                    return null != credentialValue && credentialValue.equals(value);
                 }
-                return false;
             }
         }
         return false;

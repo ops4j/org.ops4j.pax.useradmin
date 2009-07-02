@@ -35,7 +35,7 @@ public class RoleImpl implements Role {
     /**
      * The UserAdmin that uses this role.
      */
-    private UserAdminImpl  m_admin;
+    private UserAdminImpl  m_admin      = null;
 
     /**
      * The properties of this role.

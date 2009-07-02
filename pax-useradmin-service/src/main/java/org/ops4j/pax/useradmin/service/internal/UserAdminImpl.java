@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -19,6 +20,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.Authorization;
+import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
@@ -31,13 +33,13 @@ import org.osgi.util.tracker.ServiceTracker;
  * implementation.
  * 
  */
-public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
+public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
     public static String        PROP_SECURITY      = "org.ops4j.pax.useradmin.security";
 
-    protected static String     EVENT_TOPIC_PREFIX = "org/osgi/service/useradmin/UserAdmin/";
-
     // private implementation details
+
+    private static String       EVENT_TOPIC_PREFIX = "org/osgi/service/useradmin/UserAdmin/";
 
     private BundleContext       m_context          = null;
 
@@ -84,36 +86,28 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
     }
 
     private void checkAdminPermission() {
-        // TODO: add property to switch security checks on/off
-        SecurityManager securityManager = System.getSecurityManager();
-        if (null != securityManager) {
-            if (null == m_adminPermission) {
-                m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
+        if (m_checkSecurity) {
+            SecurityManager securityManager = System.getSecurityManager();
+            if (null != securityManager) {
+                if (null == m_adminPermission) {
+                    m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
+                }
+                securityManager.checkPermission(m_adminPermission);
             }
-            securityManager.checkPermission(m_adminPermission);
         }
-    }
-
-    protected Role createRole(Map<String, String> properties) throws StorageException {
-        String roleName = properties.get(StorageProvider.PROP_ROLE_NAME);
-        Map<String, String> credentials = getStorageProvider().getUserCredentials(roleName);
-        switch (new Integer(properties.get(StorageProvider.PROP_ROLE_TYPE))) {
-            case Role.GROUP:
-                return new GroupImpl(roleName, this, properties, credentials);
-            case Role.USER:
-                return new UserImpl(roleName, this, properties, credentials);
-        }
-        throw new IllegalStateException("Invalid or missing role type detected");
     }
 
     // ManagedService interface
 
     public void updated(Dictionary properties) throws ConfigurationException {
-
+        // defaults
+        m_checkSecurity = true;
+        //
         if (null !=properties) {
             String checkSecurity = (String) properties.get(PROP_SECURITY);
             if (null != checkSecurity) {
-                m_checkSecurity = "yes".equalsIgnoreCase(checkSecurity);
+                m_checkSecurity =    "yes".equalsIgnoreCase(checkSecurity)
+                                  || "true".equalsIgnoreCase(checkSecurity);
             }
         }
     }
@@ -135,22 +129,21 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
         checkAdminPermission();
         //
         try {
-            StorageProvider storage = getStorageProvider();
-            Map<String, String> properties = null;
+            StorageProvider storageProvider = getStorageProvider();
+            Role role = null;
             switch (type) {
                 case org.osgi.service.useradmin.Role.USER:
-                    properties = storage.createUser(name);
+                    role = storageProvider.createUser(name);
                     break;
 
                 case org.osgi.service.useradmin.Role.GROUP:
-                    properties = storage.createGroup(name);
+                    role = storageProvider.createGroup(name);
                     break;
 
                 default:
                     // never reached b/o previous checks
                     break;
             }
-            Role role = createRole(properties);
             fireEvent(UserAdminEvent.ROLE_CREATED, role);
             return role;
         } catch (StorageException e) {
@@ -168,7 +161,8 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
             StorageProvider storage = getStorageProvider();
             Collection<String> roleData = storage.getImpliedRoles(userName);
             String[] roles = (String[]) Collections.unmodifiableCollection(roleData).toArray();
-            AuthorizationImpl authorizationImpl = new AuthorizationImpl(user.getName(), roles);
+            AuthorizationImpl authorization = new AuthorizationImpl(user.getName(), roles);
+            return authorization;
         } catch (StorageException e) {
             logMessage(this, "error when authorizing user: " + e.getMessage(), LogService.LOG_ERROR);
         }
@@ -182,10 +176,7 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
         //
         try {
             StorageProvider storage = getStorageProvider();
-            Map<String, String> properties = storage.getRole(name);
-            if (null != properties) {
-                return createRole(properties);
-            }
+            return storage.getRole(name);
         } catch (StorageException e) {
             logMessage(this, "error when looking up role: " + e.getMessage(), LogService.LOG_ERROR);
         }
@@ -198,12 +189,8 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
         }
         try {
             StorageProvider storage = getStorageProvider();
-            Collection<Map<String, String>> roleData = storage.findRoles(filter);
-            ArrayList<Role> roles = new ArrayList<Role>();
-            if (!roleData.isEmpty()) {
-                for (Map<String, String> properties : roleData) {
-                    roles.add(createRole(properties));
-                }
+            Collection<Role> roles = storage.findRoles(filter);
+            if (!roles.isEmpty()) {
                 return (Role[]) Collections.unmodifiableCollection(roles).toArray();
             }
         } catch (StorageException e) {
@@ -219,8 +206,14 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
         if (null == value) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
-        // TODO Auto-generated method stub
-        // TODO: translate to Ldap search pattern and use findRole()?
+        try {
+            StorageProvider storage = getStorageProvider();
+            User user = storage.getUser(key, value);
+            return user;
+        } catch (StorageException e) {
+            logMessage(this,   "error when looking up user with attribute '" + key + "' = '" + value
+                             + "': " + e.getMessage(), LogService.LOG_ERROR);
+        }
         return null;
     }
 
@@ -244,12 +237,12 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
     // UserAdminUtil interface
 
     public StorageProvider getStorageProvider() throws StorageException {
-        StorageProvider storage = (StorageProvider) m_storageService.getService();
-        if (null == storage) {
+        StorageProvider storageProvider = (StorageProvider) m_storageService.getService();
+        if (null == storageProvider) {
             throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
         }
-        // else: init default storage?
-        return storage;
+        storageProvider.setFactory(this);
+        return storageProvider;
     }
 
     public void logMessage(Object source, String message, int level) {
@@ -286,10 +279,27 @@ public class UserAdminImpl implements UserAdmin, UserAdminUtil, ManagedService {
     }
 
     public void checkPermission(String name, String action) {
-        // TODO: add property to switch security checks on/off
-        SecurityManager securityManager = System.getSecurityManager();
-        if (null != securityManager) {
-            securityManager.checkPermission(new UserAdminPermission(name, action));
+        if (m_checkSecurity) {
+            SecurityManager securityManager = System.getSecurityManager();
+            if (null != securityManager) {
+                securityManager.checkPermission(new UserAdminPermission(name, action));
+            }
         }
+    }
+    
+    // UserAdminFactory interface
+    
+    public User createUser(String name,
+                           Map<String, String> properties,
+                           Map<String, String> credentials) {
+        UserImpl user = new UserImpl(name, this, properties, credentials);
+        return user;
+    }
+
+    public Group createGroup(String name,
+                             Map<String, String> properties,
+                             Map<String, String> credentials) {
+        GroupImpl group = new GroupImpl(name, this, properties, credentials);
+        return group;
     }
 }
