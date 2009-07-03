@@ -1,17 +1,31 @@
+/*
+ * Copyright 2009 Matthias Kuespert
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -32,8 +46,12 @@ import org.osgi.util.tracker.ServiceTracker;
  * A service to administer user and group/role data using a pluggable storage
  * implementation.
  * 
+ * @author Matthias Kuespert
+ * @since  02.07.2009
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
+
+    public static String        PID                = "org.ops4j.pax.useradmin";
 
     public static String        PROP_SECURITY      = "org.ops4j.pax.useradmin.security";
 
@@ -262,17 +280,16 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             properties.put("role", role);
             properties.put("role.name", role.getName());
             properties.put("role.type", role.getType());
-            properties.put("service", uaEvent.getServiceReference());
-            // TODO: properties.put("service.id",
-            // m_context.getService(uaEvent.getServiceReference().getProperty(B)));
-            // TODO: properties.put("service.objectClass", uaEvent);
-            // TODO: properties.put("service.pid", uaEvent);
+            properties.put("service", ref);
+            properties.put("service.id", ref.getProperty(Constants.OBJECTCLASS));
+            properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
+            properties.put("service.pid", ref.getProperty(Constants.SERVICE_PID));
             //
             Event event = new Event(EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
         } else {
-            logMessage(this, "No event service available - cannot send event of type: "
-                            + getEventTypeName(type) + " for role: " + role.getName(),
+            logMessage(this, "No event service available - cannot send event of type '"
+                            + getEventTypeName(type) + "' for role '" + role.getName() + "'",
                        LogService.LOG_ERROR);
         }
     }

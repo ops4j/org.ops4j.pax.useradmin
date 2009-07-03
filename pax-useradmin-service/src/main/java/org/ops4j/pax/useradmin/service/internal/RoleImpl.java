@@ -23,7 +23,8 @@ import org.osgi.service.useradmin.Role;
 /**
  * Implementation of the UserAdmin Role interface.
  * 
- * @author mkuespert
+ * @author Matthias Kuespert
+ * @since 02.07.2009
  */
 public class RoleImpl implements Role {
 
