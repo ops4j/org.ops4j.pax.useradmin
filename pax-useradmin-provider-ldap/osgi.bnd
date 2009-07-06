@@ -1,1 +1,12 @@
 Embed-Dependency: *;scope=compile|runtime
+Import-Package: org.ops4j.pax.useradmin.service.spi.*,\
+                org.osgi.service.useradmin.*,\
+                javax.naming.*, \
+                javax.naming.directory.*,\
+                javax.naming.ldap.*,\
+                com.sun.jndi.ldap.*,
+                javax.net.ssl.*,\
+                org.apache.commons.lang.*,\
+                org.apache.commons.lang.builder.*,\
+                org.apache.commons.logging.*, org.apache.commons.pool, org.apache.commons.pool.impl,  org.osgi.service.cm, org.springframework.beans, org.springframework.beans.factory, org.springframework.beans.factory.config, org.springframework.context, org.springframework.core, org.springframework.dao, org.springframework.jdbc.datasource, org.springframework.orm.hibernate3, org.springframework.transaction, org.springframework.transaction.support, org.springframework.util
+ 
