@@ -15,71 +15,92 @@
  */
 package org.ops4j.pax.useradmin.provider.ldap.internal;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-
 import org.ops4j.pax.useradmin.service.spi.StorageException;
-import org.ops4j.pax.useradmin.service.spi.StorageProvider;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.DistinguishedName;
-import org.springframework.ldap.core.LdapTemplate;
+import org.osgi.service.cm.ConfigurationException;
+
+// import com.novell.ldap.LDAPConnection;
+// import com.novell.ldap.LDAPException;
 
 /**
+ * Wraps the core Ldap access.
+ * 
  * @author Matthias Kuespert
- * @since  06.07.2009
+ * @since 06.07.2009
  */
 public class LdapWrapper {
 
-    /**
-     * The Spring LdapTemplate which is used for access.
-     */
-    private LdapTemplate m_template = null;
+//    private LDAPConnection m_connection = null;
+
+    protected void stop() { // throws LDAPException {
+/*        if (null != m_connection) {
+            m_connection.disconnect();
+        }
+*/    }
 
     /**
-     * Only used for unit tests to provide a mocked template.
+     * @return The LDAPConnection used to access the Ldap server.
+     * @throws StorageException If no template is set, i.e. init() has not been called.
+     */
+/*    private LDAPConnection getConnection() throws StorageException {
+        if (null == m_connection) {
+            throw new StorageException("no Ldap connection available - check your configuration");
+        }
+        return m_connection;
+    }
+*/    
+    /**
+     * Initialize the wrapper with the given properties.
      * 
-     * @param template
+     * @param properties The new properties.
+     * @throws ConfigurationException If an error occurs during initialization.
      */
-    public void setTemplate(LdapTemplate template) {
-        m_template = template;
-    }
-    
-    private LdapTemplate getTemplate() throws StorageException {
-        if (null == m_template) {
-            throw new StorageException("no Ldap template available - check your configuration");
-        }
-        return m_template;
-    }
+    public void init(Dictionary<String, String> properties) throws ConfigurationException {
 
-    public List<Map<String, String>> searchRoles(DistinguishedName base, String filter) throws StorageException {
-        return (List<Map<String, String>>) getTemplate().search(base, filter, new NodeAttributesMapper());
-    }
-
-    protected class NodeAttributesMapper implements AttributesMapper {
-        public Object mapFromAttributes(Attributes attributes) throws NamingException {
-            Map<String, String> properties = new HashMap<String, String>();
-            NamingEnumeration<String> keys = attributes.getIDs();
-            while (keys.hasMoreElements()) {
-                String key = keys.next();
-                String value = "";
-                NamingEnumeration<?> values = attributes.get(key).getAll();
-                while (values.hasMore()) {
-                    String data = (String) values.next();
-                    if (!"".equals(value) && !value.endsWith(StorageProvider.SEPARATOR_ATT_VALUES)) {
-                        value += StorageProvider.SEPARATOR_ATT_VALUES + " ";
-                    }
-                    if (null != data && data.length() > 0) {
-                        value += data;
-                    }
-                    properties.put(key, value);
-                }
+/*        try {
+            stop();
+            //
+            if (null == m_connection) {
+                m_connection = new LDAPConnection();
             }
-            return properties;
+            //
+            String host = StorageProviderImpl.getMandatoryProperty(properties,
+                                                                   StorageProviderImpl.PROP_LDAP_SERVER_URL);
+            String port = StorageProviderImpl.getMandatoryProperty(properties,
+                                                                   StorageProviderImpl.PROP_LDAP_SERVER_PORT);
+            m_connection.connect(host, new Integer(port));
+            
+             TODO: authentication
+            m_connection.bind(loginDN, password.getBytes("UTF8") );
+            
+            m_connection.bind(LDAPConnection.LDAP_V3, "", "".getBytes("UTF8"));
+
+        } catch (LDAPException e) {
+            throw new ConfigurationException(null,   "LDAPException during intialization: "
+                                                   + e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+            throw new ConfigurationException(null,   "Usupported encoding during intialization: "
+                                                   + e.getMessage());
         }
+*/
     }
+
+    public List<Map<String, String>> searchRoles(String base, String filter) throws StorageException {
+/*        LDAPConnection connection = getConnection();
+        
+        
+        try {
+            connection.search(base, LDAPConnection.SCOPE_SUB, filter, new String[] {""}, false);
+        } catch (LDAPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+*/        return null;
+    }
+
 }

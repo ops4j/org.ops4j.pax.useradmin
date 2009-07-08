@@ -29,21 +29,21 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
-import org.springframework.ldap.InvalidSearchFilterException;
-import org.springframework.ldap.core.DistinguishedName;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
+
+// import com.novell.ldap.LDAPException;
 
 public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     public static String ATTR_OBJECTCLASS          = "objectClass";
     
     public static String PROP_LDAP_SERVER_URL      = "org.ops4j.pax.user.ldap.server.url";
+    public static String PROP_LDAP_SERVER_PORT     = "org.ops4j.pax.user.ldap.server.port";
     public static String PROP_LDAP_ROOT_DN         = "org.ops4j.pax.user.ldap.rootdn";
     public static String PROP_LDAP_ACCESS_USER     = "org.ops4j.pax.user.ldap.access.user";
     public static String PROP_LDAP_ACCESS_PWD      = "org.ops4j.pax.user.ldap.access.pwd";
     
-    public static String DEFAULT_LDAP_SERVER_URL   = "ldap://localhost:8088";
+    public static String DEFAULT_LDAP_SERVER_URL   = "ldap://localhost";
+    public static String DEFAULT_LDAP_SERVER_PORT  = "8088";
     public static String DEFAULT_LDAP_ROOT_DN      = "dc=ops4j,dc=org";
 
     public static String PROP_OBJECTCLASS_USER     = "org.ops4j.pax.user.ldap.objectclass.user";
@@ -74,8 +74,12 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      */
     public StorageProviderImpl(LdapWrapper wrapper) {
         m_wrapper = wrapper;
+        if (null == m_wrapper) {
+            m_wrapper = new LdapWrapper();
+        }
     }
 
+    @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         //
         m_rootDN = DEFAULT_LDAP_ROOT_DN;
@@ -84,25 +88,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         m_idattrUser = DEFAULT_IDATTR_USER;
         m_idattrGroup = DEFAULT_IDATTR_GROUP;
         //
-        LdapContextSource ctx = new LdapContextSource();
         if (null != properties) {
-            ctx.setUrl(getMandatoryProperty(properties, PROP_LDAP_SERVER_URL));
+            m_wrapper.init(properties);
+            //
             m_rootDN = getMandatoryProperty(properties, PROP_LDAP_ROOT_DN);
-            ctx.setBase(m_rootDN);
-            String accessUser = (String) properties.get(PROP_LDAP_ACCESS_USER);
-            ctx.setUserDn(accessUser);
-            ctx.setPassword((String) properties.get(PROP_LDAP_ACCESS_PWD));
-            //
-            if (null == accessUser || "".equals(accessUser)) {
-                ctx.setAnonymousReadOnly(true);
-            }
-            //
-            try {
-                ctx.afterPropertiesSet();
-            } catch (Exception e) {
-                throw new ConfigurationException(null, e.getMessage());
-            }
-            //
             m_objectclassUser = (String) properties.get(PROP_OBJECTCLASS_USER);
             m_objectclassGroup = (String) properties.get(PROP_OBJECTCLASS_GROUP);
             m_idattrUser = (String) properties.get(PROP_IDATTR_USER);
@@ -114,10 +103,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                 m_idattrGroup = DEFAULT_IDATTR_GROUP;
             }
         }
-        m_wrapper.setTemplate(new LdapTemplate(ctx));
     }
 
-    private String getMandatoryProperty(Dictionary properties, String name) throws ConfigurationException {
+    protected static String getMandatoryProperty(Dictionary<String, String> properties, String name) throws ConfigurationException {
         String value = (String) properties.get(name);
         if (null == value) {
             throw new ConfigurationException(name,
@@ -125,10 +113,21 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
         return value;
     }
+    
+    protected void stop() {
+//        try {
+            if (null != m_wrapper) {
+                m_wrapper.stop();
+            }
+//        } catch (LDAPException e) {
+//            // TODO log error
+//            e.printStackTrace();
+//        }
+    }
 
     private LdapWrapper getWrapper() throws StorageException {
         if (null == m_wrapper) {
-            throw new StorageException("no Ldap template available - check your configuration");
+            throw new StorageException("no Ldap wrapper available - check your configuration");
         }
         return m_wrapper;
     }
@@ -222,47 +221,43 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     
     public Collection<Role> findRoles(UserAdminFactory factory, String filter) throws StorageException {
         LdapWrapper wrapper = getWrapper();
-        DistinguishedName base = new DistinguishedName(m_rootDN);
         Collection<Role> roles = new ArrayList<Role>();
-        try {
-            List<Map<String, String>> nodeProperties = wrapper.searchRoles(base, filter);
-            if (null != nodeProperties) {
-                for (Map<String, String> roleData : nodeProperties) {
-                    if (null != roleData) {
-                        String objectClassData = roleData.get(ATTR_OBJECTCLASS);
-                        if (null == objectClassData) {
-                            throw new StorageException("Objectclass attribute '" + ATTR_OBJECTCLASS + "' not found in server result.");
-                        }
-                        if (objectClassData.contains(m_objectclassGroup)) {
-                            String name = roleData.get(m_idattrGroup);
-                            if (null == name || "".equals(name)) {
-                                throw new StorageException("No name specified in role attributes: "
-                                                + roleData);
-                            }
-                            // TODO: read credentials
-                            System.out.println("create group '" + name + "' with attributes: "
-                                            + roleData);
-                            Group group = factory.createGroup(name, roleData, null);
-                            roles.add(group);
-                        } else if (objectClassData.contains(m_objectclassUser)) {
-                            String name = roleData.get(m_idattrUser);
-                            if (null == name || "".equals(name)) {
-                                throw new StorageException("No name specified in role attributes: "
-                                                + roleData);
-                            }
-                            // TODO: read credentials
-                            System.out.println("create user '" + name + "' with attributes: "
-                                            + roleData);
-                            User user = factory.createUser(name, roleData, null);
-                            roles.add(user);
-                        } else {
-                            System.out.println("create failed with data: " + roleData);
-                        }
+        List<Map<String, String>> nodeProperties = wrapper.searchRoles(m_rootDN, filter);
+        if (null == nodeProperties) {
+            // TODO: should we throw an exception?
+            return roles;
+        }
+        for (Map<String, String> roleData : nodeProperties) {
+            if (null != roleData) {
+                String objectClassData = roleData.get(ATTR_OBJECTCLASS);
+                if (null == objectClassData) {
+                    throw new StorageException("Objectclass attribute '" + ATTR_OBJECTCLASS
+                                    + "' not found in server result.");
+                }
+                if (objectClassData.contains(m_objectclassGroup)) {
+                    String name = roleData.get(m_idattrGroup);
+                    if (null == name || "".equals(name)) {
+                        throw new StorageException("No name specified in role attributes: "
+                                        + roleData);
                     }
+                    // TODO: read credentials
+                    System.out.println("create group '" + name + "' with attributes: " + roleData);
+                    Group group = factory.createGroup(name, roleData, null);
+                    roles.add(group);
+                } else if (objectClassData.contains(m_objectclassUser)) {
+                    String name = roleData.get(m_idattrUser);
+                    if (null == name || "".equals(name)) {
+                        throw new StorageException("No name specified in role attributes: "
+                                        + roleData);
+                    }
+                    // TODO: read credentials
+                    System.out.println("create user '" + name + "' with attributes: " + roleData);
+                    User user = factory.createUser(name, roleData, null);
+                    roles.add(user);
+                } else {
+                    System.out.println("create failed with data: " + roleData);
                 }
             }
-        } catch (InvalidSearchFilterException e) {
-            throw new StorageException("Invalid Ldap search filter: " + e.getMessage());
         }
 	    return roles;
 	}

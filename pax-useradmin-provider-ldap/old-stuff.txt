@@ -1,0 +1,177 @@
+osgi.bnd
+--------
+
+Import-Package: org.ops4j.pax.useradmin.service.spi.*,\
+                org.osgi.service.useradmin.*,\
+                org.osgi.service.cm,\
+                javax.naming.*, \
+                javax.naming.directory.*,\
+                javax.naming.ldap.*,\
+                com.sun.jndi.ldap.*,\
+                javax.net.ssl.*,\
+                org.apache.commons.lang.*,\
+                org.apache.commons.lang.builder.*,\
+                org.apache.commons.logging.*,\
+                org.apache.commons.pool.*,\
+                org.apache.commons.pool.impl.*,\
+                org.springframework.beans.*,\
+                org.springframework.beans.factory.*,\
+                org.springframework.beans.factory.config.*,\
+                org.springframework.context.*,\
+                org.springframework.core.*,\
+                org.springframework.dao.*,\
+                org.springframework.jdbc.datasource.*,\
+                org.springframework.orm.hibernate3.*,\
+                org.springframework.transaction.*,\
+                org.springframework.transaction.support.*,\
+                org.springframework.util.*
+
+pom.xml
+-------
+
+    <dependency>
+      <groupId>org.springframework.ldap</groupId>
+      <artifactId>spring-ldap-core</artifactId>
+      <version>1.3.0.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.ldap</groupId>
+      <artifactId>spring-ldap-core-tiger</artifactId>
+      <version>1.3.0.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-dao</artifactId>
+      <version>2.0.8</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>2.5.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <version>1.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.4</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+
+LdapWrapper
+-----------
+
+
+/*
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+
+import org.ops4j.pax.useradmin.service.spi.StorageException;
+import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.osgi.service.cm.ConfigurationException;
+import org.springframework.ldap.InvalidSearchFilterException;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+*/
+
+
+
+ The Spring way - needs JNDI
+    /**
+     * The Spring LdapTemplate which is used for access.
+     */
+    private LdapTemplate m_template = null;
+
+    /**
+     * Initialize the wrapper with the given properties.
+     * 
+     * @param properties The new properties.
+     * @throws ConfigurationException If an error occurs during initialization.
+     */
+    public void init(Dictionary<String, String> properties) throws ConfigurationException {
+        LdapContextSource ctx = new LdapContextSource();
+        if (null != properties) {
+            ctx.setUrl(StorageProviderImpl.getMandatoryProperty(properties, StorageProviderImpl.PROP_LDAP_SERVER_URL));
+            ctx.setBase(StorageProviderImpl.getMandatoryProperty(properties, StorageProviderImpl.PROP_LDAP_ROOT_DN));
+            String accessUser = (String) properties.get(StorageProviderImpl.PROP_LDAP_ACCESS_USER);
+            ctx.setUserDn(accessUser);
+            ctx.setPassword((String) properties.get(StorageProviderImpl.PROP_LDAP_ACCESS_PWD));
+            //
+            if (null == accessUser || "".equals(accessUser)) {
+                ctx.setAnonymousReadOnly(true);
+            }
+            //
+            try {
+                ctx.afterPropertiesSet();
+            } catch (Exception e) {
+                throw new ConfigurationException(null, e.getMessage());
+            }
+        }
+        m_template = new LdapTemplate(ctx);
+    }
+    
+    /**
+     * @return The LdapTemplate used to access the Ldap server.
+     * @throws StorageException If no template is set, i.e. init() has not been called.
+     */
+    private LdapTemplate getTemplate() throws StorageException {
+        if (null == m_template) {
+            throw new StorageException("no Ldap template available - check your configuration");
+        }
+        return m_template;
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<Map<String, String>> searchRoles(String base, String filter) throws StorageException {
+        try {
+            DistinguishedName baseDN = new DistinguishedName(base);
+            return (List<Map<String, String>>) getTemplate().search(baseDN, filter, new NodeAttributesMapper());
+        } catch (InvalidSearchFilterException e) {
+            throw new StorageException("Invalid Ldap search filter: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Inner class used to read node attributes into a Map<String, String>.
+     * 
+     * @author Matthias Kuespert
+     * @since  06.07.2009
+     */
+    protected class NodeAttributesMapper implements AttributesMapper {
+        public Object mapFromAttributes(Attributes attributes) throws NamingException {
+            Map<String, String> properties = new HashMap<String, String>();
+            NamingEnumeration<String> keys = attributes.getIDs();
+            while (keys.hasMoreElements()) {
+                String key = keys.next();
+                String value = "";
+                NamingEnumeration<?> values = attributes.get(key).getAll();
+                while (values.hasMore()) {
+                    String data = (String) values.next();
+                    if (!"".equals(value) && !value.endsWith(StorageProvider.SEPARATOR_ATT_VALUES)) {
+                        value += StorageProvider.SEPARATOR_ATT_VALUES + " ";
+                    }
+                    if (null != data && data.length() > 0) {
+                        value += data;
+                    }
+                    properties.put(key, value);
+                }
+            }
+            return properties;
+        }
+    }
+

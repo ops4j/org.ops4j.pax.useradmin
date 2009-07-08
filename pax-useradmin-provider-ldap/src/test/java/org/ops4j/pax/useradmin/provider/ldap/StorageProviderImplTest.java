@@ -32,7 +32,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
-import org.springframework.ldap.core.DistinguishedName;
 import org.easymock.classextension.*;
 
 public class StorageProviderImplTest {
@@ -43,7 +42,8 @@ public class StorageProviderImplTest {
     public void setup() {
         m_properties = new Hashtable<String, String>();
         //
-        m_properties.put(StorageProviderImpl.PROP_LDAP_SERVER_URL, "ldap://localhost:8088");
+        m_properties.put(StorageProviderImpl.PROP_LDAP_SERVER_URL, "ldap://localhost");
+        m_properties.put(StorageProviderImpl.PROP_LDAP_SERVER_PORT, "8088");
         m_properties.put(StorageProviderImpl.PROP_LDAP_ROOT_DN, "dc=kuespert-web,dc=de");
         m_properties.put(StorageProviderImpl.PROP_LDAP_ACCESS_USER, "");
         m_properties.put(StorageProviderImpl.PROP_LDAP_ACCESS_PWD, "");
@@ -56,7 +56,6 @@ public class StorageProviderImplTest {
     
 	@Test
 	public void findRoles() {
-        DistinguishedName base = new DistinguishedName(StorageProviderImpl.DEFAULT_LDAP_ROOT_DN);
 	    LdapWrapper wrapper = EasyMock.createMock(LdapWrapper.class);
         UserAdminFactory factory = EasyMock.createMock(UserAdminFactory.class);
         //
@@ -68,7 +67,7 @@ public class StorageProviderImplTest {
         mockedRole1.put(StorageProviderImpl.DEFAULT_IDATTR_USER, "jdeveloper");
         mockedRoles.add(mockedRole1);
         try {
-            EasyMock.expect(wrapper.searchRoles(base, "cn=*")).andReturn(mockedRoles);
+            EasyMock.expect(wrapper.searchRoles(StorageProviderImpl.DEFAULT_LDAP_ROOT_DN, "cn=*")).andReturn(mockedRoles);
         } catch (StorageException e) {
             // TODO: ignore or fail?
         }

@@ -17,6 +17,6 @@
   <groupId>org.ops4j.pax</groupId>
   <artifactId>pax-useradmin-itest-ldap</artifactId>
   <name>${bundle.symbolicName}</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
 </project>
