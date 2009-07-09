@@ -48,6 +48,13 @@ public class UserCredentials extends AbstractProperties {
     }
 
     @Override
+    protected void store(StorageProvider storageProvider, String key, byte[] value)
+        throws StorageException {
+        getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
+        storageProvider.setUserCredential(getUser(), key, value);
+    }
+
+    @Override
     protected void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
         storageProvider.removeUserCredential(getUser(), key);

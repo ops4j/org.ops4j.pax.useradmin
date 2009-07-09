@@ -36,11 +36,17 @@ public class RoleProperties extends AbstractProperties {
 		super(role, util, properties);
 	}
 	
-	@Override
-	protected void store(StorageProvider storageProvider, String key, String value) throws StorageException {
-	    getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
-		storageProvider.setRoleAttribute(getRole(), key, value);
-	}
+    @Override
+    protected void store(StorageProvider storageProvider, String key, String value) throws StorageException {
+        getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
+        storageProvider.setRoleAttribute(getRole(), key, value);
+    }
+
+    @Override
+    protected void store(StorageProvider storageProvider, String key, byte[] value) throws StorageException {
+        getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
+        storageProvider.setRoleAttribute(getRole(), key, value);
+    }
 
 	@Override
 	protected void remove(StorageProvider storageProvider, String key) throws StorageException {

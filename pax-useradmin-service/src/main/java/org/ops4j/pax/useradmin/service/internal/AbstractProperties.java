@@ -51,7 +51,10 @@ public abstract class AbstractProperties extends Hashtable {
     }
 
     protected abstract void store(StorageProvider storageProvider, String key, String value)
-        throws StorageException;
+    throws StorageException;
+
+    protected abstract void store(StorageProvider storageProvider, String key, byte[] value)
+    throws StorageException;
 
     protected abstract void remove(StorageProvider storageProvider, String key)
         throws StorageException;

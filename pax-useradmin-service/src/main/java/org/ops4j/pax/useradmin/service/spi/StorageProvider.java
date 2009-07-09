@@ -62,6 +62,8 @@ public interface StorageProvider {
     // property management
     
     void setRoleAttribute(Role role, String key, String value) throws StorageException;
+    
+    void setRoleAttribute(Role role, String key, byte[] value) throws StorageException;
 
     void removeRoleAttribute(Role role, String key) throws StorageException;
 
@@ -70,6 +72,8 @@ public interface StorageProvider {
     // credential management
     
     void setUserCredential(User user, String key, String value) throws StorageException;
+    
+    void setUserCredential(User user, String key, byte[] value) throws StorageException;
 
     void removeUserCredential(User user, String key) throws StorageException;
 
