@@ -183,6 +183,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         // TODO Auto-generated method stub
         
     }
+    public void setRoleAttribute(Role role, String key, byte[] value) throws StorageException {
+        // TODO Auto-generated method stub
+        
+    }
     
     public void removeRoleAttribute(Role role, String key) throws StorageException {
         // TODO Auto-generated method stub
@@ -195,6 +199,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     public void setUserCredential(User user, String key, String value) throws StorageException {
+        // TODO Auto-generated method stub
+        
+    }
+    public void setUserCredential(User user, String key, byte[] value) throws StorageException {
         // TODO Auto-generated method stub
         
     }

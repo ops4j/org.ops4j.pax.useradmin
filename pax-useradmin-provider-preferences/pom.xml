@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>useradmin</artifactId>
+		<groupId>org.ops4j.pax</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
+		<bundle.namespace>${project.groupId}.provider.preferences</bundle.namespace>
+	</properties>
+
+	<groupId>org.ops4j.pax.useradmin</groupId>
+	<artifactId>pax-useradmin-provider-preferences</artifactId>
+	<name>${bundle.symbolicName}</name>
+	<packaging>bundle</packaging>
+	<description>A Pax UserAdmin StorageProvider based on the PreferencesService</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<artifactId>pax-useradmin-service</artifactId>
+			<groupId>org.ops4j.pax.useradmin</groupId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+</project>
