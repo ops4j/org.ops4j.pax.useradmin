@@ -12,11 +12,14 @@
 	<groupId>org.ops4j.pax</groupId>
 	<artifactId>pax-useradmin-itest</artifactId>
     <name>Pax UserAdmin Integration Tests</name>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
+
+<!-- 
 	<modules>
 		<module>pax-useradmin-itest-ldap</module>
 	</modules>
-
+ -->
+ 
 	<dependencies>
 		<dependency>
 			<groupId>org.osgi</groupId>
@@ -33,6 +36,11 @@
 			<artifactId>pax-exam</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.prefs</artifactId>
+      <version>1.0.2</version>
+    </dependency>
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-junit</artifactId>

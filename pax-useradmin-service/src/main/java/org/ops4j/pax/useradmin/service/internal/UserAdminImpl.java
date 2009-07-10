@@ -82,8 +82,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     protected UserAdminImpl(BundleContext context) {
         m_storageService = new ServiceTracker(context, StorageProvider.class.getName(), null);
+        m_storageService.open();
         m_logService = new ServiceTracker(context, LogService.class.getName(), null);
+        m_logService.open();
         m_eventService = new ServiceTracker(context, EventAdmin.class.getName(), null);
+        m_eventService.open();
         m_context = context;
     }
 

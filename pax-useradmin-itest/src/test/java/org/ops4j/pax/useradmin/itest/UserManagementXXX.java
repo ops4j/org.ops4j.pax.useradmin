@@ -18,7 +18,9 @@ package org.ops4j.pax.useradmin.itest;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.useradmin.Role;
@@ -29,10 +31,11 @@ import org.osgi.service.useradmin.UserAdmin;
  * @author Matthias Kuespert
  * @since  09.07.2009
  */
-public class UserManagementTest {
+//@RunWith(JUnit4TestRunner.class)
+public class UserManagementXXX {
     
     @Inject
-    private BundleContext m_context = null;
+    private BundleContext m_context;
     
     protected UserAdmin getUserAdmin() {
         ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
@@ -43,7 +46,7 @@ public class UserManagementTest {
     }
     
 //     @Test
-    protected void testCreateUser() {
+    public void testCreateUser() {
         
         System.out.println("------------- start test -----------------");
         UserAdmin userAdmin = getUserAdmin();

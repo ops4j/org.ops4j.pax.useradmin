@@ -15,6 +15,7 @@
  */
 package org.ops4j.pax.useradmin.provider.preferences.internal;
 
+import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -28,8 +29,7 @@ public class Activator implements BundleActivator {
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        // TODO Auto-generated method stub
-
+        context.registerService(StorageProvider.class.getName(), new StorageProviderImpl(context), null);
     }
 
     /**
