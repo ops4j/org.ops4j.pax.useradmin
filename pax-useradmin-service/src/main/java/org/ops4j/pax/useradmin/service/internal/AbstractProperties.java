@@ -31,6 +31,7 @@ import org.osgi.service.useradmin.UserAdminEvent;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
+@SuppressWarnings(value = "unchecked")
 public abstract class AbstractProperties extends Hashtable {
 
     private static final long serialVersionUID = 1L;
@@ -92,6 +93,9 @@ public abstract class AbstractProperties extends Hashtable {
 
     @Override
     public synchronized Object get(Object key) {
+        if (null == key) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
+        }
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
         }
@@ -106,6 +110,9 @@ public abstract class AbstractProperties extends Hashtable {
         }
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
+        }
+        if (null == key) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
         if (!(value instanceof String || value instanceof byte[])) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE_TYPE);

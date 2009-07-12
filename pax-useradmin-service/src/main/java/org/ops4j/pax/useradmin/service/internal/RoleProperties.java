@@ -23,7 +23,7 @@ import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
- * A dictionary to manage attributes and communicate changes.
+ * A dictionary to manage role properties and communicate changes.
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009

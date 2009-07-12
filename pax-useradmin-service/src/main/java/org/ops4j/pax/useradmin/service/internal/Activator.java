@@ -18,12 +18,16 @@ package org.ops4j.pax.useradmin.service.internal;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.UserAdmin;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Activator which starts the UserAdmin service.
@@ -36,7 +40,7 @@ public class Activator implements BundleActivator {
     /**
      * Stored ServiceReference of the UserAdmin service.
      */
-    private ServiceReference m_userAdminReference = null;
+//    private ServiceReference m_userAdminReference = null;
 
     /**
      * @see BundleActivator#start(BundleContext)
@@ -44,18 +48,28 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         Dictionary<String, String> properties = new Hashtable<String, String>();
         properties.put(Constants.SERVICE_PID, UserAdminImpl.PID);
+        UserAdminImpl userAdmin = new UserAdminImpl(context,
+                                                    new ServiceTracker(context,
+                                                                       StorageProvider.class.getName(),
+                                                                       null),
+                                                    new ServiceTracker(context,
+                                                                       LogService.class.getName(),
+                                                                       null),
+                                                    new ServiceTracker(context,
+                                                                       EventAdmin.class.getName(),
+                                                                       null));
         ServiceRegistration reg = context.registerService(UserAdmin.class.getName(),
-                                                          new UserAdminImpl(context), properties);
-        m_userAdminReference = reg.getReference();
+                                                          userAdmin, properties);
+//        m_userAdminReference = reg.getReference();
     }
 
     /**
      * @see BundleActivator#stop(BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        if (null != m_userAdminReference) {
-            context.ungetService(m_userAdminReference);
-            m_userAdminReference = null;
-        }
+//        if (null != m_userAdminReference) {
+//            context.ungetService(m_userAdminReference);
+//            m_userAdminReference = null;
+//        }
     }
 }

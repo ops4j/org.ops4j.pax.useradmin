@@ -80,6 +80,7 @@ public class RoleImpl implements Role {
     /**
      * @see Role#getProperties()
      */
+    @SuppressWarnings(value = "unchecked")
     public Dictionary getProperties() {
         return m_properties;
     }

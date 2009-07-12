@@ -49,11 +49,11 @@ public interface StorageProvider {
 
     Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException;
 
-    void addMember(Group group, Role role) throws StorageException;
+    boolean addMember(Group group, Role role) throws StorageException;
 
-    void addRequiredMember(Group group, Role role) throws StorageException;
+    boolean addRequiredMember(Group group, Role role) throws StorageException;
 
-    void removeMember(Group group, Role user) throws StorageException;
+    boolean removeMember(Group group, Role role) throws StorageException;
     
     // retrieving groups a member belongs to
     

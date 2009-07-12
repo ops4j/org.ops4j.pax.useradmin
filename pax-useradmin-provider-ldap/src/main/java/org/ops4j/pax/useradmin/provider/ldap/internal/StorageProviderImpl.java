@@ -159,19 +159,19 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return null;
     }
     
-    public void addMember(Group group, Role role) throws StorageException {
+    public boolean addMember(Group group, Role role) throws StorageException {
         // TODO Auto-generated method stub
-        
+        return false;
     }
     
-    public void addRequiredMember(Group group, Role role) throws StorageException {
+    public boolean addRequiredMember(Group group, Role role) throws StorageException {
         // TODO Auto-generated method stub
-        
+        return false;
     }
     
-    public void removeMember(Group group, Role user) throws StorageException {
+    public boolean removeMember(Group group, Role role) throws StorageException {
         // TODO Auto-generated method stub
-        
+        return false;
     }
     
     public Collection<String> getImpliedRoles(String userName) {

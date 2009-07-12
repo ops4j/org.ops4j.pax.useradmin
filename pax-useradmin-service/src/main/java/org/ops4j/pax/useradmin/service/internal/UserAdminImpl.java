@@ -80,12 +80,15 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      */
     private ServiceTracker      m_eventService     = null;
 
-    protected UserAdminImpl(BundleContext context) {
-        m_storageService = new ServiceTracker(context, StorageProvider.class.getName(), null);
+    protected UserAdminImpl(BundleContext context,
+                            ServiceTracker storageService,
+                            ServiceTracker logService,
+                            ServiceTracker eventService) {
+        m_storageService = storageService;
         m_storageService.open();
-        m_logService = new ServiceTracker(context, LogService.class.getName(), null);
+        m_logService = logService;
         m_logService.open();
-        m_eventService = new ServiceTracker(context, EventAdmin.class.getName(), null);
+        m_eventService = eventService;
         m_eventService.open();
         m_context = context;
     }
@@ -106,7 +109,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
     }
 
-    private void checkAdminPermission() {
+    protected void checkAdminPermission() {
         if (m_checkSecurity) {
             SecurityManager securityManager = System.getSecurityManager();
             if (null != securityManager) {
@@ -119,7 +122,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     // ManagedService interface
-
+    @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
         m_checkSecurity = true;
@@ -206,13 +209,13 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     public Role[] getRoles(String filter) throws InvalidSyntaxException {
         if (filter == null || filter.equals("")) {
-            filter = "*"; // all roles filter
+            filter = "*"; // default: filter all roles
         }
         try {
             StorageProvider storage = getStorageProvider();
             Collection<Role> roles = storage.findRoles(this, filter);
             if (!roles.isEmpty()) {
-                return (Role[]) Collections.unmodifiableCollection(roles).toArray();
+                return roles.toArray(new Role[0]);
             }
         } catch (StorageException e) {
             logMessage(this, "error when looking up roles: " + e.getMessage(), LogService.LOG_ERROR);
@@ -284,7 +287,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             properties.put("role.name", role.getName());
             properties.put("role.type", role.getType());
             properties.put("service", ref);
-            properties.put("service.id", ref.getProperty(Constants.OBJECTCLASS));
+            properties.put("service.id", ref.getProperty(Constants.SERVICE_ID));
             properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
             properties.put("service.pid", ref.getProperty(Constants.SERVICE_PID));
             //

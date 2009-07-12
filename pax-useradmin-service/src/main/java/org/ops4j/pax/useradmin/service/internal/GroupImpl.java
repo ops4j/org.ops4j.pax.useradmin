@@ -42,9 +42,11 @@ public class GroupImpl extends UserImpl implements Group {
     public boolean addMember(Role role) {
         if (role != null) {
             try {
+                getAdmin().checkAdminPermission();
                 StorageProvider storageProvider = getAdmin().getStorageProvider();
-                storageProvider.addMember(this, role);
-                return true;
+                return storageProvider.addMember(this, role);
+                // TODO: verify that we really don't need to fire an event here
+                // - the spec doesn't mention anything
             } catch (StorageException e) {
                 getAdmin().logMessage(this,
                                         "error when adding basic member to group '" + getName() + "':"
@@ -57,9 +59,9 @@ public class GroupImpl extends UserImpl implements Group {
     public boolean addRequiredMember(Role role) {
         if (role != null) {
             try {
+                getAdmin().checkAdminPermission();
                 StorageProvider storageProvider = getAdmin().getStorageProvider();
-                storageProvider.addRequiredMember(this, role);
-                return true;
+                return storageProvider.addRequiredMember(this, role);
             } catch (StorageException e) {
                 getAdmin().logMessage(this,
                                         "error when adding required member to group '" + getName() + "':"
@@ -72,9 +74,9 @@ public class GroupImpl extends UserImpl implements Group {
     public boolean removeMember(Role role) {
         if (role != null) {
             try {
+                getAdmin().checkAdminPermission();
                 StorageProvider storageProvider = getAdmin().getStorageProvider();
-                storageProvider.removeMember(this, role);
-                return true;
+                return storageProvider.removeMember(this, role);
             } catch (StorageException e) {
                 getAdmin().logMessage(this,
                                         "error when removing member from group '" + getName() + "':"
@@ -88,10 +90,11 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
-            return (Role[]) Collections.unmodifiableCollection(roles).toArray();
+            if (!roles.isEmpty()) {
+                 return roles.toArray(new Role[0]);
+            }
         } catch (StorageException e) {
-            getAdmin().logMessage(
-                                  this,
+            getAdmin().logMessage(this,
                                    "error when retrieving basic members of group '" + getName() + "':"
                                   + e.getMessage(), LogService.LOG_ERROR);
         }
@@ -102,10 +105,11 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getRequiredMembers(getAdmin(), this);
-            return (Role[]) Collections.unmodifiableCollection(roles).toArray();
+            if (!roles.isEmpty()) {
+                return roles.toArray(new Role[0]);
+            }
         } catch (StorageException e) {
-            getAdmin().logMessage(
-                                  this,
+            getAdmin().logMessage(this,
                                     "error when retrieving required members of group '" + getName()
                                   + "':" + e.getMessage(), LogService.LOG_ERROR);
         }

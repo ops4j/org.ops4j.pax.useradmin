@@ -40,11 +40,13 @@ public class UserImpl extends RoleImpl implements User {
         m_credentials = new UserCredentials(this, admin, credentials);
     }
 
+    @SuppressWarnings(value = "unchecked")
     public Dictionary getCredentials() {
         return m_credentials;
     }
 
     public boolean hasCredential(String key, Object value) {
+        getAdmin().checkAdminPermission();
         if (null != key && null != value && (value instanceof String || value instanceof byte[])) {
             for (Object credential : m_credentials.keySet()) {
                 if (((String) credential).equals(key)) {
