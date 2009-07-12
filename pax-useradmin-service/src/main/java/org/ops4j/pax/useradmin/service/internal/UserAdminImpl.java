@@ -16,7 +16,6 @@
 package org.ops4j.pax.useradmin.service.internal;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -122,6 +121,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     // ManagedService interface
+    
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
@@ -177,15 +177,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     public Authorization getAuthorization(User user) {
-        String userName = User.USER_ANYONE;
-        if (null != user) {
-            userName = user.getName();
-        }
         try {
-            StorageProvider storage = getStorageProvider();
-            Collection<String> roleData = storage.getImpliedRoles(userName);
-            String[] roles = (String[]) Collections.unmodifiableCollection(roleData).toArray();
-            AuthorizationImpl authorization = new AuthorizationImpl(user.getName(), roles);
+            AuthorizationImpl authorization = new AuthorizationImpl(this, user);
             return authorization;
         } catch (StorageException e) {
             logMessage(this, "error when authorizing user: " + e.getMessage(), LogService.LOG_ERROR);
@@ -258,6 +251,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     // UserAdminUtil interface
 
     public StorageProvider getStorageProvider() throws StorageException {
+        if (null == m_storageService) {
+            throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
+        }
         StorageProvider storageProvider = (StorageProvider) m_storageService.getService();
         if (null == storageProvider) {
             throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
@@ -266,14 +262,16 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     public void logMessage(Object source, String message, int level) {
-        LogService log = (LogService) m_logService.getService();
+        LogService log = null != m_logService ? (LogService) m_logService.getService()
+                                              : null;
         if (null != log) {
             log.log(level, "[" + source.getClass().getName() + "] " + message);
         }
     }
 
     public void fireEvent(int type, Role role) {
-        EventAdmin eventAdmin = (EventAdmin) m_eventService.getService();
+        EventAdmin eventAdmin = null != m_eventService ? (EventAdmin) m_eventService.getService()
+                                                       : null;
         if (null != eventAdmin) {
             ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
             UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);

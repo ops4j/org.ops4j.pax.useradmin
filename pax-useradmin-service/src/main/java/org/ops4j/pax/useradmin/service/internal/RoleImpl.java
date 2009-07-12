@@ -15,6 +15,7 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -92,10 +93,15 @@ public class RoleImpl implements Role {
         return Role.ROLE;
     }
 
-    /**
-     * @see Role#getAdmin()
-     */
     protected UserAdminImpl getAdmin() {
         return m_admin;
+    }
+    
+    protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
+        if (checkedRoles.contains(getName())) {
+            return (false);
+        }
+        checkedRoles.add(getName());
+        return (getName().equals(Role.USER_ANYONE));
     }
 }

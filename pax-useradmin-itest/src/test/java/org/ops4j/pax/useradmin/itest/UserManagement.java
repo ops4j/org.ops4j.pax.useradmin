@@ -49,10 +49,10 @@ public abstract class UserManagement extends UserAdminTestBase {
         try {
             Role[] roles = userAdmin.getRoles(null);
             Assert.assertNotNull("No roles returned", roles);
-            Assert.assertEquals("Not exactly one role found", 1, roles.length);
-            Assert.assertNotNull("Invalid role returned", roles[0]);
-            Assert.assertEquals("Role is not a user", Role.USER, roles[0].getType());
-            Assert.assertEquals("Mismatching user name", USER_NAME, roles[0].getName());
+            Assert.assertEquals("Not exactly two roles found", 2, roles.length);
+            Assert.assertNotNull("Invalid role returned", roles[1]);
+            Assert.assertEquals("Role is not a user", Role.USER, roles[1].getType());
+            Assert.assertEquals("Mismatching user name", USER_NAME, roles[1].getName());
         } catch (InvalidSyntaxException e) {
             Assert.fail("Invalid filter syntax: " + e.getMessage());
         }
@@ -76,10 +76,10 @@ public abstract class UserManagement extends UserAdminTestBase {
         try {
             Role[] roles = userAdmin.getRoles(null);
             Assert.assertNotNull("No roles returned", roles);
-            Assert.assertEquals("Not exactly one role found", 1, roles.length);
-            Assert.assertNotNull("Invalid role returned", roles[0]);
-            Assert.assertEquals("Role is not a group", Role.GROUP, roles[0].getType());
-            Assert.assertEquals("Mismatching user name", GROUP_NAME, roles[0].getName());
+            Assert.assertEquals("Not exactly two roles found", 2, roles.length);
+            Assert.assertNotNull("Invalid role returned", roles[1]);
+            Assert.assertEquals("Role is not a group", Role.GROUP, roles[1].getType());
+            Assert.assertEquals("Mismatching user name", GROUP_NAME, roles[1].getName());
         } catch (InvalidSyntaxException e) {
             Assert.fail("Invalid filter syntax: " + e.getMessage());
         }

@@ -19,26 +19,22 @@ package org.ops4j.pax.useradmin.itest.preferences;
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.*;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.itest.UserManagement;
+import org.ops4j.pax.exam.options.TimeoutOption;
+import org.ops4j.pax.useradmin.itest.AuthorizationManagement;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.useradmin.Role;
-import org.osgi.service.useradmin.User;
-import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * @author Matthias Kuespert
- * @since  09.07.2009
+ * @since  12.07.2009
  */
 @RunWith(JUnit4TestRunner.class)
-public class Preferences_UserManagementTest extends UserManagement {
+public class Preferences_AuthorizationManagement extends AuthorizationManagement {
 
     @Inject
     private BundleContext m_context;
@@ -50,6 +46,7 @@ public class Preferences_UserManagementTest extends UserManagement {
     @Configuration
     public static Option[] configure() {
         return options(logProfile(),
+//                       vmOption("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
                        mavenBundle().groupId("org.apache.felix")
                                     .artifactId("org.apache.felix.prefs").version("1.0.2")
                                     .startLevel(1),
@@ -62,19 +59,8 @@ public class Preferences_UserManagementTest extends UserManagement {
                        );
     }
 
-//    public static String USER_NAME = "jdeveloper";
-
     @Test
-    public void createAndFindUserOk() {
-        super.createAndFindUserOk();
+    public void hasRole() {
+        super.hasRole();
     }
-
-//    @Test
-//    public void retrieveUser() {
-//        
-//        UserAdmin userAdmin = getUserAdmin();
-//        User user = (User) userAdmin.getRole(USER_NAME);
-//        Assert.assertNotNull("Could not retrieve user", user);
-//        Assert.assertEquals("Mismatching user name", user.getName(), USER_NAME);
-//    }
 }

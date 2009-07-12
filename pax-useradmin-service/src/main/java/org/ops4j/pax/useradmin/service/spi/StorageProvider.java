@@ -55,10 +55,6 @@ public interface StorageProvider {
 
     boolean removeMember(Group group, Role role) throws StorageException;
     
-    // retrieving groups a member belongs to
-    
-    Collection<String> getImpliedRoles(String userName);
-
     // property management
     
     void setRoleAttribute(Role role, String key, String value) throws StorageException;

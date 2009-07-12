@@ -22,7 +22,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
@@ -36,11 +35,6 @@ import org.osgi.util.tracker.ServiceTracker;
  * @since 02.07.2009
  */
 public class Activator implements BundleActivator {
-
-    /**
-     * Stored ServiceReference of the UserAdmin service.
-     */
-//    private ServiceReference m_userAdminReference = null;
 
     /**
      * @see BundleActivator#start(BundleContext)
@@ -60,16 +54,11 @@ public class Activator implements BundleActivator {
                                                                        null));
         ServiceRegistration reg = context.registerService(UserAdmin.class.getName(),
                                                           userAdmin, properties);
-//        m_userAdminReference = reg.getReference();
     }
 
     /**
      * @see BundleActivator#stop(BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-//        if (null != m_userAdminReference) {
-//            context.ungetService(m_userAdminReference);
-//            m_userAdminReference = null;
-//        }
     }
 }

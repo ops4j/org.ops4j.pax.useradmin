@@ -119,7 +119,7 @@ public class StorageProviderImpl implements StorageProvider {
         }
         //
         if (null != filter) {
-            if (null == properties) { //) && !"*".equals(filter.toString())) {
+            if (null == properties) {
                 return null;
             }
             Dictionary<String, String> dict = new Hashtable<String, String>(properties);
@@ -196,6 +196,19 @@ public class StorageProviderImpl implements StorageProvider {
         m_preferencesService = new ServiceTracker(m_context, PreferencesService.class.getName(),
                                                   null);
         m_preferencesService.open();
+        //
+        // create the anonymous user if it does not exist
+        //
+        Preferences node = getRootNode();
+        try {
+            if (!node.nodeExists(Role.USER_ANYONE)) {
+                Preferences anyoneNode = node.node(Role.USER_ANYONE);
+                anyoneNode.putInt(NODE_TYPE, Role.USER);
+            }
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error creating anonymous role '" + Role.USER_ANYONE + "': "
+                                         + e.getMessage());
+        }
     }
 
     private Preferences getRootNode() throws StorageException {
@@ -221,7 +234,7 @@ public class StorageProviderImpl implements StorageProvider {
 
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         Preferences node = getRootNode().node(name);
-        node.putInt(NODE_TYPE, Role.USER);
+        node.putInt(NODE_TYPE, Role.GROUP);
         Group group = factory.createGroup(name, null, null);
         try {
             node.flush();
@@ -233,6 +246,9 @@ public class StorageProviderImpl implements StorageProvider {
     }
 
     public void deleteRole(Role role) throws StorageException {
+        if (Role.USER_ANYONE.equals(role.getName())) {
+            return; // never delete the anonymous user
+        }
         try {
             if (getRootNode().nodeExists(role.getName())) {
                 getRootNode().node(role.getName()).removeNode();
@@ -308,11 +324,6 @@ public class StorageProviderImpl implements StorageProvider {
                                        + e.getMessage());
         }
         return true;
-    }
-
-    public Collection<String> getImpliedRoles(String userName) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public void setRoleAttribute(Role role, String key, String value) throws StorageException {

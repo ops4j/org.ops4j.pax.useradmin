@@ -15,9 +15,12 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
+import java.util.Vector;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -118,5 +121,36 @@ public class GroupImpl extends UserImpl implements Group {
 
     public int getType() {
         return Role.GROUP;
+    }
+
+    protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
+        if (checkedRoles.contains(getName())) {
+            return (false);
+        }
+        checkedRoles.add(getName());
+        if (getName().equals(role.getName())) {
+            return (true);
+        }
+        //
+        Collection<String> requiredCheckedRoles = new ArrayList<String>(checkedRoles);
+        Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
+        Role[] members = getRequiredMembers();
+        if (null != members) {
+            for (Role member : members) {
+                if (!((RoleImpl) member).isImpliedBy(role, requiredCheckedRoles)) {
+                    return false;
+                }
+            }
+        }
+        
+        members = getMembers();
+        if (null != members) {
+            for (Role member : members) {
+                if (((RoleImpl) member).isImpliedBy(role, basicCheckedRoles)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

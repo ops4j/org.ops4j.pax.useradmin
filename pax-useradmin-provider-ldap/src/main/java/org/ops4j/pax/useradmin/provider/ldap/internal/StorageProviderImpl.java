@@ -21,6 +21,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.service.internal.UserAdminImpl;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -172,11 +173,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public boolean removeMember(Group group, Role role) throws StorageException {
         // TODO Auto-generated method stub
         return false;
-    }
-    
-    public Collection<String> getImpliedRoles(String userName) {
-        // TODO Auto-generated method stub
-        return null;
     }
     
     public void setRoleAttribute(Role role, String key, String value) throws StorageException {
