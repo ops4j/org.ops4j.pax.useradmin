@@ -96,12 +96,14 @@ public class StorageProviderImpl implements StorageProvider {
         Preferences propertyTypes = node.node(TYPES_NODE);
         propertyTypes.putBoolean(key, true);
         node.put(key, value);
+        node.flush();
     }
 
     private void storeAttribute(Preferences node, String key, byte[] value) throws BackingStoreException {
         Preferences propertyTypes = node.node(TYPES_NODE);
         propertyTypes.putBoolean(key, false);
         node.putByteArray(key, value);
+        node.flush();
     }
 
     private Role loadRole(UserAdminFactory factory, String name, Filter filter) 
@@ -117,7 +119,7 @@ public class StorageProviderImpl implements StorageProvider {
         }
         //
         if (null != filter) {
-            if (null == properties && !"*".equals(filter.toString())) {
+            if (null == properties) { //) && !"*".equals(filter.toString())) {
                 return null;
             }
             Dictionary<String, String> dict = new Hashtable<String, String>(properties);
@@ -194,7 +196,6 @@ public class StorageProviderImpl implements StorageProvider {
         m_preferencesService = new ServiceTracker(m_context, PreferencesService.class.getName(),
                                                   null);
         m_preferencesService.open();
-//        logMessage(this, "Preferences StorageProvider started", LogService.LOG_DEBUG);
     }
 
     private Preferences getRootNode() throws StorageException {
@@ -209,6 +210,12 @@ public class StorageProviderImpl implements StorageProvider {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.USER);
         User user = factory.createUser(name, null, null);
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
+                                       + e.getMessage());
+        }
         return user;
     }
 
@@ -216,6 +223,12 @@ public class StorageProviderImpl implements StorageProvider {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.USER);
         Group group = factory.createGroup(name, null, null);
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
+                                       + e.getMessage());
+        }
         return group;
     }
 
@@ -223,6 +236,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             if (getRootNode().nodeExists(role.getName())) {
                 getRootNode().node(role.getName()).removeNode();
+                getRootNode().flush();
             }
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error removing node '" + role.getName() + "': "
@@ -255,6 +269,12 @@ public class StorageProviderImpl implements StorageProvider {
         }
         //
         node.put(role.getName(), BASIC_MEMBER_STRING);
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
+                                       + e.getMessage());
+        }
         return true;
     }
 
@@ -265,6 +285,12 @@ public class StorageProviderImpl implements StorageProvider {
         }
         //
         node.put(role.getName(), REQUIRED_MEMBER_STRING);
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
+                                       + e.getMessage());
+        }
         return true;
     }
 
@@ -275,6 +301,12 @@ public class StorageProviderImpl implements StorageProvider {
         }
         //
         node.remove(role.getName());
+        try {
+            getRootNode().flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
+                                       + e.getMessage());
+        }
         return true;
     }
 
@@ -287,6 +319,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
             storeAttribute(node, key, value);
+            node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing attribute for role '" + role.getName()
                                        + "': " + e.getMessage());
@@ -297,6 +330,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
             storeAttribute(node, key, value);
+            node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing attribute for role '" + role.getName()
                                        + "': " + e.getMessage());
@@ -307,9 +341,13 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             node.remove(key);
+            getRootNode().flush();
         } catch (IllegalStateException e) {
             throw new StorageException(  "Error removing attribute from role '" + role.getName()
                                        + "': " + e.getMessage());
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error removing attribute from role '" + role.getName()
+                                         + "': " + e.getMessage());
         }
     }
 
@@ -318,6 +356,7 @@ public class StorageProviderImpl implements StorageProvider {
             Preferences node = getRootNode().node(role.getName());
             if (node.nodeExists(PROPERTIES_NODE)) {
                 node.node(PROPERTIES_NODE).removeNode();
+                node.flush();
             }
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error clearing attributes of role '" + role.getName()
@@ -329,6 +368,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             storeAttribute(node, key, value);
+            node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing credential for user '" + user.getName()
                                        + "': " + e.getMessage());
@@ -339,6 +379,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             storeAttribute(node, key, value);
+            node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing credential for user '" + user.getName()
                                        + "': " + e.getMessage());
@@ -349,9 +390,13 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             node.remove(key);
+            getRootNode().flush();
         } catch (IllegalStateException e) {
             throw new StorageException(  "Error removing credential from user '" + user.getName()
                                        + "': " + e.getMessage());
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error removing credential from user '" + user.getName()
+                                         + "': " + e.getMessage());
         }
     }
 
@@ -360,6 +405,7 @@ public class StorageProviderImpl implements StorageProvider {
             Preferences node = getRootNode().node(user.getName());
             if (node.nodeExists(CREDENTIALS_NODE)) {
                 node.node(CREDENTIALS_NODE).removeNode();
+                node.flush();
             }
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error clearing credentials of user '" + user.getName()
@@ -402,7 +448,10 @@ public class StorageProviderImpl implements StorageProvider {
 
     public Collection<Role> findRoles(UserAdminFactory factory, String filterString) throws StorageException {
         try {
-            Filter filter = m_context.createFilter(filterString);
+            Filter filter = null;
+            if (null != filterString) {
+                filter = m_context.createFilter(filterString);
+            }
             Collection<Role> roles = loadRoles(factory, filter);
             return roles;
         } catch (InvalidSyntaxException e) {

@@ -208,9 +208,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     public Role[] getRoles(String filter) throws InvalidSyntaxException {
-        if (filter == null || filter.equals("")) {
-            filter = "*"; // default: filter all roles
-        }
         try {
             StorageProvider storage = getStorageProvider();
             Collection<Role> roles = storage.findRoles(this, filter);

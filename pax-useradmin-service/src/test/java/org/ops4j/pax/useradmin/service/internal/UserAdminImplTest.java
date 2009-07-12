@@ -229,7 +229,7 @@ public class UserAdminImplTest {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(spTracker.getService()).andReturn(sp);
-            EasyMock.expect(sp.findRoles(userAdmin, "*")).andReturn(new ArrayList<Role>());
+            EasyMock.expect(sp.findRoles(userAdmin, null)).andReturn(new ArrayList<Role>());
         } catch (Exception e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -249,7 +249,7 @@ public class UserAdminImplTest {
         roles.add(role);
         try {
             EasyMock.expect(spTracker.getService()).andReturn(sp);
-            EasyMock.expect(sp.findRoles(userAdmin, "*")).andReturn(roles);
+            EasyMock.expect(sp.findRoles(userAdmin, null)).andReturn(roles);
         } catch (Exception e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }

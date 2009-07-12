@@ -13,48 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ops4j.pax.useradmin.itest;
 
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Inject;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.useradmin.Role;
-import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * @author Matthias Kuespert
- * @since  09.07.2009
+ * @since  12.07.2009
  */
-//@RunWith(JUnit4TestRunner.class)
-public class UserManagementXXX {
-    
-    @Inject
-    private BundleContext m_context;
+public abstract class UserAdminTestBase {
+
+    protected abstract BundleContext getBundleContext();
     
     protected UserAdmin getUserAdmin() {
-        ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
+        BundleContext context = getBundleContext();
+        ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
         Assert.assertNotNull("No UserAdmin service reference found", ref);
-        UserAdmin userAdmin = (UserAdmin) m_context.getService(ref);
+        UserAdmin userAdmin = (UserAdmin) context.getService(ref);
         Assert.assertNotNull("No UserAdmin service found", userAdmin);
         return userAdmin;
     }
-    
-//     @Test
-    public void testCreateUser() {
-        
-        System.out.println("------------- start test -----------------");
-        UserAdmin userAdmin = getUserAdmin();
-
-        User user = (User) userAdmin.createRole("jdeveloper", Role.USER);
-        Assert.assertNotNull("Could not create user", user);
-
-        
-    }
-
 }
