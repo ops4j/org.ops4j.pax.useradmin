@@ -69,7 +69,17 @@ public class Preferences_UserManagementTest extends UserManagement {
         super.createAndFindUserOk();
     }
 
-//    @Test
+    @Test
+    public void createAndFindGroupOk() {
+        super.createAndFindGroupOk();
+    }
+
+    @Test
+    public void createAndRemoveUserOk() {
+        super.createAndRemoveUserOk();
+    }
+
+    //    @Test
 //    public void retrieveUser() {
 //        
 //        UserAdmin userAdmin = getUserAdmin();

@@ -180,6 +180,18 @@ public class StorageProviderImpl implements StorageProvider {
         }
         return null;
     }
+    
+    // TODO: use when removing users - check & test
+    private void removeFromGroups(String memberName) throws BackingStoreException, StorageException {
+        String[] roleNames = getRootNode().childrenNames();
+        for (String name : roleNames) {
+            Preferences node = getRootNode().node(name);
+            if (node.nodeExists(MEMBERS_NODE)) {
+                Preferences membersNode = node.node(MEMBERS_NODE);
+                membersNode.remove(memberName);
+            }
+        }
+    }
 
     public void logMessage(Object source, String message, int level) {
         LogService log = (LogService) m_logService.getService();
@@ -245,19 +257,21 @@ public class StorageProviderImpl implements StorageProvider {
         return group;
     }
 
-    public void deleteRole(Role role) throws StorageException {
-        if (Role.USER_ANYONE.equals(role.getName())) {
-            return; // never delete the anonymous user
-        }
-        try {
-            if (getRootNode().nodeExists(role.getName())) {
-                getRootNode().node(role.getName()).removeNode();
-                getRootNode().flush();
+    public boolean deleteRole(Role role) throws StorageException {
+        if (!Role.USER_ANYONE.equals(role.getName())) { // never delete the anonymous user
+            try {
+                if (getRootNode().nodeExists(role.getName())) {
+                    removeFromGroups(role.getName());
+                    getRootNode().node(role.getName()).removeNode();
+                    getRootNode().flush();
+                    return true;
+                }
+            } catch (BackingStoreException e) {
+                throw new StorageException(  "Error removing node '" + role.getName() + "': "
+                                           + e.getMessage());
             }
-        } catch (BackingStoreException e) {
-            throw new StorageException(  "Error removing node '" + role.getName() + "': "
-                                       + e.getMessage());
         }
+        return false;
     }
 
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {

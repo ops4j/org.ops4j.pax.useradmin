@@ -18,7 +18,6 @@ package org.ops4j.pax.useradmin.itest;
 
 import junit.framework.Assert;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.useradmin.Authorization;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
@@ -48,6 +47,12 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
         Group group2 = (Group) userAdmin.createRole(GROUP_NAME2, Role.GROUP);
         Group group3 = (Group) userAdmin.createRole(GROUP_NAME3, Role.GROUP);
         
+        Assert.assertNotNull("User1 is null", user1);
+        Assert.assertNotNull("User2 is null", user2);
+        Assert.assertNotNull("Group1 is null", group1);
+        Assert.assertNotNull("Group2 is null", group2);
+        Assert.assertNotNull("Group3 is null", group3);
+        //
         Assert.assertTrue(group1.addMember(user2));
         Assert.assertTrue(group2.addMember(user1));
         Assert.assertTrue(group2.addMember(user2));

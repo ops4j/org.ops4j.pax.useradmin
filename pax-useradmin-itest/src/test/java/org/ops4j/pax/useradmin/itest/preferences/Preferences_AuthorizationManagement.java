@@ -25,7 +25,6 @@ import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.exam.options.TimeoutOption;
 import org.ops4j.pax.useradmin.itest.AuthorizationManagement;
 import org.osgi.framework.BundleContext;
 
@@ -46,7 +45,8 @@ public class Preferences_AuthorizationManagement extends AuthorizationManagement
     @Configuration
     public static Option[] configure() {
         return options(logProfile(),
-//                       vmOption("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
+                       // rawPaxRunnerOption("--ups"),
+                       // vmOption("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006"),
                        mavenBundle().groupId("org.apache.felix")
                                     .artifactId("org.apache.felix.prefs").version("1.0.2")
                                     .startLevel(1),

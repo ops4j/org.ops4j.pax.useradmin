@@ -50,15 +50,20 @@ public abstract class UserManagement extends UserAdminTestBase {
             Role[] roles = userAdmin.getRoles(null);
             Assert.assertNotNull("No roles returned", roles);
             Assert.assertEquals("Not exactly two roles found", 2, roles.length);
-            Assert.assertNotNull("Invalid role returned", roles[1]);
-            Assert.assertEquals("Role is not a user", Role.USER, roles[1].getType());
-            Assert.assertEquals("Mismatching user name", USER_NAME, roles[1].getName());
+            for  (Role r : roles) {
+                if (USER_NAME.equals(r.getName())) {
+                    Assert.assertNotNull("Invalid role returned", r);
+                    Assert.assertEquals("Role is not a user", Role.USER, r.getType());
+                    return;
+                }
+            }
         } catch (InvalidSyntaxException e) {
             Assert.fail("Invalid filter syntax: " + e.getMessage());
         }
+        Assert.fail("Cannot find user " + USER_NAME);
     }
 
-    public void createAndFindGroupOk() {
+    protected void createAndFindGroupOk() {
         UserAdmin userAdmin = getUserAdmin();
         Group group = (Group) userAdmin.createRole(GROUP_NAME, Role.GROUP);
         Assert.assertNotNull("Could not create group", group);
@@ -66,7 +71,7 @@ public abstract class UserManagement extends UserAdminTestBase {
         //
         // lookup via getRole()
         //
-        Role role = userAdmin.getRole(USER_NAME);
+        Role role = userAdmin.getRole(GROUP_NAME);
         Assert.assertNotNull("No role found with name " + GROUP_NAME, role);
         Assert.assertEquals("Role is not a group", Role.GROUP, role.getType());
         Assert.assertEquals("Mismatching user name", GROUP_NAME, role.getName());
@@ -77,11 +82,38 @@ public abstract class UserManagement extends UserAdminTestBase {
             Role[] roles = userAdmin.getRoles(null);
             Assert.assertNotNull("No roles returned", roles);
             Assert.assertEquals("Not exactly two roles found", 2, roles.length);
-            Assert.assertNotNull("Invalid role returned", roles[1]);
-            Assert.assertEquals("Role is not a group", Role.GROUP, roles[1].getType());
-            Assert.assertEquals("Mismatching user name", GROUP_NAME, roles[1].getName());
+            for  (Role r : roles) {
+                if (GROUP_NAME.equals(r.getName())) {
+                    Assert.assertNotNull("Invalid role returned", r);
+                    Assert.assertEquals("Role is not a user", Role.GROUP, r.getType());
+                    return;
+                }
+            }
         } catch (InvalidSyntaxException e) {
             Assert.fail("Invalid filter syntax: " + e.getMessage());
         }
+        Assert.fail("Cannot find group " + GROUP_NAME);
     }
+
+    protected void createAndRemoveUserOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
+        Assert.assertNotNull("Could not create user", user);
+        Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
+        Group group = (Group) userAdmin.createRole(GROUP_NAME, Role.GROUP);
+        Assert.assertNotNull("Could not create group", group);
+        Assert.assertEquals("Mismatching group name", GROUP_NAME, group.getName());
+        //
+        group.addMember(user);
+        Role[] members = group.getMembers();
+        Assert.assertNotNull("No members found", members);
+        Assert.assertEquals("Mismatching member count", 1, members.length);
+        //
+        // remove user
+        //
+        Assert.assertTrue(userAdmin.removeRole(user.getName()));
+        members = group.getMembers();
+        Assert.assertNull("Unexpected members found", members);
+    }
+
 }

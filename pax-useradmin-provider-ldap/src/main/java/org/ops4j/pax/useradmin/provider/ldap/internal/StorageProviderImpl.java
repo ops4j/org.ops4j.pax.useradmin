@@ -145,9 +145,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return null;
     }
     
-    public void deleteRole(Role role) throws StorageException {
+    public boolean deleteRole(Role role) throws StorageException {
         // TODO Auto-generated method stub
-        
+        return false;
     }
     
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
