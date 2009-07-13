@@ -21,17 +21,32 @@ import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.User;
 
 /**
+ * An interface which provides methods to create implementation objects. This
+ * interface is intended to be used only by implementations of the
+ * <code>StorageProvider</code> interface.
  * 
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
 public interface UserAdminFactory {
 
-    User createUser(String name,
-                    Map<String, String> properties,
-                    Map<String, String> credentials);
+    /**
+     * Create a <code>UserImpl</code> instance.
+     * 
+     * @param name The name of the user.
+     * @param properties The properties of the user.
+     * @param credentials The credentials of the user.
+     * @return A new <code>UserImpl</code> instance.
+     */
+    User createUser(String name, Map<String, String> properties, Map<String, String> credentials);
 
-    Group createGroup(String name,
-                      Map<String, String> properties,
-                      Map<String, String> credentials);
+    /**
+     * Create a <code>GroupImpl</code> instance.
+     * 
+     * @param name The name of the group.
+     * @param properties The properties of the group.
+     * @param credentials The credentials of the group.
+     * @return A new <code>GroupImpl</code> instance.
+     */
+    Group createGroup(String name, Map<String, String> properties, Map<String, String> credentials);
 }

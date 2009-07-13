@@ -23,15 +23,25 @@ import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 
 /**
- * Implementation of the User interface.
+ * Implementation of the <code>User</code> interface.
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009
  */
 public class UserImpl extends RoleImpl implements User {
 
+    /**
+     * The credentials stored for this user.
+     */
     private UserCredentials m_credentials = null;
 
+    /**
+     * Constructor.
+     * 
+     * @see RoleImpl#RoleImpl(String, UserAdminImpl, Map)
+     * 
+     * @param credentials The credentials of this user.
+     */
     protected UserImpl(String name,
                        UserAdminImpl admin,
                        Map<String, String> properties,
@@ -41,11 +51,17 @@ public class UserImpl extends RoleImpl implements User {
         m_credentials = new UserCredentials(this, admin, credentials);
     }
 
+    /**
+     * @see User#getCredentials()
+     */
     @SuppressWarnings(value = "unchecked")
     public Dictionary getCredentials() {
         return m_credentials;
     }
 
+    /**
+     * @see User#hasCredential(String, Object)
+     */
     public boolean hasCredential(String key, Object value) {
         getAdmin().checkAdminPermission();
         if (null != key && null != value && (value instanceof String || value instanceof byte[])) {
@@ -60,10 +76,20 @@ public class UserImpl extends RoleImpl implements User {
         return false;
     }
 
+    /**
+     * @see User#getType()
+     */
     public int getType() {
         return Role.USER;
     }
 
+    /**
+     * Checks if this user is implied by the given role.
+     * 
+     * @param role The role to check.
+     * @param checkedRoles Used for loop detection.
+     * @return True if this role is implied by the given one, false otherwise.
+     */
     protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
             return (false);

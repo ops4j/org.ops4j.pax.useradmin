@@ -22,7 +22,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.UserAdmin;
@@ -52,8 +51,7 @@ public class Activator implements BundleActivator {
                                                     new ServiceTracker(context,
                                                                        EventAdmin.class.getName(),
                                                                        null));
-        ServiceRegistration reg = context.registerService(UserAdmin.class.getName(),
-                                                          userAdmin, properties);
+        context.registerService(UserAdmin.class.getName(), userAdmin, properties);
     }
 
     /**

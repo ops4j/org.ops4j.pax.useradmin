@@ -79,6 +79,14 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      */
     private ServiceTracker      m_eventService     = null;
 
+    /**
+     * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
+     * 
+     * @param context The <code>BundleContext</code>
+     * @param storageService A <code>ServiceTracker</code> to locate the <code>StorageProvider</code> service to use.
+     * @param logService A <code>ServiceTracker</code> to locate the <code>LogService</code> to use.
+     * @param eventService A <code>ServiceTracker</code> to locate the <code>EventAdmin</code> service to use.
+     */
     protected UserAdminImpl(BundleContext context,
                             ServiceTracker storageService,
                             ServiceTracker logService,
@@ -92,6 +100,12 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         m_context = context;
     }
 
+    /**
+     * Maps event codes to strings.
+     * 
+     * @param type The type of the event
+     * @return The event code as string
+     */
     private String getEventTypeName(int type) {
         switch (type) {
             case UserAdminEvent.ROLE_CHANGED:
@@ -108,6 +122,12 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
     }
 
+    /**
+     * Checks if the caller has admin permissions.
+     * 
+     * @throws <code>SecurityException</code> If a security manager exists and
+     *         the caller does not have the UserAdminPermission with name admin.
+     */
     protected void checkAdminPermission() {
         if (m_checkSecurity) {
             SecurityManager securityManager = System.getSecurityManager();
@@ -122,6 +142,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     // ManagedService interface
     
+    /**
+     * @see ManagedService#updated(Dictionary)
+     */
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
@@ -138,6 +161,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     // UserAdmin interface
 
+    /**
+     * @see UserAdmin#createRole(String, int)
+     */
     public Role createRole(String name, int type) {
         if (name == null) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
@@ -176,6 +202,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return null;
     }
 
+    /**
+     * @see UserAdmin#getAuthorization(User)
+     */
     public Authorization getAuthorization(User user) {
         try {
             AuthorizationImpl authorization = new AuthorizationImpl(this, user);
@@ -186,6 +215,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return null;
     }
 
+    /**
+     * @see UserAdmin#getRole(String)
+     */
     public Role getRole(String name) {
         if (name == null) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
@@ -200,6 +232,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return null;
     }
 
+    /**
+     * @see UserAdmin#getRoles(String)
+     */
     public Role[] getRoles(String filter) throws InvalidSyntaxException {
         try {
             StorageProvider storage = getStorageProvider();
@@ -213,6 +248,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return null;
     }
 
+    /**
+     * @see UserAdmin#getUser(String, String)
+     */
     public User getUser(String key, String value) {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
@@ -231,25 +269,35 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return null;
     }
 
+    /**
+     * @see UserAdmin#removeRole(String)
+     */
     public boolean removeRole(String name) {
-        Role role = getRole(name);
-        if (null == role) {
-            return false;
-        }
-        checkAdminPermission();
-        try {
-            StorageProvider storageProvider = getStorageProvider();
-            storageProvider.deleteRole(role);
-            fireEvent(UserAdminEvent.ROLE_REMOVED, role);
-            return true;
-        } catch (StorageException e) {
-            logMessage(this, "error when deleting role: " + e.getMessage(), LogService.LOG_ERROR);
+        if (null != name) {
+            Role role = getRole(name);
+            if (null != role) {
+                checkAdminPermission();
+                try {
+                    StorageProvider storageProvider = getStorageProvider();
+                    if (storageProvider.deleteRole(role)) {
+                        fireEvent(UserAdminEvent.ROLE_REMOVED, role);
+                        return true;
+                    } else {
+                        logMessage(this, "Role '" + name + "'could not be deleted", LogService.LOG_ERROR);
+                    }
+                } catch (StorageException e) {
+                    logMessage(this, "error when deleting role: " + e.getMessage(), LogService.LOG_ERROR);
+                }
+            }
         }
         return false;
     }
 
     // UserAdminUtil interface
 
+    /**
+     * @see UserAdminUtil#getStorageProvider()
+     */
     public StorageProvider getStorageProvider() throws StorageException {
         if (null == m_storageService) {
             throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
@@ -261,6 +309,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return storageProvider;
     }
 
+    /**
+     * @see UserAdminUtil#logMessage(Object, String, int)
+     */
     public void logMessage(Object source, String message, int level) {
         LogService log = null != m_logService ? (LogService) m_logService.getService()
                                               : null;
@@ -269,6 +320,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
     }
 
+    /**
+     * @see UserAdminUtil#fireEvent(int, Role)
+     */
     public void fireEvent(int type, Role role) {
         EventAdmin eventAdmin = null != m_eventService ? (EventAdmin) m_eventService.getService()
                                                        : null;
@@ -295,6 +349,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
     }
 
+    /**
+     * @see UserAdminUtil#checkPermission(String, String)
+     */
     public void checkPermission(String name, String action) {
         if (m_checkSecurity) {
             SecurityManager securityManager = System.getSecurityManager();
@@ -306,6 +363,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     
     // UserAdminFactory interface
     
+    /**
+     * @see UserAdminFactory#createUser(String, Map, Map)
+     */
     public User createUser(String name,
                            Map<String, String> properties,
                            Map<String, String> credentials) {
@@ -313,6 +373,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return user;
     }
 
+    /**
+     * @see UserAdminFactory#createGroup(String, Map, Map)
+     */
     public Group createGroup(String name,
                              Map<String, String> properties,
                              Map<String, String> credentials) {

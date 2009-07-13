@@ -16,7 +16,7 @@
 package org.ops4j.pax.useradmin.service.internal;
 
 /**
- * Message texts.
+ * Message texts which are used more than once.
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009

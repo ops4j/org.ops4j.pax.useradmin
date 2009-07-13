@@ -17,10 +17,7 @@ package org.ops4j.pax.useradmin.service.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Map;
-import java.util.Vector;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -35,6 +32,11 @@ import org.osgi.service.useradmin.Role;
  */
 public class GroupImpl extends UserImpl implements Group {
 
+    /**
+     * Constructor.
+     * 
+     * @see UserImpl#UserImpl(String, UserAdminImpl, Map, Map)
+     */
     protected GroupImpl(String name,
                         UserAdminImpl admin,
                         Map<String, String> properties,
@@ -42,6 +44,9 @@ public class GroupImpl extends UserImpl implements Group {
         super(name, admin, properties, credentials);
     }
 
+    /**
+     * @see Group#addMember(Role)
+     */
     public boolean addMember(Role role) {
         if (role != null) {
             try {
@@ -59,6 +64,9 @@ public class GroupImpl extends UserImpl implements Group {
         return false;
     }
 
+    /**
+     * @see Group#addRequiredMember(Role)
+     */
     public boolean addRequiredMember(Role role) {
         if (role != null) {
             try {
@@ -74,6 +82,9 @@ public class GroupImpl extends UserImpl implements Group {
         return false;
     }
 
+    /**
+     * @see Group#removeMember(Role)
+     */
     public boolean removeMember(Role role) {
         if (role != null) {
             try {
@@ -89,6 +100,9 @@ public class GroupImpl extends UserImpl implements Group {
         return false;
     }
 
+    /**
+     * @see Group#getMembers()
+     */
     public Role[] getMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
@@ -104,6 +118,9 @@ public class GroupImpl extends UserImpl implements Group {
         return null;
     }
 
+    /**
+     * @see Group#getRequiredMembers()
+     */
     public Role[] getRequiredMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
@@ -119,10 +136,20 @@ public class GroupImpl extends UserImpl implements Group {
         return null;
     }
 
+    /**
+     * @see Group#getType()
+     */
     public int getType() {
         return Role.GROUP;
     }
 
+    /**
+     * Checks if this group is implied by the given role.
+     * 
+     * @param role The role to check.
+     * @param checkedRoles Used for loop detection.
+     * @return True if this role is implied by the given one, false otherwise.
+     */
     protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
             return (false);

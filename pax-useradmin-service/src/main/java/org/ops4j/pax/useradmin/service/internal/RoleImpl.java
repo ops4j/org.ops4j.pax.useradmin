@@ -50,13 +50,10 @@ public class RoleImpl implements Role {
     /**
      * Constructor.
      * 
-     * @param name
-     *            The name of the role.
-     * @param admin
-     *            The UserAdmin that uses this role.
-     * @param properties
-     *            A map containing the raw properties of this role as read by
-     *            the StorageProvider.
+     * @param name The name of the role.
+     * @param admin The UserAdmin that uses this role.
+     * @param properties A map containing the raw properties of this role as
+     *            read by the StorageProvider.
      */
     protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, String> properties) {
         if (name == null) {
@@ -93,10 +90,20 @@ public class RoleImpl implements Role {
         return Role.ROLE;
     }
 
+    /**
+     * @return The <code>UserAdminImpl</code> object that created this role.
+     */
     protected UserAdminImpl getAdmin() {
         return m_admin;
     }
     
+    /**
+     * Checks if this role is implied by the given one.
+     * 
+     * @param role The role to check.
+     * @param checkedRoles Used for loop detection.
+     * @return True if this role is implied by the given one, false otherwise.
+     */
     protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
             return (false);

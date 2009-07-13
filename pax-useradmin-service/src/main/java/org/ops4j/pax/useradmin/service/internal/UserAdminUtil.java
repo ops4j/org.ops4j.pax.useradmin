@@ -23,12 +23,46 @@ import org.osgi.service.useradmin.Role;
  * Collection of utility methods.
  * 
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
 public interface UserAdminUtil {
 
-	void checkPermission(String permission, String credential);
-	StorageProvider getStorageProvider() throws StorageException;
-	void logMessage(Object source, String message, int level);
-	void fireEvent(int type, Role role);
+    /**
+     * Checks if the caller has the specified permission.
+     * 
+     * @param permission The name of the permission, e.g. the name of a property
+     *            to change.
+     * @param credential The <code>UserAdminPermission</code> code.
+     * 
+     * @throws <code>SecurityException</code> If a security manager exists and
+     *         the caller does not have the UserAdminPermission with name admin.
+     */
+    void checkPermission(String permission, String credential);
+
+    /**
+     * Provides access to the <code>StorageProvider</code> used to persist data.
+     * 
+     * @return An instance of the <code>StorageProvider</code> service.
+     * @throws StorageException If the <code>StorageProvider</code> service is
+     *             not available.
+     */
+    StorageProvider getStorageProvider() throws StorageException;
+
+    /**
+     * Prints the given message to the logger. If no logging service is
+     * available the call is silently ignored.
+     * 
+     * @param source The object which sends the message.
+     * @param message The message text.
+     * @param level The log level.
+     */
+    void logMessage(Object source, String message, int level);
+
+    /**
+     * Publish an event of the given type related to the role specified.
+     * 
+     * @param type The type of event - see <code>UserAdminEvent</code>.
+     * @param role The role which is related to the event.
+     */
+    void fireEvent(int type, Role role);
 }
