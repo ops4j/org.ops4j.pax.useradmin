@@ -36,31 +36,49 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
     private static final String GROUP_NAME1 = "developers";
     private static final String GROUP_NAME2 = "people";
     private static final String GROUP_NAME3 = "admins";
+    private static final String GROUP_NAME4 = "additional-admins";
     
+    private User user1 = null;
+    private User user2 = null;
+
+    private Group group1 = null;
+    private Group group2 = null;
+    private Group group3 = null;
+    private Group group4 = null;
     
-    public void hasRole() {
-        
+    protected void setup() {
         UserAdmin userAdmin = getUserAdmin();
-        User user1 = (User) userAdmin.createRole(USER_NAME1, Role.USER);
-        User user2 = (User) userAdmin.createRole(USER_NAME2, Role.USER);
-        Group group1 = (Group) userAdmin.createRole(GROUP_NAME1, Role.GROUP);
-        Group group2 = (Group) userAdmin.createRole(GROUP_NAME2, Role.GROUP);
-        Group group3 = (Group) userAdmin.createRole(GROUP_NAME3, Role.GROUP);
-        
+        user1 = (User) userAdmin.createRole(USER_NAME1, Role.USER);
+        user2 = (User) userAdmin.createRole(USER_NAME2, Role.USER);
+        group1 = (Group) userAdmin.createRole(GROUP_NAME1, Role.GROUP);
+        group2 = (Group) userAdmin.createRole(GROUP_NAME2, Role.GROUP);
+        group3 = (Group) userAdmin.createRole(GROUP_NAME3, Role.GROUP);
+        group4 = (Group) userAdmin.createRole(GROUP_NAME4, Role.GROUP);
+        //
         Assert.assertNotNull("User1 is null", user1);
         Assert.assertNotNull("User2 is null", user2);
         Assert.assertNotNull("Group1 is null", group1);
         Assert.assertNotNull("Group2 is null", group2);
         Assert.assertNotNull("Group3 is null", group3);
+        Assert.assertNotNull("Group4 is null", group4);
         //
         Assert.assertTrue(group1.addMember(user2));
+        Assert.assertNotNull("Group has no members", group1.getMembers());
+        Assert.assertEquals("Mismatching member count", 1, group1.getMembers().length);
+        //
         Assert.assertTrue(group2.addMember(user1));
         Assert.assertTrue(group2.addMember(user2));
+        Assert.assertNotNull("Group has no members", group2.getMembers());
+        Assert.assertEquals("Mismatching member count", 2, group2.getMembers().length);
+        //
         Assert.assertTrue(group3.addMember(user1));
-        
+        Assert.assertTrue(group3.addMember(group4));
         Assert.assertNotNull("Group has no members", group3.getMembers());
-        Assert.assertEquals("Mismatching member count", 1, group3.getMembers().length);
-
+        Assert.assertEquals("Mismatching member count", 2, group3.getMembers().length);
+    }
+    
+    protected void hasRole() {
+        UserAdmin userAdmin = getUserAdmin();
         Authorization auth = userAdmin.getAuthorization(user1);
         Assert.assertNotNull("No Authorization found", auth);
         Assert.assertTrue("Role not authorized", auth.hasRole(GROUP_NAME3));

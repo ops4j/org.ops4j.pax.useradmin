@@ -23,6 +23,8 @@ import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
 
 /**
+ * User management related tests.
+ * 
  * @author Matthias Kuespert
  * @since  09.07.2009
  */
@@ -115,5 +117,4 @@ public abstract class UserManagement extends UserAdminTestBase {
         members = group.getMembers();
         Assert.assertNull("Unexpected members found", members);
     }
-
 }

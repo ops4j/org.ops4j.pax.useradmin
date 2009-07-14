@@ -15,19 +15,48 @@
  */
 package org.ops4j.pax.useradmin.itest;
 
+import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.*;
+
 import org.junit.Assert;
+import org.ops4j.pax.exam.Option;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.useradmin.UserAdmin;
 
 /**
+ * Abstract base class for all integration tests.
+ * 
  * @author Matthias Kuespert
- * @since  12.07.2009
+ * @since 12.07.2009
  */
 public abstract class UserAdminTestBase {
 
+    /**
+     * Abstract method used to retrieve the <code>BundleContext</code>.
+     * 
+     * @return <code>BundleContext</code> used throughout the tests.
+     */
     protected abstract BundleContext getBundleContext();
-    
+
+    /**
+     * @return The basic OSGi framework configuration used to run the tests.
+     */
+    protected static Option getBasicFrameworkConfiguration() {
+        return composite(logProfile(),
+                         mavenBundle().groupId("org.apache.felix")
+                                      .artifactId("org.apache.felix.prefs")
+                                      .version("1.0.2")
+                                      .startLevel(1),
+                         mavenBundle().groupId("org.ops4j.pax.useradmin")
+                                      .artifactId("pax-useradmin-service")
+                                      .version("0.0.1-SNAPSHOT")
+                                      .startLevel(5));
+    }
+
+    /**
+     * @return The <code>UserAdmin</code> service instance to test.
+     */
     protected UserAdmin getUserAdmin() {
         BundleContext context = getBundleContext();
         ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
