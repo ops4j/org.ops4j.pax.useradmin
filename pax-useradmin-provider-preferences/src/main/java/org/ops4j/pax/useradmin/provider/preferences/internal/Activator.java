@@ -20,8 +20,11 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 /**
+ * Activator which starts the PreferencesService based
+ * <code>StorageProvider</code> service.
+ * 
  * @author Matthias Kuespert
- * @since  08.07.2009
+ * @since 08.07.2009
  */
 public class Activator implements BundleActivator {
 
@@ -29,15 +32,13 @@ public class Activator implements BundleActivator {
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        context.registerService(StorageProvider.class.getName(), new StorageProviderImpl(context), null);
+        context.registerService(StorageProvider.class.getName(), new StorageProviderImpl(context),
+                                null);
     }
 
     /**
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        // TODO Auto-generated method stub
-
     }
-
 }

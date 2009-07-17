@@ -63,4 +63,14 @@ public class UserManagementTest extends UserManagement {
     public void createAndRemoveUserOk() {
         super.createAndRemoveUserOk();
     }
+
+    @Test
+    public void setAndGetAttributesOk() {
+        super.setAndGetAttributesOk();
+    }
+
+    @Test
+    public void setAndGetCredentialsOk() {
+        super.setAndGetCredentialsOk();
+    }
 }

@@ -159,19 +159,19 @@ public class GroupImpl extends UserImpl implements Group {
             return (true);
         }
         //
-        Collection<String> requiredCheckedRoles = new ArrayList<String>(checkedRoles);
-        Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
         Role[] members = getRequiredMembers();
         if (null != members) {
+            Collection<String> requiredCheckedRoles = new ArrayList<String>(checkedRoles);
             for (Role member : members) {
                 if (!((RoleImpl) member).isImpliedBy(role, requiredCheckedRoles)) {
                     return false;
                 }
             }
         }
-        
+        //
         members = getMembers();
         if (null != members) {
+            Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
             for (Role member : members) {
                 if (((RoleImpl) member).isImpliedBy(role, basicCheckedRoles)) {
                     return true;

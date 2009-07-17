@@ -117,4 +117,58 @@ public abstract class UserManagement extends UserAdminTestBase {
         members = group.getMembers();
         Assert.assertNull("Unexpected members found", members);
     }
+    
+    @SuppressWarnings(value = "unchecked")
+    protected void setAndGetAttributesOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
+        Assert.assertNotNull("Could not create user", user);
+        Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
+        //
+        Assert.assertNull("Value 1 not set", user.getProperties().put("", "emptyKeyValue"));
+        Assert.assertNull("Value 2 not set", user.getProperties().put("stringKey", "stringKeyValue"));
+        Assert.assertNull("Value 3 not set", user.getProperties().put("byteKey", "byteKeyValue".getBytes()));
+        //
+        String stringValue;
+        byte[] byteValue;
+        stringValue = (String) user.getProperties().get("");
+        Assert.assertNotNull(stringValue);
+        Assert.assertEquals("emptyKeyValue", stringValue);
+        stringValue = (String) user.getProperties().get("stringKey");
+        Assert.assertNotNull(stringValue);
+        Assert.assertEquals("stringKeyValue", stringValue);
+        byteValue = (byte[]) user.getProperties().get("byteKey");
+        Assert.assertNotNull(byteValue);
+        Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
+        //
+        Assert.assertNotNull(user.getProperties().put("", "emptyKeyChangedValue"));
+        Assert.assertEquals("emptyKeyChangedValue", (String) user.getProperties().get(""));
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    protected void setAndGetCredentialsOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
+        Assert.assertNotNull("Could not create user", user);
+        Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
+        //
+        Assert.assertNull("Value 1 not set", user.getCredentials().put("", "emptyKeyValue"));
+        Assert.assertNull("Value 2 not set", user.getCredentials().put("stringKey", "stringKeyValue"));
+        Assert.assertNull("Value 3 not set", user.getCredentials().put("byteKey", "byteKeyValue".getBytes()));
+        //
+        String stringValue;
+        byte[] byteValue;
+        stringValue = (String) user.getCredentials().get("");
+        Assert.assertNotNull(stringValue);
+        Assert.assertEquals("emptyKeyValue", stringValue);
+        stringValue = (String) user.getCredentials().get("stringKey");
+        Assert.assertNotNull(stringValue);
+        Assert.assertEquals("stringKeyValue", stringValue);
+        byteValue = (byte[]) user.getCredentials().get("byteKey");
+        Assert.assertNotNull(byteValue);
+        Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
+        //
+        Assert.assertNotNull(user.getCredentials().put("", "emptyKeyChangedValue"));
+        Assert.assertEquals("emptyKeyChangedValue", (String) user.getCredentials().get(""));
+    }
 }

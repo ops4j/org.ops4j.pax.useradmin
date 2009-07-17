@@ -38,6 +38,8 @@ import org.osgi.service.useradmin.User;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
+ * A PreferencesService based <code>StorageProvider</code> service.
+ * 
  * @author Matthias Kuespert
  * @since 08.07.2009
  */
@@ -164,10 +166,10 @@ public class StorageProviderImpl implements StorageProvider {
 
     protected Collection<Role> loadMembers(UserAdminFactory factory, Group group, String memberType) throws BackingStoreException,
         StorageException {
+        Collection<Role> members = new ArrayList<Role>();
         Preferences node = getRootNode().node(group.getName());
         if (node.nodeExists(MEMBERS_NODE)) {
             Preferences membersNode = node.node(MEMBERS_NODE);
-            Collection<Role> members = new ArrayList<Role>();
             for (String name : membersNode.keys()) {
                 if (memberType.equals(membersNode.get(name, ""))) {
                     Role role = loadRole(factory, name, null);
@@ -176,9 +178,8 @@ public class StorageProviderImpl implements StorageProvider {
                     }
                 }
             }
-            return members;
         }
-        return null;
+        return members;
     }
     
     // TODO: use when removing users - check & test

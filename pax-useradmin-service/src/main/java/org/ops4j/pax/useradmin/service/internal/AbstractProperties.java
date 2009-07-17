@@ -119,7 +119,11 @@ public abstract class AbstractProperties extends Hashtable {
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
-            store(storageProvider, (String) key, (String) value);
+            if (value instanceof String) {
+                store(storageProvider, (String) key, (String) value);
+            } else {
+                store(storageProvider, (String) key, (byte[]) value);
+            }
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
             return super.put(key, value);
         } catch (StorageException e) {
