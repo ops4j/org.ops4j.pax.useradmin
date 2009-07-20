@@ -21,11 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.osgi.service.cm.ConfigurationException;
 
-// import com.novell.ldap.LDAPConnection;
-// import com.novell.ldap.LDAPException;
+ import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPException;
 
 /**
  * Wraps the core Ldap access.
@@ -35,25 +36,25 @@ import org.osgi.service.cm.ConfigurationException;
  */
 public class LdapWrapper {
 
-//    private LDAPConnection m_connection = null;
+    private LDAPConnection m_connection = null;
 
-    protected void stop() { // throws LDAPException {
-/*        if (null != m_connection) {
+    protected void stop() throws LDAPException {
+        if (null != m_connection) {
             m_connection.disconnect();
         }
-*/    }
+    }
 
     /**
      * @return The LDAPConnection used to access the Ldap server.
      * @throws StorageException If no template is set, i.e. init() has not been called.
      */
-/*    private LDAPConnection getConnection() throws StorageException {
+    protected LDAPConnection getConnection() throws StorageException {
         if (null == m_connection) {
             throw new StorageException("no Ldap connection available - check your configuration");
         }
         return m_connection;
     }
-*/    
+    
     /**
      * Initialize the wrapper with the given properties.
      * 
@@ -62,36 +63,40 @@ public class LdapWrapper {
      */
     public void init(Dictionary<String, String> properties) throws ConfigurationException {
 
-/*        try {
-            stop();
-            //
-            if (null == m_connection) {
-                m_connection = new LDAPConnection();
-            }
-            //
-            String host = StorageProviderImpl.getMandatoryProperty(properties,
-                                                                   StorageProviderImpl.PROP_LDAP_SERVER_URL);
-            String port = StorageProviderImpl.getMandatoryProperty(properties,
-                                                                   StorageProviderImpl.PROP_LDAP_SERVER_PORT);
-            m_connection.connect(host, new Integer(port));
-            
-             TODO: authentication
-            m_connection.bind(loginDN, password.getBytes("UTF8") );
-            
-            m_connection.bind(LDAPConnection.LDAP_V3, "", "".getBytes("UTF8"));
+        if (null != properties) {
+            try {
+                stop();
+                //
+                if (null == m_connection) {
+                    m_connection = new LDAPConnection();
+                }
+                //
+//                String host = StorageProviderImpl.getMandatoryProperty(properties,
+//                                                                       ConfigurationConstants.PROP_LDAP_SERVER_URL);
+//                String port = StorageProviderImpl.getMandatoryProperty(properties,
+//                                                                       ConfigurationConstants.PROP_LDAP_SERVER_PORT);
+//                m_connection.connect(host, new Integer(port));
+                
+                // TODO: authentication
+//                m_connection.bind(loginDN, password.getBytes("UTF8") );
+                
+                m_connection.bind(LDAPConnection.LDAP_V3, "", "".getBytes("UTF8"));
 
-        } catch (LDAPException e) {
-            throw new ConfigurationException(null,   "LDAPException during intialization: "
-                                                   + e.getMessage());
-        } catch (UnsupportedEncodingException e) {
-            throw new ConfigurationException(null,   "Usupported encoding during intialization: "
-                                                   + e.getMessage());
+            } catch (LDAPException e) {
+                throw new ConfigurationException(null,   "LDAPException during intialization: "
+                                                       + e.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                throw new ConfigurationException(null,   "Usupported encoding during intialization: "
+                                                       + e.getMessage());
+            }
+        } else {
+            System.out.println("----------------------------------> no properties ---------------------------------");
+            // throw new ConfigurationException(null, "No properties given for intialization");
         }
-*/
     }
 
     public List<Map<String, String>> searchRoles(String base, String filter) throws StorageException {
-/*        LDAPConnection connection = getConnection();
+        LDAPConnection connection = getConnection();
         
         
         try {
@@ -100,7 +105,7 @@ public class LdapWrapper {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-*/        return null;
+        return null;
     }
 
 }

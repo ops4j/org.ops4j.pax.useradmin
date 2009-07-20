@@ -45,9 +45,11 @@ public abstract class UserAdminTestBase {
     protected static Option getBasicFrameworkConfiguration() {
         return composite(logProfile(),
                          mavenBundle().groupId("org.apache.felix")
-                                      .artifactId("org.apache.felix.prefs")
-                                      .version("1.0.2")
-                                      .startLevel(1),
+                                      .artifactId("org.apache.felix.eventadmin")
+                                      .version("1.0.0").startLevel(1),
+                         mavenBundle().groupId("org.apache.felix")
+                                      .artifactId("org.apache.felix.configadmin")
+                                      .version("1.0.4").startLevel(1),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-service")
                                       .version("0.0.1-SNAPSHOT")

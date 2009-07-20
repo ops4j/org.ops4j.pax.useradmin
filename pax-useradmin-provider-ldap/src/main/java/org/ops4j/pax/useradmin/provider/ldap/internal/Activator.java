@@ -15,9 +15,17 @@
  */
 package org.ops4j.pax.useradmin.provider.ldap.internal;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.service.cm.ManagedService;
+
+import com.novell.ldap.LDAPConnection;
 
 /**
  * Activator of the Pax UserAdmin bundle.
@@ -36,8 +44,18 @@ public class Activator implements BundleActivator {
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        m_serviceImpl = new StorageProviderImpl(null);
-        context.registerService(StorageProvider.class.getName(), m_serviceImpl, null);
+        m_serviceImpl = new StorageProviderImpl(context, new LDAPConnection());
+        
+//        Dictionary<String, String> properties = new Hashtable<String, String>();
+//        properties.put(StorageProviderImpl.PROP_LDAP_SERVER_URL, StorageProviderImpl.DEFAULT_LDAP_SERVER_URL);
+//        properties.put(StorageProviderImpl.PROP_LDAP_SERVER_PORT, StorageProviderImpl.DEFAULT_LDAP_SERVER_PORT);
+//        properties.put(StorageProviderImpl.PROP_LDAP_ROOT_DN, StorageProviderImpl.DEFAULT_LDAP_ROOT_DN);
+//        m_serviceImpl.updated(properties);
+        
+        
+        Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
+        serviceProperties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
+        context.registerService(new String[] { StorageProvider.class.getName(), ManagedService.class.getName() }, m_serviceImpl, serviceProperties);
     }
 
     /**
@@ -45,7 +63,7 @@ public class Activator implements BundleActivator {
      */
     public void stop(BundleContext context) throws Exception {
         if (null != m_serviceImpl) {
-            m_serviceImpl.stop();
+//            m_serviceImpl.stop();
         }
     }
 

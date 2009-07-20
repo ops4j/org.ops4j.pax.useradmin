@@ -178,9 +178,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
         checkAdminPermission();
         //
+        Role role = null;
         try {
             StorageProvider storageProvider = getStorageProvider();
-            Role role = null;
             switch (type) {
                 case org.osgi.service.useradmin.Role.USER:
                     role = storageProvider.createUser(this, name);
@@ -194,12 +194,15 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                     // never reached b/o previous checks
                     break;
             }
-            fireEvent(UserAdminEvent.ROLE_CREATED, role);
-            return role;
+            if (null != role) {
+                fireEvent(UserAdminEvent.ROLE_CREATED, role);
+            } else {
+                logMessage(this, "role was not created", LogService.LOG_ERROR);
+            }
         } catch (StorageException e) {
-            logMessage(this, "error when creating role: ", LogService.LOG_ERROR);
+            logMessage(this, "error when creating role: " + e.getMessage(), LogService.LOG_ERROR);
         }
-        return null;
+        return role;
     }
 
     /**
@@ -333,8 +336,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             Dictionary<String, Object> properties = new Hashtable<String, Object>();
             properties.put("event", uaEvent);
             properties.put("role", role);
-            properties.put("role.name", role.getName());
-            properties.put("role.type", role.getType());
+            properties.put("role.name", null != role ? role.getName() : "n/a");
+            properties.put("role.type", null != role ? role.getType() : "n/a");
             properties.put("service", ref);
             properties.put("service.id", ref.getProperty(Constants.SERVICE_ID));
             properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
@@ -343,8 +346,12 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             Event event = new Event(EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
         } else {
-            logMessage(this, "No event service available - cannot send event of type '"
-                            + getEventTypeName(type) + "' for role '" + role.getName() + "'",
+            String message = "No event service available - cannot send event of type '"
+                + getEventTypeName(type) + "'";
+            if (null != role) {
+                message += " for role '" + role.getName() + "'";
+            }
+            logMessage(this, message,
                        LogService.LOG_ERROR);
         }
     }

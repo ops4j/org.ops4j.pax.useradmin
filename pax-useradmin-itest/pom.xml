@@ -11,7 +11,7 @@
 
 	<groupId>org.ops4j.pax</groupId>
 	<artifactId>pax-useradmin-itest</artifactId>
-    <name>Pax UserAdmin Integration Tests</name>
+  <name>Pax UserAdmin Integration Tests</name>
 	<packaging>jar</packaging>
 
 <!-- 
@@ -52,11 +52,17 @@
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
+      <groupId>org.ops4j.pax.useradmin</groupId>
 			<artifactId>pax-useradmin-service</artifactId>
-			<groupId>org.ops4j.pax.useradmin</groupId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.useradmin</groupId>
+      <artifactId>pax-useradmin-provider-ldap</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
 	</dependencies>
 
 </project>

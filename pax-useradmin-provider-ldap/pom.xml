@@ -34,7 +34,7 @@
 			<artifactId>org.osgi.compendium</artifactId>
 			<scope>provided</scope>
 		</dependency>
-	
+
 		<dependency>
 			<artifactId>pax-useradmin-service</artifactId>
 			<groupId>org.ops4j.pax.useradmin</groupId>
@@ -42,14 +42,20 @@
 			<scope>provided</scope>
 		</dependency>
 
-<!-- 	
 		<dependency>
 			<groupId>com.novell.ldap</groupId>
 			<artifactId>jldap</artifactId>
 			<version>4.3</version>
-            <scope>compile</scope>
+			<scope>compile</scope>
 		</dependency>
- -->
+
+		<dependency>
+			<groupId>org.openspml</groupId>
+			<artifactId>openspml</artifactId>
+			<version>0.5</version>
+      <scope>compile</scope>
+		</dependency>
+		 
 	</dependencies>
  
 </project>

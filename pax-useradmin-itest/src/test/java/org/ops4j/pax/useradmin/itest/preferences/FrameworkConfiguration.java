@@ -33,8 +33,13 @@ public class FrameworkConfiguration {
      *         service based variant of the UserAdmin service
      */
     protected static Option get() {
-        return composite(mavenBundle().groupId("org.ops4j.pax.useradmin")
+        return composite(mavenBundle().groupId("org.apache.felix")
+                                      .artifactId("org.apache.felix.prefs")
+                                      .version("1.0.2")
+                                      .startLevel(1),
+                         mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-provider-preferences")
-                                      .version("0.0.1-SNAPSHOT").startLevel(4));
+                                      .version("0.0.1-SNAPSHOT")
+                                      .startLevel(4));
     }
 }
