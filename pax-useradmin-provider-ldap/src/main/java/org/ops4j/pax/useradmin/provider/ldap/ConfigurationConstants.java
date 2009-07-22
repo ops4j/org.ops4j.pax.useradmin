@@ -41,13 +41,21 @@ public class ConfigurationConstants {
     public static final String DEFAULT_LDAP_ROOT_GROUPS    = "ou=groups";
     
     public static final String PROP_USER_OBJECTCLASS       = "org.ops4j.pax.user.ldap.user.objectclass";
-    public static final String PROP_USER_IDATTR            = "org.ops4j.pax.user.ldap.user.idattr";
+    public static final String PROP_USER_ATTR_ID           = "org.ops4j.pax.user.ldap.user.attr.id";
+    public static final String PROP_USER_ATTR_INITIAL      = "org.ops4j.pax.user.ldap.user.attr.initial";
+    
     public static final String PROP_GROUP_OBJECTCLASS      = "org.ops4j.pax.user.ldap.group.objectclass";
-    public static final String PROP_GROUP_IDATTR           = "org.ops4j.pax.user.ldap.group.idattr";
+    public static final String PROP_GROUP_ATTR_ID          = "org.ops4j.pax.user.ldap.group.attr.id";
+    public static final String PROP_GROUP_ATTR_INITIAL     = "org.ops4j.pax.user.ldap.group.attr.initial";
+    public static final String PROP_GROUP_ATTR_MEMBER      = "org.ops4j.pax.user.ldap.group.attr.member";
     
     public static final String DEFAULT_USER_OBJECTCLASS    = "organizationalPerson, inetOrgPerson, person, top";
-    public static final String DEFAULT_USER_IDATTR         = "uid";
-    public static final String DEFAULT_GROUP_OBJECTCLASS   = "organizationalRole, top ";
-    public static final String DEFAULT_GROUP_IDATTR        = "cn";
+    public static final String DEFAULT_USER_ATTR_ID        = "uid";
+    public static final String DEFAULT_USER_ATTR_INITIAL   = "cn, sn";
+
+    public static final String DEFAULT_GROUP_OBJECTCLASS   = "groupOfNames, top ";
+    public static final String DEFAULT_GROUP_ATTR_ID       = "cn";
+    public static final String DEFAULT_GROUP_ATTR_INITIAL  = "";
+    public static final String DEFAULT_GROUP_ATTR_MEMBER   = "member";
 
 }

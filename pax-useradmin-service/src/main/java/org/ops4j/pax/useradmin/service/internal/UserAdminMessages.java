@@ -31,7 +31,9 @@ public class UserAdminMessages {
 	public static String MSG_INVALID_KEY_TYPE = "Only String is allowed as key for role properties";
     public static String MSG_INVALID_VALUE = "The 'value' parameter must not be null";
 	public static String MSG_INVALID_VALUE_TYPE = "Only String or byte[] is allowed as value for role properties";
-	public static String MSG_INVALID_ROLE = "The 'role' parameter must not be null";
+    public static String MSG_INVALID_ROLE = "The 'role' parameter must not be null";
+    public static String MSG_INVALID_FILTER = "The 'filter' parameter must not be null";
+    public static String MSG_INVALID_USER = "The 'user' parameter must not be null";
 	public static String MSG_INVALID_USERADMIN = "The 'userAdmin' parameter must not be null";
 	public static String MSG_INVALID_STORAGE = "The 'storageProvider' parameter must not be null";
 

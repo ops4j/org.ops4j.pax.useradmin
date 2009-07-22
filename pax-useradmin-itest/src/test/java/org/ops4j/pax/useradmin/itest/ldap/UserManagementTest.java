@@ -72,25 +72,7 @@ public class UserManagementTest extends UserManagement {
 
     @Test
     public void createAndFindUserOk() {
-        
-        UserAdmin admin = getUserAdmin();
         super.createAndFindUserOk();
-
-        
-//        try {
-//            // Role[] roles = admin.getRoles("(|(objectClass=organizationalPerson)(objectClass=organizationalRole))");
-////            Role[] roles = admin.getRoles("(|(uid=jdeveloper)(cn=jdeveloper))");
-//            Role[] roles = admin.getRoles("uid=jdeveloper");
-//            if (null != roles) {
-//                for (Role role : roles) {
-//                    System.out.println(" -------------- found role: " + role.getName());
-//                }
-//            } else System.out.println(" ---------------- nothing found");
-//        } catch (InvalidSyntaxException e) {
-//            Assert.fail(e.getMessage());
-//        }
-//        
-//        Assert.assertNotNull(admin.getRole("jdeveloper"));
     }
 
     @Test
@@ -101,6 +83,11 @@ public class UserManagementTest extends UserManagement {
     @Test
     public void createAndRemoveUserOk() {
         super.createAndRemoveUserOk();
+    }
+
+    @Test
+    public void createAndRemoveUserWithGroupsOk() {
+        super.createAndRemoveUserWithGroupsOk();
     }
 
     @Test

@@ -50,8 +50,8 @@ public class StorageProviderImplTest {
         //
         m_properties.put(ConfigurationConstants.PROP_USER_OBJECTCLASS, ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
         m_properties.put(ConfigurationConstants.PROP_GROUP_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
-        m_properties.put(ConfigurationConstants.PROP_USER_IDATTR, ConfigurationConstants.DEFAULT_USER_IDATTR);
-        m_properties.put(ConfigurationConstants.PROP_GROUP_IDATTR, ConfigurationConstants.DEFAULT_GROUP_IDATTR);
+        m_properties.put(ConfigurationConstants.PROP_USER_ATTR_ID, ConfigurationConstants.DEFAULT_USER_ATTR_ID);
+        m_properties.put(ConfigurationConstants.PROP_GROUP_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
     }
     
 	@Test

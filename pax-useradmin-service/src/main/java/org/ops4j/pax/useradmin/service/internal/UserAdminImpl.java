@@ -165,7 +165,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdmin#createRole(String, int)
      */
     public Role createRole(String name, int type) {
-        if (name == null) {
+        if (null == name) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
         }
         if (   (type != org.osgi.service.useradmin.Role.GROUP)
@@ -200,7 +200,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                 logMessage(this, "role was not created", LogService.LOG_ERROR);
             }
         } catch (StorageException e) {
-            logMessage(this, "error when creating role: " + e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
         }
         return role;
     }
@@ -209,6 +209,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdmin#getAuthorization(User)
      */
     public Authorization getAuthorization(User user) {
+        if (null == user) {
+            throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_USER));
+        }
         try {
             AuthorizationImpl authorization = new AuthorizationImpl(this, user);
             return authorization;
@@ -222,15 +225,18 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdmin#getRole(String)
      */
     public Role getRole(String name) {
-        if (name == null) {
+        if (null == name) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
+        }
+        if ("".equals(name)) {
+            name = Role.USER_ANYONE;
         }
         //
         try {
             StorageProvider storage = getStorageProvider();
             return storage.getRole(this, name);
         } catch (StorageException e) {
-            logMessage(this, "error when looking up role: " + e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
         }
         return null;
     }
@@ -246,7 +252,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                 return roles.toArray(new Role[0]);
             }
         } catch (StorageException e) {
-            logMessage(this, "error when looking up roles: " + e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
         }
         return null;
     }
@@ -266,8 +272,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             User user = storage.getUser(this, key, value);
             return user;
         } catch (StorageException e) {
-            logMessage(this,   "error when looking up user with attribute '" + key + "' = '" + value
-                             + "': " + e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
         }
         return null;
     }
@@ -276,7 +281,10 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdmin#removeRole(String)
      */
     public boolean removeRole(String name) {
-        if (null != name) {
+        if (null == name) {
+            throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
+        }
+        if (!"".equals(name) && !Role.USER_ANYONE.equals(name)) {
             Role role = getRole(name);
             if (null != role) {
                 checkAdminPermission();
@@ -286,12 +294,16 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                         fireEvent(UserAdminEvent.ROLE_REMOVED, role);
                         return true;
                     } else {
-                        logMessage(this, "Role '" + name + "'could not be deleted", LogService.LOG_ERROR);
+                        logMessage(this, "Role '" + name + "' could not be deleted", LogService.LOG_ERROR);
                     }
                 } catch (StorageException e) {
-                    logMessage(this, "error when deleting role: " + e.getMessage(), LogService.LOG_ERROR);
+                    logMessage(this, e.getMessage(), LogService.LOG_ERROR);
                 }
+            } else {
+                logMessage(this, "Role '" + name + "' does not exist.", LogService.LOG_ERROR);
             }
+        } else {
+            logMessage(this, "Standard user '" + Role.USER_ANYONE + "' cannot be removed.", LogService.LOG_ERROR);
         }
         return false;
     }

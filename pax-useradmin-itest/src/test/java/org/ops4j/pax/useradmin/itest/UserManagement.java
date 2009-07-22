@@ -54,7 +54,6 @@ public abstract class UserManagement extends UserAdminTestBase {
             Assert.assertEquals("Not exactly two roles found", 2, roles.length);
             for  (Role r : roles) {
                 if (USER_NAME.equals(r.getName())) {
-                    Assert.assertNotNull("Invalid role returned", r);
                     Assert.assertEquals("Role is not a user", Role.USER, r.getType());
                     return;
                 }
@@ -86,7 +85,6 @@ public abstract class UserManagement extends UserAdminTestBase {
             Assert.assertEquals("Not exactly two roles found", 2, roles.length);
             for  (Role r : roles) {
                 if (GROUP_NAME.equals(r.getName())) {
-                    Assert.assertNotNull("Invalid role returned", r);
                     Assert.assertEquals("Role is not a user", Role.GROUP, r.getType());
                     return;
                 }
@@ -102,6 +100,18 @@ public abstract class UserManagement extends UserAdminTestBase {
         User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
         Assert.assertNotNull("Could not create user", user);
         Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
+        //
+        // remove user
+        //
+        Assert.assertTrue("Could not delete user", userAdmin.removeRole(user.getName()));
+        Assert.assertNull("Unexpected user found", userAdmin.getRole(USER_NAME));
+    }
+    
+    protected void createAndRemoveUserWithGroupsOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
+        Assert.assertNotNull("Could not create user", user);
+        Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
         Group group = (Group) userAdmin.createRole(GROUP_NAME, Role.GROUP);
         Assert.assertNotNull("Could not create group", group);
         Assert.assertEquals("Mismatching group name", GROUP_NAME, group.getName());
@@ -113,11 +123,11 @@ public abstract class UserManagement extends UserAdminTestBase {
         //
         // remove user
         //
-        Assert.assertTrue(userAdmin.removeRole(user.getName()));
+        Assert.assertTrue("Could not delete user", userAdmin.removeRole(user.getName()));
         members = group.getMembers();
         Assert.assertNull("Unexpected members found", members);
     }
-    
+
     @SuppressWarnings(value = "unchecked")
     protected void setAndGetAttributesOk() {
         UserAdmin userAdmin = getUserAdmin();

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.service.internal.UserAdminMessages;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -259,18 +260,16 @@ public class StorageProviderImpl implements StorageProvider {
     }
 
     public boolean deleteRole(Role role) throws StorageException {
-        if (!Role.USER_ANYONE.equals(role.getName())) { // never delete the anonymous user
-            try {
-                if (getRootNode().nodeExists(role.getName())) {
-                    removeFromGroups(role.getName());
-                    getRootNode().node(role.getName()).removeNode();
-                    getRootNode().flush();
-                    return true;
-                }
-            } catch (BackingStoreException e) {
-                throw new StorageException(  "Error removing node '" + role.getName() + "': "
-                                           + e.getMessage());
+        try {
+            if (getRootNode().nodeExists(role.getName())) {
+                removeFromGroups(role.getName());
+                getRootNode().node(role.getName()).removeNode();
+                getRootNode().flush();
+                return true;
             }
+        } catch (BackingStoreException e) {
+            throw new StorageException(  "Error removing node '" + role.getName() + "': "
+                                       + e.getMessage());
         }
         return false;
     }
@@ -347,7 +346,8 @@ public class StorageProviderImpl implements StorageProvider {
             storeAttribute(node, key, value);
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error storing attribute for role '" + role.getName()
+            throw new StorageException(  "Error storing attribute '" + key + "' = '" + value
+                                       + "' for role '" + role.getName()
                                        + "': " + e.getMessage());
         }
     }
