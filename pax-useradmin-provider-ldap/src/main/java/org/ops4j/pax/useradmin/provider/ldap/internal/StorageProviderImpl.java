@@ -45,32 +45,32 @@ import com.novell.ldap.LDAPSearchResults;
 public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     private static final String PATTERN_SPLIT_LIST_VALUE = ", *";
-    
-    private String  m_accessUser       = "";
-    private String  m_accessPassword   = "";
-    private String  m_host             = ConfigurationConstants.DEFAULT_LDAP_SERVER_URL;
-    private String  m_port             = ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT;
 
-    private String  m_rootDN           = ConfigurationConstants.DEFAULT_LDAP_ROOT_DN;
-    private String  m_rootUsersDN      = ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS  + "," + m_rootDN;
-    private String  m_rootGroupsDN     = ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS + "," + m_rootDN;
+    private String              m_accessUser             = "";
+    private String              m_accessPassword         = "";
+    private String              m_host                   = ConfigurationConstants.DEFAULT_LDAP_SERVER_URL;
+    private String              m_port                   = ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT;
 
-    private String  m_userObjectclass  = ConfigurationConstants.DEFAULT_USER_OBJECTCLASS;
-    private String  m_userIdAttr       = ConfigurationConstants.DEFAULT_USER_ATTR_ID;
-    private String  m_userInitialAttr  = ConfigurationConstants.DEFAULT_USER_ATTR_INITIAL;
+    private String              m_rootDN                 = ConfigurationConstants.DEFAULT_LDAP_ROOT_DN;
+    private String              m_rootUsersDN            = ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS
+                                                                         + "," + m_rootDN;
+    private String              m_rootGroupsDN           = ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS
+                                                                         + "," + m_rootDN;
 
-    private String  m_groupObjectclass = ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS;
-    private String  m_groupIdAttr      = ConfigurationConstants.DEFAULT_GROUP_ATTR_ID;
-    private String  m_groupInitialAttr = ConfigurationConstants.DEFAULT_GROUP_ATTR_INITIAL;
-    private String  m_groupMemberAttr  = ConfigurationConstants.DEFAULT_GROUP_ATTR_MEMBER;
+    private String              m_userObjectclass        = ConfigurationConstants.DEFAULT_USER_OBJECTCLASS;
+    private String              m_userIdAttr             = ConfigurationConstants.DEFAULT_USER_ATTR_ID;
+    private String              m_userMandatoryAttr      = ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY;
+
+    private String              m_groupObjectclass       = ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS;
+    private String              m_groupIdAttr            = ConfigurationConstants.DEFAULT_GROUP_ATTR_ID;
+    private String              m_groupMandatoryAttr     = ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY;
+    private String              m_groupMemberAttr        = ConfigurationConstants.DEFAULT_GROUP_ATTR_MEMBER;
     
     /**
      * The connection which is used for access.
      */
     private LDAPConnection m_connection = null;
 
-    private BundleContext m_context = null;
-    
     /**
      * Constructor.
      * 
@@ -84,7 +84,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         if (null == context) {
             throw new IllegalArgumentException("Internal error: no BundleContext object specified when constructing the StorageProvider instance.");
         }
-        m_context = context;
     }
 
     // ManagedService interface
@@ -170,16 +169,16 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                                                 ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
         m_userIdAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_ID,
                                            ConfigurationConstants.DEFAULT_USER_ATTR_ID);
-        m_userInitialAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_INITIAL,
-                                                ConfigurationConstants.DEFAULT_USER_ATTR_INITIAL);
+        m_userMandatoryAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_MANDATORY,
+                                                ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY);
 
         m_groupObjectclass = getOptionalProperty(properties,
                                                  ConfigurationConstants.PROP_GROUP_OBJECTCLASS,
                                                  ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
         m_groupIdAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_ID,
                                             ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
-        m_groupInitialAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_INITIAL,
-                                                 ConfigurationConstants.DEFAULT_GROUP_ATTR_INITIAL);
+        m_groupMandatoryAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY,
+                                                 ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
         m_groupMemberAttr = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_MEMBER,
                                                 ConfigurationConstants.DEFAULT_GROUP_ATTR_MEMBER);
     }
@@ -206,9 +205,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             m_connection.bind(LDAPConnection.LDAP_V3, m_accessUser, m_accessPassword.getBytes("UTF8"));
             return m_connection;
         } catch (LDAPException e) {
-            throw new StorageException("Error opening connection: " + e.getMessage());
+            throw new StorageException("Error opening connection to LDAP server '"
+                                       + m_host + ":" + m_port + "': " + e.getMessage() + " - " + e.getLDAPErrorMessage());
         } catch (UnsupportedEncodingException e) {
-            throw new StorageException("Error opening connection: " + e.getMessage());
+            throw new StorageException("Unknown encoding when opening connection: " + e.getMessage());
         }
     }
 
@@ -325,8 +325,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     /**
      * @see StorageProvider#createUser(UserAdminFactory, String)
-     * 
-     * TODO: how to handle mandatory scheme arguments (i.e. sn, cn) dynamically?
      */
     public User createUser(UserAdminFactory factory, String name) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -338,9 +336,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                                          m_userObjectclass.split(PATTERN_SPLIT_LIST_VALUE)));
         attributes.add(new LDAPAttribute(m_userIdAttr, name));
         properties.put(m_userIdAttr, name);
-        // set all initial attributes to name
-        if (!"".equals(m_userInitialAttr)) {
-            for (String attr : m_userInitialAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
+        // set all mandatory attributes to name
+        if (!"".equals(m_userMandatoryAttr)) {
+            for (String attr : m_userMandatoryAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
                 attributes.add(new LDAPAttribute(attr.trim(), name));
                 properties.put(attr.trim(), name);
             }
@@ -376,10 +374,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         attributes.add(new LDAPAttribute(m_groupMemberAttr, userAnyoneDN));
         properties.put(m_groupMemberAttr, userAnyoneDN);
         //
-        // set all initial attributes to name
+        // set all mandatory attributes to name
         //
-        if (!"".equals(m_groupInitialAttr)) {
-            for (String attr : m_groupInitialAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
+        if (!"".equals(m_groupMandatoryAttr)) {
+            for (String attr : m_groupMandatoryAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
                 attributes.add(new LDAPAttribute(attr.trim(), name));
                 properties.put(attr.trim(), name);
             }
@@ -413,32 +411,111 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    @SuppressWarnings(value = "unchecked")
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
-        // TODO Auto-generated method stub
-        return null;
+        Collection<Role> roles = new ArrayList<Role>();
+        LDAPConnection connection = openConnection();
+        try {
+            LDAPEntry entry = readEntry(connection, group.getName());
+            if (entry == null) {
+                throw new StorageException(  "Internal error: group '" + group.getName()
+                                           + "' could not be retrieved.");
+            }
+            Iterator<LDAPAttribute> it = entry.getAttributeSet().iterator();
+            while (it.hasNext()) {
+                LDAPAttribute attribute = it.next();
+                if (m_groupMemberAttr.equals(attribute.getName())) {
+                    String userDN = attribute.getStringValue();
+                    LDAPEntry userEntry = connection.read(userDN);
+                    if (null == userEntry) {
+                        throw new StorageException(  "Internal error: group member '" + userDN
+                                                     + "' could not be retrieved.");
+                    }
+                    Role role = createRole(factory, userEntry);
+                    roles.add(role);
+                }
+            }
+            return roles;
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error deleting role with name '" + group.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: add required member handling
+        throw new IllegalStateException("required member handling is not yet implemented");
     }
     
+    @SuppressWarnings(value = "unchecked")
     public boolean addMember(Group group, Role role) throws StorageException {
-        // TODO Auto-generated method stub
-        return false;
+        LDAPConnection connection = openConnection();
+        try {
+            LDAPEntry entry = readEntry(connection, group.getName());
+            if (entry == null) {
+                throw new StorageException(  "Internal error: group '" + group.getName()
+                                           + "' could not be retrieved.");
+            }
+            String roleDN = getRoleDN(role);
+            Iterator<LDAPAttribute> it = entry.getAttributeSet().iterator();
+            while (it.hasNext()) {
+                LDAPAttribute attribute = it.next();
+                if (m_groupMemberAttr.equals(attribute.getName()) && roleDN.equals(attribute.getStringValue())) {
+                    // ignore already existing members
+                    return false;
+                }
+            }
+            LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(m_groupMemberAttr, roleDN));
+            connection.modify(entry.getDN(), modification);
+            return true;
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error deleting role with name '" + group.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     public boolean addRequiredMember(Group group, Role role) throws StorageException {
-        // TODO Auto-generated method stub
-        return false;
+        // TODO: add required member handling
+        throw new IllegalStateException("required member handling is not yet implemented");
     }
     
     public boolean removeMember(Group group, Role role) throws StorageException {
-        // TODO Auto-generated method stub
-        return false;
+        LDAPConnection connection = openConnection();
+        try {
+            LDAPEntry entry = readEntry(connection, group.getName());
+            if (entry == null) {
+                throw new StorageException(  "Internal error: group '" + group.getName()
+                                           + "' could not be retrieved.");
+            }
+            String roleDN = getRoleDN(role);
+            LDAPModification modification = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(m_groupMemberAttr, roleDN));
+            connection.modify(entry.getDN(), modification);
+            return true;
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error deleting role with name '" + group.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     public void setRoleAttribute(Role role, String key, String value) throws StorageException {
+        if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
+            throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
+                                       + "' - change the configuration instead.");
+        }
+        if (Role.USER == role.getType() && m_userIdAttr.equals(key)) {
+            throw new StorageException(  "Cannot modify ID attribute '" + m_userIdAttr
+                                       + "' - recreate the user instead.");
+        }
+        if (Role.GROUP == role.getType() && m_groupIdAttr.equals(key)) {
+            throw new StorageException(  "Cannot modify ID attribute '" + m_groupIdAttr
+                                       + "' - recreate the group instead.");
+        }
         LDAPConnection connection = openConnection();
         try {
             String dn = getRoleDN(role);
@@ -454,6 +531,18 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
 
     public void setRoleAttribute(Role role, String key, byte[] value) throws StorageException {
+        if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
+            throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
+                                         + "' - change the configuration instead.");
+        }
+        if (Role.USER == role.getType() && m_userIdAttr.equals(key)) {
+            throw new StorageException(  "Cannot modify ID attribute '" + m_userIdAttr
+                                       + "' - recreate the user instead.");
+        }
+        if (Role.GROUP == role.getType() && m_groupIdAttr.equals(key)) {
+            throw new StorageException(  "Cannot modify ID attribute '" + m_groupIdAttr
+                                       + "' - recreate the group instead.");
+        }
         LDAPConnection connection = openConnection();
         try {
             String dn = getRoleDN(role);
@@ -469,6 +558,28 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     public void removeRoleAttribute(Role role, String key) throws StorageException {
+        if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
+            throw new StorageException(  "Cannot remove '" + ConfigurationConstants.ATTR_OBJECTCLASS
+                                       + "' attribute - change the configuration instead.");
+        }
+        if (Role.USER == role.getType()) {
+            if (m_userIdAttr.equals(key)) {
+                throw new StorageException(  "Cannot remove mandatory ID attribute '" + m_userIdAttr
+                                             + "'.");
+            } else if (m_userMandatoryAttr.contains(key)) {
+                throw new StorageException(  "Cannot remove mandatory attribute '" + key
+                                             + "'.");
+            }
+        }
+        if (Role.GROUP == role.getType()) {
+            if (m_groupIdAttr.equals(key)) {
+                throw new StorageException(  "Cannot remove mandatory ID attribute '" + m_groupIdAttr
+                                             + "'.");
+            } else if (m_userMandatoryAttr.contains(key)) {
+                throw new StorageException(  "Cannot remove mandatory attribute '" + key
+                                             + "'.");
+            }
+        }
         LDAPConnection connection = openConnection();
         try {
             String dn = getRoleDN(role);
@@ -490,21 +601,17 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     
     public void setUserCredential(User user, String key, String value) throws StorageException {
         // TODO Auto-generated method stub
-        
     }
     public void setUserCredential(User user, String key, byte[] value) throws StorageException {
         // TODO Auto-generated method stub
-        
     }
     
     public void removeUserCredential(User user, String key) throws StorageException {
         // TODO Auto-generated method stub
-        
     }
     
     public void clearUserCredentials(User user) throws StorageException {
         // TODO Auto-generated method stub
-        
     }
     
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
@@ -521,8 +628,36 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
-        // TODO Auto-generated method stub
-        return null;
+        LDAPConnection connection = openConnection();
+        try {
+            String filterString = "(&";
+            for (String objectClass : m_userObjectclass.split(PATTERN_SPLIT_LIST_VALUE)) {
+                filterString += "(" + ConfigurationConstants.ATTR_OBJECTCLASS + "=" + objectClass.trim() + ")";
+            }
+            filterString += "(" + key + "=" + value + "))";
+            LDAPSearchResults result = connection.search(m_rootDN, LDAPConnection.SCOPE_SUB,
+                                                         filterString, null, false);
+            User user = null;
+            while (result.hasMore()) {
+                if (null != user) {
+                    throw new StorageException("more than one user found");
+                }
+                LDAPEntry entry = result.next();
+                Role role = createRole(factory, entry);
+                if (null != role) {
+                    if (Role.USER != role.getType()) {
+                        throw new StorageException("Internal error: found role is not a user");
+                    }
+                    user = (User) role;
+                }
+            }
+            return user;
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error finding user with attribute '" + key + "=" + value + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     /**

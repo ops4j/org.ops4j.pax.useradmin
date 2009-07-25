@@ -142,13 +142,13 @@ public abstract class UserManagement extends UserAdminTestBase {
         String stringValue;
         byte[] byteValue;
         stringValue = (String) user.getProperties().get("");
-        Assert.assertNotNull(stringValue);
+        Assert.assertNotNull("Retrieving value for empty key returned null", stringValue);
         Assert.assertEquals("emptyKeyValue", stringValue);
         stringValue = (String) user.getProperties().get("stringKey");
-        Assert.assertNotNull(stringValue);
+        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
         Assert.assertEquals("stringKeyValue", stringValue);
         byteValue = (byte[]) user.getProperties().get("byteKey");
-        Assert.assertNotNull(byteValue);
+        Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
         Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
         //
         Assert.assertNotNull(user.getProperties().put("", "emptyKeyChangedValue"));
@@ -169,13 +169,13 @@ public abstract class UserManagement extends UserAdminTestBase {
         String stringValue;
         byte[] byteValue;
         stringValue = (String) user.getCredentials().get("");
-        Assert.assertNotNull(stringValue);
+        Assert.assertNotNull("Retrieving value for empty key returned null", stringValue);
         Assert.assertEquals("emptyKeyValue", stringValue);
         stringValue = (String) user.getCredentials().get("stringKey");
-        Assert.assertNotNull(stringValue);
+        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
         Assert.assertEquals("stringKeyValue", stringValue);
         byteValue = (byte[]) user.getCredentials().get("byteKey");
-        Assert.assertNotNull(byteValue);
+        Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
         Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
         //
         Assert.assertNotNull(user.getCredentials().put("", "emptyKeyChangedValue"));

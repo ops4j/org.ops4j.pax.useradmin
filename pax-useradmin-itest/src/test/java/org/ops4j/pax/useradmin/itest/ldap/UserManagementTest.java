@@ -17,12 +17,6 @@ package org.ops4j.pax.useradmin.itest.ldap;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,13 +25,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.itest.UserManagement;
-import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.useradmin.Role;
-import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * Testing the user-management parts of the preferences service based

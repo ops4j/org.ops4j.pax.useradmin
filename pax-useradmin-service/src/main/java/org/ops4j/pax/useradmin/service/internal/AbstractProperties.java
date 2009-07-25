@@ -99,6 +99,9 @@ public abstract class AbstractProperties extends Hashtable {
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
         }
+        if ("".equals(key)) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
+        }
         checkGetPermission((String) key);
         return super.get(key);
     }
@@ -111,7 +114,10 @@ public abstract class AbstractProperties extends Hashtable {
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
         }
-        if (null == key) {
+        if ("".equals(key)) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
+        }
+        if (null == value) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
         if (!(value instanceof String || value instanceof byte[])) {
@@ -139,6 +145,9 @@ public abstract class AbstractProperties extends Hashtable {
         }
         if (!(key instanceof String)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
+        }
+        if ("".equals(key)) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
