@@ -16,7 +16,6 @@
 package org.ops4j.pax.useradmin.itest;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.*;
 
 import org.junit.Assert;
 import org.ops4j.pax.exam.Option;
@@ -43,8 +42,7 @@ public abstract class UserAdminTestBase {
      * @return The basic OSGi framework configuration used to run the tests.
      */
     protected static Option getBasicFrameworkConfiguration() {
-        return composite(// logProfile(),
-                         mavenBundle().groupId("org.ops4j.pax.logging")
+        return composite(mavenBundle().groupId("org.ops4j.pax.logging")
                                       .artifactId("pax-logging-api")
                                       .version("1.3.0").startLevel(1),
                          mavenBundle().groupId("org.ops4j.pax.logging")

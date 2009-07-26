@@ -151,7 +151,9 @@ public class FrameworkConfiguration {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //
         // wait for ApacheDS to be ready ...
+        //
         ServiceTracker apacheDSTracker = new ServiceTracker(context,
                                                             context.getServiceReference(ApacheDSServer.class.getName()),
                                                             null);
@@ -201,6 +203,5 @@ public class FrameworkConfiguration {
     }
     
     protected static void cleanup() {
-        // TODO delete all entries from users and groups??
     }
 }

@@ -30,6 +30,12 @@ import org.osgi.service.useradmin.UserAdmin;
  */
 public abstract class UserManagement extends UserAdminTestBase {
     
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_PASSWD = "userPassword";
+    private static final String VALUE_DESCRIPTION = "some description";
+    private static final String VALUE_CHANGED_DESCRIPTION = "some changed description";
+    private static final String VALUE_PASSWD = "secret";
+    
     private static final String USER_NAME = "jdeveloper";
     private static final String GROUP_NAME = "developers";
 
@@ -135,24 +141,20 @@ public abstract class UserManagement extends UserAdminTestBase {
         Assert.assertNotNull("Could not create user", user);
         Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
         //
-        Assert.assertNull("Value 1 not set", user.getProperties().put("", "emptyKeyValue"));
-        Assert.assertNull("Value 2 not set", user.getProperties().put("stringKey", "stringKeyValue"));
-        Assert.assertNull("Value 3 not set", user.getProperties().put("byteKey", "byteKeyValue".getBytes()));
+        Assert.assertNull("Value 1 not set", user.getProperties().put(KEY_DESCRIPTION, VALUE_DESCRIPTION));
+        Assert.assertNull("Value 2 not set", user.getProperties().put(KEY_PASSWD, VALUE_PASSWD.getBytes()));
         //
         String stringValue;
         byte[] byteValue;
-        stringValue = (String) user.getProperties().get("");
-        Assert.assertNotNull("Retrieving value for empty key returned null", stringValue);
-        Assert.assertEquals("emptyKeyValue", stringValue);
-        stringValue = (String) user.getProperties().get("stringKey");
+        stringValue = (String) user.getProperties().get(KEY_DESCRIPTION);
         Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
-        Assert.assertEquals("stringKeyValue", stringValue);
-        byteValue = (byte[]) user.getProperties().get("byteKey");
+        Assert.assertEquals(VALUE_DESCRIPTION, stringValue);
+        byteValue = (byte[]) user.getProperties().get(KEY_PASSWD);
         Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
-        Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
+        Assert.assertArrayEquals(VALUE_PASSWD.getBytes(), byteValue);
         //
-        Assert.assertNotNull(user.getProperties().put("", "emptyKeyChangedValue"));
-        Assert.assertEquals("emptyKeyChangedValue", (String) user.getProperties().get(""));
+        Assert.assertNotNull(user.getProperties().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
+        Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getProperties().get(KEY_DESCRIPTION));
     }
 
     @SuppressWarnings(value = "unchecked")
@@ -162,23 +164,19 @@ public abstract class UserManagement extends UserAdminTestBase {
         Assert.assertNotNull("Could not create user", user);
         Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
         //
-        Assert.assertNull("Value 1 not set", user.getCredentials().put("", "emptyKeyValue"));
-        Assert.assertNull("Value 2 not set", user.getCredentials().put("stringKey", "stringKeyValue"));
-        Assert.assertNull("Value 3 not set", user.getCredentials().put("byteKey", "byteKeyValue".getBytes()));
+        Assert.assertNull("Value 1 not set", user.getCredentials().put(KEY_DESCRIPTION, VALUE_DESCRIPTION));
+        Assert.assertNull("Value 2 not set", user.getCredentials().put(KEY_PASSWD, VALUE_PASSWD.getBytes()));
         //
         String stringValue;
         byte[] byteValue;
-        stringValue = (String) user.getCredentials().get("");
-        Assert.assertNotNull("Retrieving value for empty key returned null", stringValue);
-        Assert.assertEquals("emptyKeyValue", stringValue);
-        stringValue = (String) user.getCredentials().get("stringKey");
+        stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
         Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
-        Assert.assertEquals("stringKeyValue", stringValue);
-        byteValue = (byte[]) user.getCredentials().get("byteKey");
+        Assert.assertEquals(VALUE_DESCRIPTION, stringValue);
+        byteValue = (byte[]) user.getCredentials().get(KEY_PASSWD);
         Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
-        Assert.assertArrayEquals("byteKeyValue".getBytes(), byteValue);
+        Assert.assertArrayEquals(VALUE_PASSWD.getBytes(), byteValue);
         //
-        Assert.assertNotNull(user.getCredentials().put("", "emptyKeyChangedValue"));
-        Assert.assertEquals("emptyKeyChangedValue", (String) user.getCredentials().get(""));
+        Assert.assertNotNull(user.getCredentials().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
+        Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
     }
 }

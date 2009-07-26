@@ -60,11 +60,13 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     private String              m_userObjectclass        = ConfigurationConstants.DEFAULT_USER_OBJECTCLASS;
     private String              m_userIdAttr             = ConfigurationConstants.DEFAULT_USER_ATTR_ID;
     private String              m_userMandatoryAttr      = ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY;
+    private String              m_userCredentialAttr     = ConfigurationConstants.DEFAULT_USER_ATTR_CREDENTIAL;
 
     private String              m_groupObjectclass       = ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS;
     private String              m_groupIdAttr            = ConfigurationConstants.DEFAULT_GROUP_ATTR_ID;
     private String              m_groupMandatoryAttr     = ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY;
     private String              m_groupMemberAttr        = ConfigurationConstants.DEFAULT_GROUP_ATTR_MEMBER;
+    private String              m_groupCredentialAttr    = ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL;
     
     /**
      * The connection which is used for access.
@@ -246,7 +248,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return true;
     }
     
-    // TODO: check algorithm
     private int getRoleType(String[] objectClasses) {
         // check if all our required user objectclasses are contained in the
         // given list
@@ -259,25 +260,40 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return Role.ROLE;
     }
 
-    // TODO: credential handling
     @SuppressWarnings(value = "unchecked")
     private Role createRole(UserAdminFactory factory, LDAPEntry entry) throws StorageException {
         Map<String, String> properties = new HashMap<String, String>();
-        int type = Role.ROLE;
+        Map<String, String> credentials = new HashMap<String, String>();
+        // first determine the type
+        LDAPAttribute typeAttr = entry.getAttribute(ConfigurationConstants.ATTR_OBJECTCLASS);
+        if (null == typeAttr) {
+            throw new StorageException("No type attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS + "' found for entry: " + entry);
+        }
+        int type = getRoleType(typeAttr.getStringValueArray());
+        // then read additional attributes
         Iterator<LDAPAttribute> it = entry.getAttributeSet().iterator();
         while (it.hasNext()) {
             LDAPAttribute attribute = it.next();
             if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(attribute.getName())) {
-                type = getRoleType(attribute.getStringValueArray());
+                // ignore: we've read that already
+            } else if (   (type == Role.GROUP && m_groupCredentialAttr.equals(attribute.getName()))
+                       || (type == Role.USER && m_userCredentialAttr.equals(attribute.getName()))) {
+                for (String value : attribute.getStringValueArray()) {
+                    String[] data = value.split("; *");
+                    if (2 != data.length) {
+                        throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
+                    }
+                    credentials.put(data[0], data[1]);
+                }
             } else {
                 properties.put(attribute.getName(), attribute.getStringValue());
             }
         }
         switch (type) {
             case Role.USER:
-                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(), properties, null);
+                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(), properties, credentials);
             case Role.GROUP:
-                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(), properties, null);
+                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(), properties, credentials);
             default:
                 return null;
                 // throw new StorageException("Unexpected role type '" + type + "' detected.");
@@ -600,18 +616,89 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     public void setUserCredential(User user, String key, String value) throws StorageException {
-        // TODO Auto-generated method stub
+        LDAPConnection connection = openConnection();
+        try {
+            LDAPEntry entry = readEntry(connection, user.getName());
+            if (null == entry) {
+                throw new StorageException("Could not find user '" + user.getName() + "'");
+            }
+            String dn = getRoleDN(user);
+            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
+            LDAPAttribute attribute = entry.getAttribute(attrName);
+            if (null != attribute) {
+                for (String attrValue : attribute.getStringValueArray()) {
+                    String[] data = attrValue.split("; *");
+                    if (2 != data.length) {
+                        throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
+                    }
+                    if (data[0].equals(key)) {
+                        // modify existing entry
+                        attribute.removeValue(attrValue);
+                        attribute.addValue(key + ";" + value);
+                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
+                        connection.modify(dn, modification);
+                        return;
+                    }
+                }
+            } else {
+                LDAPModification modification = new LDAPModification(LDAPModification.ADD,
+                                                                     new LDAPAttribute(attrName, key + ";" + value));
+                connection.modify(dn, modification);
+                return;
+            }
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
+
     public void setUserCredential(User user, String key, byte[] value) throws StorageException {
-        // TODO Auto-generated method stub
+        LDAPConnection connection = openConnection();
+        try {
+            LDAPEntry entry = readEntry(connection, user.getName());
+            if (null == entry) {
+                throw new StorageException("Could not find user '" + user.getName() + "'");
+            }
+            String dn = getRoleDN(user);
+            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
+            LDAPAttribute attribute = entry.getAttribute(attrName);
+            if (null != attribute) {
+                for (String attrValue : attribute.getStringValueArray()) {
+                    String[] data = attrValue.split("; *");
+                    if (2 != data.length) {
+                        throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
+                    }
+                    if (data[0].equals(key)) {
+                        // modify existing entry
+                        attribute.removeValue(attrValue);
+                        attribute.addValue(key + ";" + value);
+                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
+                        connection.modify(dn, modification);
+                        return;
+                    }
+                }
+            } else {
+                LDAPModification modification = new LDAPModification(LDAPModification.ADD,
+                                                                     new LDAPAttribute(attrName, key + ";" + value));
+                connection.modify(dn, modification);
+                return;
+            }
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     public void removeUserCredential(User user, String key) throws StorageException {
-        // TODO Auto-generated method stub
+        throw new IllegalStateException("credential handling is not yet implemented");
     }
     
     public void clearUserCredentials(User user) throws StorageException {
-        // TODO Auto-generated method stub
+        throw new IllegalStateException("credential handling is not yet implemented");
     }
     
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {

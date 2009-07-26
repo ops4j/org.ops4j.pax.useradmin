@@ -116,6 +116,23 @@ public class RoleImplTest {
     }
     
     @Test (expected = IllegalArgumentException.class)
+    public void getPropertyEmptyKey() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        //
+        try {
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+        } catch (StorageException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        role.getProperties().get("");
+        EasyMock.verify(userAdmin, sp);
+    }
+    
+    @Test (expected = IllegalArgumentException.class)
     public void getPropertyWrongKeyType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         RoleImpl role = new RoleImpl(NAME, userAdmin, null);
@@ -157,6 +174,24 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put(null, VALUE1);
+        EasyMock.verify(userAdmin, sp);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    @SuppressWarnings(value = "unchecked")
+    public void addPropertyEmptyKey() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        //
+        try {
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+        } catch (StorageException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        role.getProperties().put("", VALUE1);
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -249,6 +284,23 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().remove(null);
+        EasyMock.verify(userAdmin, sp);
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void removePropertyEmptyKey() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        //
+        try {
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+        } catch (StorageException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        role.getProperties().remove("");
         EasyMock.verify(userAdmin, sp);
     }
 

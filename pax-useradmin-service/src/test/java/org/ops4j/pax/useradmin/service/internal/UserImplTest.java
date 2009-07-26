@@ -33,7 +33,8 @@ import org.osgi.service.useradmin.UserAdminPermission;
 /**
  * Testing the UserImpl and UserCredentials classes.
  * 
- * Note: only successful calls are tested here - failures are tested in the RoleImplTest class 
+ * Note: only successful calls are tested here - failures of the AbstractProperties class are
+ *       tested in the RoleImplTest class 
  * 
  * @author Matthias Kuespert
  * @since  11.07.2009

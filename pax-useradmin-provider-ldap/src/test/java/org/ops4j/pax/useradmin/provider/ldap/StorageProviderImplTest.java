@@ -26,7 +26,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ops4j.pax.useradmin.provider.ldap.internal.LdapWrapper;
 import org.ops4j.pax.useradmin.provider.ldap.internal.StorageProviderImpl;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
