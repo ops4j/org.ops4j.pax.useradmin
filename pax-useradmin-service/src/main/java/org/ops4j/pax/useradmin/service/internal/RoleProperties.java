@@ -32,7 +32,7 @@ public class RoleProperties extends AbstractProperties {
 
 	private static final long serialVersionUID = 1L;
 
-	public RoleProperties(Role role, UserAdminUtil util, Map<String, String> properties) {
+	protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
 		super(role, util, properties);
 	}
 	

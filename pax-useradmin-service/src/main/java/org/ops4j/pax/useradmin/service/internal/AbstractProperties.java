@@ -62,13 +62,7 @@ public abstract class AbstractProperties extends Hashtable {
 
     protected abstract void clear(StorageProvider storageProvider) throws StorageException;
 
-    public AbstractProperties(Role role, UserAdminUtil util, Map<String, String> properties) {
-        if (null == role) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_ROLE);
-        }
-        if (null == util) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_USERADMIN);
-        }
+    protected AbstractProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         m_role = role;
         m_util = util;
         //

@@ -38,7 +38,7 @@ public interface UserAdminFactory {
      * @param credentials The credentials of the user.
      * @return A new <code>UserImpl</code> instance.
      */
-    User createUser(String name, Map<String, String> properties, Map<String, String> credentials);
+    User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials);
 
     /**
      * Create a <code>GroupImpl</code> instance.
@@ -48,5 +48,5 @@ public interface UserAdminFactory {
      * @param credentials The credentials of the group.
      * @return A new <code>GroupImpl</code> instance.
      */
-    Group createGroup(String name, Map<String, String> properties, Map<String, String> credentials);
+    Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials);
 }

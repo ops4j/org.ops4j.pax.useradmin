@@ -44,8 +44,8 @@ public class UserImpl extends RoleImpl implements User {
      */
     protected UserImpl(String name,
                        UserAdminImpl admin,
-                       Map<String, String> properties,
-                       Map<String, String> credentials) {
+                       Map<String, Object> properties,
+                       Map<String, Object> credentials) {
         super(name, admin, properties);
         //
         m_credentials = new UserCredentials(this, admin, credentials);

@@ -55,7 +55,7 @@ public class RoleImpl implements Role {
      * @param properties A map containing the raw properties of this role as
      *            read by the StorageProvider.
      */
-    protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, String> properties) {
+    protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, Object> properties) {
         if (name == null) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
         }

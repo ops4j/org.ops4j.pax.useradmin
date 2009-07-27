@@ -262,8 +262,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     @SuppressWarnings(value = "unchecked")
     private Role createRole(UserAdminFactory factory, LDAPEntry entry) throws StorageException {
-        Map<String, String> properties = new HashMap<String, String>();
-        Map<String, String> credentials = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> credentials = new HashMap<String, Object>();
         // first determine the type
         LDAPAttribute typeAttr = entry.getAttribute(ConfigurationConstants.ATTR_OBJECTCLASS);
         if (null == typeAttr) {
@@ -346,7 +346,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         LDAPConnection connection = openConnection();
         // fill attribute set (for LDAP creation) and properties (for UserAdmin creation)
         LDAPAttributeSet attributes = new LDAPAttributeSet();
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         //
         attributes.add(new LDAPAttribute(ConfigurationConstants.ATTR_OBJECTCLASS,
                                          m_userObjectclass.split(PATTERN_SPLIT_LIST_VALUE)));
@@ -377,7 +377,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         LDAPAttributeSet attributes = new LDAPAttributeSet();
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         attributes.add(new LDAPAttribute(ConfigurationConstants.ATTR_OBJECTCLASS,
                                          m_groupObjectclass.split(PATTERN_SPLIT_LIST_VALUE)));
         //

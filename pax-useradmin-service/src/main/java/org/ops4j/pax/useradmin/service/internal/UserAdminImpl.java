@@ -386,8 +386,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminFactory#createUser(String, Map, Map)
      */
     public User createUser(String name,
-                           Map<String, String> properties,
-                           Map<String, String> credentials) {
+                           Map<String, Object> properties,
+                           Map<String, Object> credentials) {
         UserImpl user = new UserImpl(name, this, properties, credentials);
         return user;
     }
@@ -396,8 +396,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminFactory#createGroup(String, Map, Map)
      */
     public Group createGroup(String name,
-                             Map<String, String> properties,
-                             Map<String, String> credentials) {
+                             Map<String, Object> properties,
+                             Map<String, Object> credentials) {
         GroupImpl group = new GroupImpl(name, this, properties, credentials);
         return group;
     }

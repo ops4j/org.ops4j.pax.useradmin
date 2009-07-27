@@ -39,8 +39,8 @@ public class GroupImpl extends UserImpl implements Group {
      */
     protected GroupImpl(String name,
                         UserAdminImpl admin,
-                        Map<String, String> properties,
-                        Map<String, String> credentials) {
+                        Map<String, Object> properties,
+                        Map<String, Object> credentials) {
         super(name, admin, properties, credentials);
     }
 

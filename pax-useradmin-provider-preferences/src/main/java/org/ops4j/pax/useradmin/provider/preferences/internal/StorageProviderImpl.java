@@ -81,9 +81,9 @@ public class StorageProviderImpl implements StorageProvider {
         return service;
     }
 
-    private Map<String, String> loadAttributes(Preferences node) throws BackingStoreException {
+    private Map<String, Object> loadAttributes(Preferences node) throws BackingStoreException {
         Preferences propertyTypes = node.node(TYPES_NODE);
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, Object> properties = new HashMap<String, Object>();
         for (String key : node.keys()) {
             if (propertyTypes.getBoolean(key, false)) {
                 properties.put(key, node.get(key, ""));
@@ -115,7 +115,7 @@ public class StorageProviderImpl implements StorageProvider {
         }
         Preferences node = getRootNode().node(name);
         //
-        Map<String, String> properties = null;
+        Map<String, Object> properties = null;
         if (node.nodeExists(PROPERTIES_NODE)) {
             properties = loadAttributes(node.node(PROPERTIES_NODE));
         }
@@ -124,13 +124,13 @@ public class StorageProviderImpl implements StorageProvider {
             if (null == properties) {
                 return null;
             }
-            Dictionary<String, String> dict = new Hashtable<String, String>(properties);
+            Dictionary<String, Object> dict = new Hashtable<String, Object>(properties);
             if (!filter.match(dict)) {
                 return null;
             }
         }
         //
-        Map<String, String> credentials = null;
+        Map<String, Object> credentials = null;
         if (node.nodeExists(CREDENTIALS_NODE)) {
             credentials = loadAttributes(node.node(CREDENTIALS_NODE));
         }

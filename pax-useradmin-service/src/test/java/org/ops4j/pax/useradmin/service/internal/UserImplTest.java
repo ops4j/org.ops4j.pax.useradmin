@@ -45,8 +45,8 @@ public class UserImplTest {
     private static final String KEY1 = "testCredential1";
     private static final String VALUE1 = "someCredentialValue1";
     
-    private Map<String, String> getCredentials() {
-        Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, Object> getCredentials() {
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(KEY1, VALUE1);
         return properties;
     }
@@ -66,7 +66,7 @@ public class UserImplTest {
     @Test
     public void constructEmptyCredentials() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        UserImpl user = new UserImpl(NAME, userAdmin, null, new HashMap<String, String>());
+        UserImpl user = new UserImpl(NAME, userAdmin, null, new HashMap<String, Object>());
         Assert.assertNotNull("Could not create UserImpl instance", user);
         Assert.assertEquals("Mismatching name", NAME, user.getName());
         Assert.assertEquals("Invalid type", Role.USER, user.getType());

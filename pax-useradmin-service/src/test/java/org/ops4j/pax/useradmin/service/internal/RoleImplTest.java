@@ -38,11 +38,13 @@ import org.osgi.service.useradmin.UserAdminPermission;
 public class RoleImplTest {
 
     private static final String NAME = "someRole";
-    private static final String KEY1 = "test";
+    private static final String KEY1 = "key1";
     private static final String VALUE1 = "someValue1";
+    private static final String KEY2 = "key2";
+    private static final byte[] VALUE2 = "someValue2".getBytes();
     
-    private Map<String, String> getProperties() {
-        Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, Object> getProperties() {
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(KEY1, VALUE1);
         return properties;
     }
@@ -75,7 +77,7 @@ public class RoleImplTest {
     @Test
     public void constructEmptyProperties() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, new HashMap<String, String>());
+        RoleImpl role = new RoleImpl(NAME, userAdmin, new HashMap<String, Object>());
         Assert.assertNotNull("Could not create RoleImpl instance", role);
         Assert.assertEquals("Mismatching name", NAME, role.getName());
         Assert.assertEquals("Invalid type", Role.ROLE, role.getType());

@@ -32,7 +32,7 @@ public class UserCredentials extends AbstractProperties {
 
     private static final long serialVersionUID = 1L;
 
-    public UserCredentials(User user, UserAdminUtil util, Map<String, String> properties) {
+    protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
         super(user, util, properties);
     }
 
