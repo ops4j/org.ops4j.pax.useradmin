@@ -26,16 +26,16 @@ import org.osgi.service.useradmin.UserAdminPermission;
  * A dictionary to manage role properties and communicate changes.
  * 
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
 public class RoleProperties extends AbstractProperties {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
-		super(role, util, properties);
-	}
-	
+    protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
+        super(role, util, properties);
+    }
+
     @Override
     protected void store(StorageProvider storageProvider, String key, String value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
@@ -48,17 +48,17 @@ public class RoleProperties extends AbstractProperties {
         storageProvider.setRoleAttribute(getRole(), key, value);
     }
 
-	@Override
-	protected void remove(StorageProvider storageProvider, String key) throws StorageException {
+    @Override
+    protected void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
-		storageProvider.removeRoleAttribute(getRole(), key);
-	}
-	
-	@Override
-	protected void clear(StorageProvider storageProvider) throws StorageException {
+        storageProvider.removeRoleAttribute(getRole(), key);
+    }
+
+    @Override
+    protected void clear(StorageProvider storageProvider) throws StorageException {
         for (Object key : keySet()) {
             getUtil().checkPermission((String) key, UserAdminPermission.CHANGE_PROPERTY);
         }
-		storageProvider.clearRoleAttributes(getRole());
-	}
+        storageProvider.clearRoleAttributes(getRole());
+    }
 }

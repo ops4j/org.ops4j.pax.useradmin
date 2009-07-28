@@ -152,32 +152,47 @@ public class GroupImpl extends UserImpl implements Group {
      */
     protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
-            return (false);
+            return false;
         }
         checkedRoles.add(getName());
         if (getName().equals(role.getName())) {
-            return (true);
+            return true;
         }
+        //
+        boolean isImplied = false;
         //
         Role[] members = getRequiredMembers();
         if (null != members) {
+            isImplied = true;
             Collection<String> requiredCheckedRoles = new ArrayList<String>(checkedRoles);
             for (Role member : members) {
+                if (requiredCheckedRoles.contains(member.getName())) {
+                    isImplied = false;
+                    break;
+                }
                 if (!((RoleImpl) member).isImpliedBy(role, requiredCheckedRoles)) {
-                    return false;
+                    isImplied = false;
+                    break;
                 }
             }
         }
         //
-        members = getMembers();
-        if (null != members) {
-            Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
-            for (Role member : members) {
-                if (((RoleImpl) member).isImpliedBy(role, basicCheckedRoles)) {
-                    return true;
+        if (!isImplied) {
+            members = getMembers();
+            if (null != members) {
+                Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
+                for (Role member : members) {
+                    if (basicCheckedRoles.contains(member.getName())) {
+                        continue;
+                    }
+                    if (((RoleImpl) member).isImpliedBy(role, basicCheckedRoles)) {
+//                        return true;
+                        isImplied = true;
+                        break;
+                    }
                 }
             }
         }
-        return false;
+        return isImplied;
     }
 }

@@ -54,6 +54,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     public static String        PROP_SECURITY      = "org.ops4j.pax.useradmin.security";
 
+    public static boolean       DEFAULT_SECURITY   = false;
+
     // private implementation details
 
     private static String       EVENT_TOPIC_PREFIX = "org/osgi/service/useradmin/UserAdmin/";
@@ -62,7 +64,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     private UserAdminPermission m_adminPermission  = null;
     
-    private boolean             m_checkSecurity    = true;
+    private boolean             m_checkSecurity    = DEFAULT_SECURITY;
 
     /**
      * The ServiceTracker which monitors the service used to store data.
@@ -91,6 +93,15 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                             ServiceTracker storageService,
                             ServiceTracker logService,
                             ServiceTracker eventService) {
+        if (null == storageService) {
+            throw new IllegalArgumentException("No StorageProvider ServiceTracker specified.");
+        }
+        if (null == logService) {
+            throw new IllegalArgumentException("No LogService ServiceTracker specified.");
+        }
+        if (null == eventService) {
+            throw new IllegalArgumentException("No EventAdmin ServiceTracker specified.");
+        }
         m_storageService = storageService;
         m_storageService.open();
         m_logService = logService;
@@ -107,21 +118,24 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @return The event code as string
      */
     private String getEventTypeName(int type) {
+        String typeName = null;
         switch (type) {
             case UserAdminEvent.ROLE_CHANGED:
-                return "ROLE_CHANGED";
-
+                typeName = "ROLE_CHANGED";
+                break;
             case UserAdminEvent.ROLE_CREATED:
-                return "ROLE_CREATED";
-
+                typeName = "ROLE_CREATED";
+                break;
             case UserAdminEvent.ROLE_REMOVED:
-                return "ROLE_REMOVED";
-
-            default:
-                return null;
+                typeName = "ROLE_REMOVED";
         }
+        return typeName;
     }
 
+    protected boolean doCheckSecurity() {
+        return m_checkSecurity;
+    }
+    
     /**
      * Checks if the caller has admin permissions.
      * 
@@ -148,7 +162,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
-        m_checkSecurity = true;
+        m_checkSecurity = DEFAULT_SECURITY;
         //
         if (null !=properties) {
             String checkSecurity = (String) properties.get(PROP_SECURITY);
@@ -168,8 +182,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == name) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
         }
-        if (   (type != org.osgi.service.useradmin.Role.GROUP)
-            && (type != org.osgi.service.useradmin.Role.USER)) {
+        if (   (type != Role.GROUP)
+            && (type != Role.USER)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_ROLE_TYPE);
         }
         if (null != getRole(name)) {
@@ -182,11 +196,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         try {
             StorageProvider storageProvider = getStorageProvider();
             switch (type) {
-                case org.osgi.service.useradmin.Role.USER:
+                case Role.USER:
                     role = storageProvider.createUser(this, name);
                     break;
 
-                case org.osgi.service.useradmin.Role.GROUP:
+                case Role.GROUP:
                     role = storageProvider.createGroup(this, name);
                     break;
 
@@ -194,11 +208,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                     // never reached b/o previous checks
                     break;
             }
-            if (null != role) {
-                fireEvent(UserAdminEvent.ROLE_CREATED, role);
-            } else {
-                logMessage(this, "role was not created", LogService.LOG_ERROR);
-            }
+            fireEvent(UserAdminEvent.ROLE_CREATED, role);
         } catch (StorageException e) {
             logMessage(this, e.getMessage(), LogService.LOG_ERROR);
         }
@@ -212,13 +222,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == user) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_USER));
         }
-        try {
-            AuthorizationImpl authorization = new AuthorizationImpl(this, user);
-            return authorization;
-        } catch (StorageException e) {
-            logMessage(this, "error when authorizing user: " + e.getMessage(), LogService.LOG_ERROR);
-        }
-        return null;
+        AuthorizationImpl authorization = new AuthorizationImpl(this, user);
+        return authorization;
     }
 
     /**
@@ -314,9 +319,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#getStorageProvider()
      */
     public StorageProvider getStorageProvider() throws StorageException {
-        if (null == m_storageService) {
-            throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
-        }
         StorageProvider storageProvider = (StorageProvider) m_storageService.getService();
         if (null == storageProvider) {
             throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
@@ -328,8 +330,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#logMessage(Object, String, int)
      */
     public void logMessage(Object source, String message, int level) {
-        LogService log = null != m_logService ? (LogService) m_logService.getService()
-                                              : null;
+        LogService log = (LogService) m_logService.getService();
         if (null != log) {
             log.log(level, "[" + source.getClass().getName() + "] " + message);
         }
@@ -339,8 +340,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#fireEvent(int, Role)
      */
     public void fireEvent(int type, Role role) {
-        EventAdmin eventAdmin = null != m_eventService ? (EventAdmin) m_eventService.getService()
-                                                       : null;
+        EventAdmin eventAdmin = (EventAdmin) m_eventService.getService();
         if (null != eventAdmin) {
             ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
             UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);

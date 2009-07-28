@@ -36,15 +36,9 @@ public class AuthorizationImpl implements Authorization {
 
     private UserAdminImpl m_userAdmin = null;
 
-    protected AuthorizationImpl(UserAdminImpl userAdmin, User user) throws StorageException {
+    protected AuthorizationImpl(UserAdminImpl userAdmin, User user) {
         m_userAdmin = userAdmin;
         m_user = user;
-        if (null == m_user) {
-            m_user = (User) m_userAdmin.getRole(Role.USER_ANYONE);
-            if (null == m_user) {
-                throw new StorageException("Anonymous user '" + Role.USER_ANYONE + "' does not exist");
-            }
-        }
     }
 
     public String getName() {

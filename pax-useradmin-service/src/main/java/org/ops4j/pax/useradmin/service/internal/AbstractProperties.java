@@ -70,8 +70,7 @@ public abstract class AbstractProperties extends Hashtable {
         //
         if (null != properties) {
             for (String key : properties.keySet()) {
-                String value = (String) properties.get(key);
-                super.put(key, value);
+                super.put(key, properties.get(key));
             }
         }
     }

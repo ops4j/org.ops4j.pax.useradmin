@@ -15,6 +15,8 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,7 @@ import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.UserAdminEvent;
 import org.osgi.service.useradmin.UserAdminPermission;
@@ -37,15 +40,16 @@ import org.osgi.service.useradmin.UserAdminPermission;
  */
 public class RoleImplTest {
 
-    private static final String NAME = "someRole";
-    private static final String KEY1 = "key1";
+    private static final String NAME   = "someRole";
+    private static final String KEY1   = "key1";
     private static final String VALUE1 = "someValue1";
-    private static final String KEY2 = "key2";
+    private static final String KEY2   = "key2";
     private static final byte[] VALUE2 = "someValue2".getBytes();
     
     private Map<String, Object> getProperties() {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(KEY1, VALUE1);
+        properties.put(KEY2, VALUE2);
         return properties;
     }
     
@@ -96,8 +100,9 @@ public class RoleImplTest {
         Assert.assertEquals("Invalid type", Role.ROLE, role.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, role.getAdmin());
         Dictionary properties = role.getProperties(); 
+        Assert.assertNotNull(properties);
         Assert.assertNotNull("Invalid properties", properties);
-        Assert.assertEquals("Mismatching property count", 1, properties.size());
+        Assert.assertEquals("Mismatching property count", 2, properties.size());
     }
     
     @Test (expected = IllegalArgumentException.class)
@@ -114,6 +119,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().get(null);
+        //
         EasyMock.verify(userAdmin, sp);
     }
     
@@ -131,6 +137,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().get("");
+        //
         EasyMock.verify(userAdmin, sp);
     }
     
@@ -148,6 +155,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().get(666);
+        //
         EasyMock.verify(userAdmin, sp);
     }
     
@@ -158,6 +166,8 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin);
         //
         Assert.assertEquals("Mismatching value", VALUE1, role.getProperties().get(KEY1));
+        Assert.assertEquals("Mismatching value", VALUE2, role.getProperties().get(KEY2));
+        //
         EasyMock.verify(userAdmin);
     }
     
@@ -176,6 +186,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put(null, VALUE1);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -194,6 +205,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put("", VALUE1);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -212,6 +224,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put(666, VALUE1);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -230,6 +243,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put(KEY1, null);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -248,6 +262,42 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().put(KEY1, 666);
+        //
+        EasyMock.verify(userAdmin, sp);
+    }
+
+    @Test
+    @SuppressWarnings(value = "unchecked")
+    public void addPropertyStorageException() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        //
+        StorageException exception = new StorageException("");
+        try {
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_PROPERTY);
+            sp.setRoleAttribute(role, KEY1, VALUE1);
+            EasyMock.expectLastCall().andThrow(exception);
+            userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
+                                 EasyMock.matches(exception.getMessage()),
+                                 EasyMock.eq(LogService.LOG_ERROR));
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
+            sp.setRoleAttribute(role, KEY2, VALUE2);
+            EasyMock.expectLastCall().andThrow(exception);
+            userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
+                                 EasyMock.matches(exception.getMessage()),
+                                 EasyMock.eq(LogService.LOG_ERROR));
+        } catch (StorageException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        Assert.assertNull("Setting property did return some previous value", role.getProperties().put(KEY1, VALUE1));
+        Assert.assertNull("Setting property did return some previous value", role.getProperties().put(KEY2, VALUE2));
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -263,12 +313,19 @@ public class RoleImplTest {
             sp.setRoleAttribute(role, KEY1, VALUE1);
             userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_PROPERTY);
             userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, role);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            sp.setRoleAttribute(role, KEY2, VALUE2);
+            userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
+            userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, role);
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
         EasyMock.replay(userAdmin, sp);
         //
-        role.getProperties().put(KEY1, VALUE1);
+        Assert.assertNull("Setting property did return some previous value", role.getProperties().put(KEY1, VALUE1));
+        Assert.assertNull("Setting property did return some previous value", role.getProperties().put(KEY2, VALUE2));
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -286,6 +343,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().remove(null);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -303,6 +361,7 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().remove("");
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -320,6 +379,41 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().remove(666);
+        //
+        EasyMock.verify(userAdmin, sp);
+    }
+
+    @Test
+    public void removePropertyStorageException() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role = new RoleImpl(NAME, userAdmin, getProperties());
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        //
+        StorageException exception = new StorageException("");
+        try {
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_PROPERTY);
+            sp.removeRoleAttribute(role, KEY1);
+            EasyMock.expectLastCall().andThrow(exception);
+            userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
+                                 EasyMock.matches(exception.getMessage()),
+                                 EasyMock.eq(LogService.LOG_ERROR));
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
+            sp.removeRoleAttribute(role, KEY2);
+            EasyMock.expectLastCall().andThrow(exception);
+            userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
+                                 EasyMock.matches(exception.getMessage()),
+                                 EasyMock.eq(LogService.LOG_ERROR));
+        } catch (StorageException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        Assert.assertNull("Removing property did return some previous value", role.getProperties().remove(KEY1));
+        Assert.assertNull("Removing property did return some previous value", role.getProperties().remove(KEY2));
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
@@ -331,8 +425,13 @@ public class RoleImplTest {
         //
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
-            sp.removeRoleAttribute(role, KEY1);
             userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_PROPERTY);
+            sp.removeRoleAttribute(role, KEY1);
+            userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, role);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
+            sp.removeRoleAttribute(role, KEY2);
             userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, role);
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
@@ -340,9 +439,30 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         role.getProperties().remove(KEY1);
+        role.getProperties().remove(KEY2);
+        //
         EasyMock.verify(userAdmin, sp);
     }
 
     // Note: a test for the clear() method is not needed since the Dictionary
     // class does not provide a clear method
+
+    @Test
+    public void impliedByOk() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        RoleImpl role1 = new RoleImpl(NAME, userAdmin, getProperties());
+        RoleImpl role2 = new RoleImpl(Role.USER_ANYONE, userAdmin, getProperties());
+        //
+        EasyMock.replay(userAdmin);
+        //
+        Collection<String> checkedRoles = new ArrayList<String>();
+        Assert.assertTrue(role2.isImpliedBy(role1, checkedRoles));
+        checkedRoles.clear();
+        Assert.assertTrue(role2.isImpliedBy(null, checkedRoles));
+        checkedRoles.clear();
+        checkedRoles.add(Role.USER_ANYONE);
+        Assert.assertFalse(role2.isImpliedBy(null, checkedRoles));
+        //
+        EasyMock.verify(userAdmin);
+    }
 }

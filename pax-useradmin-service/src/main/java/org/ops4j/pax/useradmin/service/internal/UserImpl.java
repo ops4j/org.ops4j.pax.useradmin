@@ -95,6 +95,6 @@ public class UserImpl extends RoleImpl implements User {
             return (false);
         }
         checkedRoles.add(getName());
-        return ((getName()).equals(role.getName()));
+        return getName().equals(role.getName()); // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
     }
 }
