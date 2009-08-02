@@ -18,7 +18,7 @@ package org.ops4j.pax.useradmin.service.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.ops4j.pax.useradmin.service.spi.StorageException;
+import org.ops4j.pax.useradmin.service.internal.RoleImpl.ImplicationResult;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.useradmin.Authorization;
 import org.osgi.service.useradmin.Role;
@@ -41,17 +41,22 @@ public class AuthorizationImpl implements Authorization {
         m_user = user;
     }
 
+    /**
+     * @see Authorization#getName()
+     */
     public String getName() {
-        return null != m_user ? m_user.getName() : Role.USER_ANYONE;
+        return null != m_user ? m_user.getName() : null;
     }
 
     public String[] getRoles() {
         Collection<String> roleNames = new ArrayList<String>();
         try {
             for (Role role : m_userAdmin.getRoles(null)) {
-                if (((RoleImpl) role).isImpliedBy(m_user, new ArrayList<String>())) {
-                    String name = role.getName();
-                    if (!Role.USER_ANYONE.equals(name)) {
+                if (!Role.USER_ANYONE.equals(role.getName())) {
+                    ImplicationResult result = ((RoleImpl) role).isImpliedBy(m_user,
+                                                                             new ArrayList<String>());
+                    if (ImplicationResult.IMPLIEDBY_YES == result) {
+                        String name = role.getName();
                         roleNames.add(name);
                     }
                 }
@@ -60,15 +65,24 @@ public class AuthorizationImpl implements Authorization {
                 return roleNames.toArray(new String[0]);
             }
         } catch (InvalidSyntaxException e) {
-            // will never be reached b/o checks in getRoles()
+            // will never be reached because UserAdmin.getRoles() allows null filters
         }
         return null;
     }
 
     public boolean hasRole(String name) {
+//        String[] roles = getRoles();
+//        if (null != roles) {
+//            for (String role : roles) {
+//                if (role.equals(name)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
         RoleImpl roleToCheck = (RoleImpl) m_userAdmin.getRole(name);
         if (null != roleToCheck) {
-            return roleToCheck.isImpliedBy(m_user, new ArrayList<String>());
+            return ImplicationResult.IMPLIEDBY_YES == roleToCheck.isImpliedBy(m_user, new ArrayList<String>());
         }
         return false;
     }

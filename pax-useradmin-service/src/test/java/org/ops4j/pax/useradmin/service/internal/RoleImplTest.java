@@ -25,6 +25,7 @@ import junit.framework.Assert;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
+import org.ops4j.pax.useradmin.service.internal.RoleImpl.ImplicationResult;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.service.log.LogService;
@@ -447,7 +448,7 @@ public class RoleImplTest {
     // Note: a test for the clear() method is not needed since the Dictionary
     // class does not provide a clear method
 
-    @Test
+    @Test (expected = IllegalStateException.class)
     public void impliedByOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         RoleImpl role1 = new RoleImpl(NAME, userAdmin, getProperties());
@@ -456,12 +457,12 @@ public class RoleImplTest {
         EasyMock.replay(userAdmin);
         //
         Collection<String> checkedRoles = new ArrayList<String>();
-        Assert.assertTrue(role2.isImpliedBy(role1, checkedRoles));
-        checkedRoles.clear();
-        Assert.assertTrue(role2.isImpliedBy(null, checkedRoles));
-        checkedRoles.clear();
-        checkedRoles.add(Role.USER_ANYONE);
-        Assert.assertFalse(role2.isImpliedBy(null, checkedRoles));
+        Assert.assertEquals("", ImplicationResult.IMPLIEDBY_YES, role2.isImpliedBy(role1, checkedRoles));
+//        checkedRoles.clear();
+//        Assert.assertEquals("", ImplicationResult.IMPLIEDBY_YES, role2.isImpliedBy(null, checkedRoles));
+//        checkedRoles.clear();
+//        checkedRoles.add(Role.USER_ANYONE);
+//        Assert.assertEquals("", ImplicationResult.IMPLIEDBY_NO, role2.isImpliedBy(null, checkedRoles));
         //
         EasyMock.verify(userAdmin);
     }

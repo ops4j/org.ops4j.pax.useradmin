@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
+import org.ops4j.pax.useradmin.service.internal.RoleImpl.ImplicationResult;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.service.log.LogService;
@@ -36,7 +37,8 @@ import org.osgi.service.useradmin.Role;
  */
 public class GroupImplTest {
 
-    private static final String GROUP_NAME = "someGroup";
+    private static final String GROUP_NAME1 = "someGroup1";
+    private static final String GROUP_NAME2 = "someGroup2";
     private static final String USER_NAME1 = "user1";
     private static final String USER_NAME2 = "user2";
     private static final String USER_NAME3 = "user3";
@@ -44,9 +46,9 @@ public class GroupImplTest {
     @Test
     public void constructOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         Assert.assertNotNull("Could not create GroupImpl instance", group);
-        Assert.assertEquals("Mismatching name", GROUP_NAME, group.getName());
+        Assert.assertEquals("Mismatching name", GROUP_NAME1, group.getName());
         Assert.assertEquals("Invalid type", Role.GROUP, group.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, group.getAdmin());
     }
@@ -54,7 +56,7 @@ public class GroupImplTest {
     @Test
     public void addAndRemoveMember() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
         RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
@@ -95,7 +97,7 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberNull() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         EasyMock.replay(userAdmin);
         //
         Assert.assertFalse("Null member added", group.addMember(null));
@@ -106,7 +108,7 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberStorageException() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
@@ -130,7 +132,7 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
@@ -150,7 +152,7 @@ public class GroupImplTest {
     @Test
     public void getNoBasicMembers() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
@@ -168,7 +170,7 @@ public class GroupImplTest {
     @Test
     public void addAndGetSomeBasicMembers() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
         RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
@@ -210,7 +212,7 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberNull() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         //
         EasyMock.replay(userAdmin);
         //
@@ -222,7 +224,7 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberStorageException() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
@@ -246,7 +248,7 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
@@ -266,7 +268,7 @@ public class GroupImplTest {
     @Test
     public void getNoRequiredMembers() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
@@ -284,7 +286,7 @@ public class GroupImplTest {
     @Test
     public void addAndGetSomeRequiredMembers() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
         RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
@@ -321,102 +323,178 @@ public class GroupImplTest {
         EasyMock.verify(userAdmin, sp);
     }
 
+    /*
+     * Setup:
+     * 
+     * user1 - basic member of group1 and group2 
+     * user2 - basic member of group1
+     * user3 - not in any group
+     * 
+     * group1:
+     *     - basic: user1, user2
+     * group2:
+     *     - required: group1
+     *     - basic: user1
+     */
+    
     @Test
     public void impliedByOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME, userAdmin, null, null);
-        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
-        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
-        RoleImpl role3 = new UserImpl(USER_NAME3, userAdmin, null, null);
+        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null, null);
+        RoleImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        RoleImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
+        RoleImpl user3 = new UserImpl(USER_NAME3, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
             userAdmin.checkAdminPermission();
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
-            EasyMock.expect(sp.addMember(group, role1)).andReturn(true);
+            EasyMock.expect(sp.addMember(group1, user1)).andReturn(true);
             userAdmin.checkAdminPermission();
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
-            EasyMock.expect(sp.addRequiredMember(group, role2)).andReturn(true);
+            EasyMock.expect(sp.addMember(group1, user2)).andReturn(true);
             //
-            // User1
+            userAdmin.checkAdminPermission();
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            EasyMock.expect(sp.addMember(group2, user1)).andReturn(true);
+            userAdmin.checkAdminPermission();
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            EasyMock.expect(sp.addRequiredMember(group2, group1)).andReturn(true);
+            //
+            // User1 implies group1
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             Collection<Role> requiredRoles = new ArrayList<Role>();
-            requiredRoles.add(role2);
-            EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andReturn(requiredRoles);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             Collection<Role> basicRoles = new ArrayList<Role>();
-            basicRoles.add(role1);
-            EasyMock.expect(sp.getMembers(userAdmin, group)).andReturn(basicRoles);
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
             //
-            // User2
-            //
-            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
-            requiredRoles = new ArrayList<Role>();
-            requiredRoles.add(role2);
-            EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andReturn(requiredRoles);
-            //
-            // User3
+            // User2 implies group1
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             requiredRoles = new ArrayList<Role>();
-            requiredRoles.add(role2);
-            EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andReturn(requiredRoles);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             basicRoles = new ArrayList<Role>();
-            basicRoles.add(role1);
-            EasyMock.expect(sp.getMembers(userAdmin, group)).andReturn(basicRoles);
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
             //
-            // User 1 loop
+            // User3 implies group1
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             requiredRoles = new ArrayList<Role>();
-            requiredRoles.add(role2);
-            EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andReturn(requiredRoles);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             basicRoles = new ArrayList<Role>();
-            basicRoles.add(role1);
-            EasyMock.expect(sp.getMembers(userAdmin, group)).andReturn(basicRoles);
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
+            //
+            // User 1 implies group2
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            requiredRoles = new ArrayList<Role>();
+            requiredRoles.add(group1);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group2)).andReturn(requiredRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            requiredRoles = new ArrayList<Role>();
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            basicRoles = new ArrayList<Role>();
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            basicRoles = new ArrayList<Role>();
+            basicRoles.add(user1);
+            EasyMock.expect(sp.getMembers(userAdmin, group2)).andReturn(basicRoles);
+            //
+            // User 2 implies group2
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            requiredRoles = new ArrayList<Role>();
+            requiredRoles.add(group1);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group2)).andReturn(requiredRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            requiredRoles = new ArrayList<Role>();
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            basicRoles = new ArrayList<Role>();
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            basicRoles = new ArrayList<Role>();
+            basicRoles.add(user1);
+            EasyMock.expect(sp.getMembers(userAdmin, group2)).andReturn(basicRoles);
             //
             // User 2 loop
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             requiredRoles = new ArrayList<Role>();
-            requiredRoles.add(role2);
-            EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andReturn(requiredRoles);
+            requiredRoles.add(group1);
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group2)).andReturn(requiredRoles);
+            //
+            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+            requiredRoles = new ArrayList<Role>();
+            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             basicRoles = new ArrayList<Role>();
-            basicRoles.add(role1);
-            EasyMock.expect(sp.getMembers(userAdmin, group)).andReturn(basicRoles);
+            basicRoles.add(user1);
+            basicRoles.add(user2);
+            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
+//            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+//            requiredRoles = new ArrayList<Role>();
+//            requiredRoles.add(user2);
+//            EasyMock.expect(sp.getRequiredMembers(userAdmin, group1)).andReturn(requiredRoles);
+//            //
+//            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
+//            basicRoles = new ArrayList<Role>();
+//            basicRoles.add(user1);
+//            EasyMock.expect(sp.getMembers(userAdmin, group1)).andReturn(basicRoles);
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
         EasyMock.replay(userAdmin, sp);
         //
-        Assert.assertTrue("Member not added", group.addMember(role1));
-        Assert.assertTrue("Member not added", group.addRequiredMember(role2));
+        Assert.assertTrue("Member not added", group1.addMember(user1));
+        Assert.assertTrue("Member not added", group1.addMember(user2));
+        Assert.assertTrue("Member not added", group2.addMember(user1));
+        Assert.assertTrue("Member not added", group2.addRequiredMember(group1));
         //
         Collection<String> checkedRoles = new ArrayList<String>();
-        Assert.assertTrue("Group not implied by itself", group.isImpliedBy(group, checkedRoles));
+        Assert.assertEquals("Group not implied by itself", ImplicationResult.IMPLIEDBY_YES, group1.isImpliedBy(group1, checkedRoles));
         checkedRoles.clear();
-        Assert.assertTrue("User 1 not implied by group", group.isImpliedBy(role1, checkedRoles));
+        Assert.assertEquals("User 1 does not imply group 1", ImplicationResult.IMPLIEDBY_YES, group1.isImpliedBy(user1, checkedRoles));
         checkedRoles.clear();
-        Assert.assertTrue("User 2 not implied by group", group.isImpliedBy(role2, checkedRoles));
+        Assert.assertEquals("User 2 does not imply group 1", ImplicationResult.IMPLIEDBY_YES, group1.isImpliedBy(user2, checkedRoles));
         checkedRoles.clear();
-        Assert.assertFalse("User 3 is implied by group", group.isImpliedBy(role3, checkedRoles));
+        Assert.assertEquals("User 3 does imply group 1", ImplicationResult.IMPLIEDBY_NO, group1.isImpliedBy(user3, checkedRoles));
         checkedRoles.clear();
-        checkedRoles.add(GROUP_NAME);
-        Assert.assertFalse("Loop not detected", group.isImpliedBy(group, checkedRoles));
+        Assert.assertEquals("User 1 does not imply group 2", ImplicationResult.IMPLIEDBY_YES, group2.isImpliedBy(user1, checkedRoles));
+        checkedRoles.clear();
+        Assert.assertEquals("User 2 does imply group 2", ImplicationResult.IMPLIEDBY_NO, group2.isImpliedBy(user2, checkedRoles));
+        checkedRoles.clear();
+        checkedRoles.add(GROUP_NAME1);
+        Assert.assertEquals("Loop not detected", ImplicationResult.IMPLIEDBY_LOOPDETECTED, group1.isImpliedBy(group1, checkedRoles));
         checkedRoles.clear();
         checkedRoles.add(USER_NAME1);
-        Assert.assertFalse("Loop not detected", group.isImpliedBy(role1, checkedRoles));
-        checkedRoles.clear();
-        checkedRoles.add(USER_NAME2);
-        Assert.assertFalse("Loop not detected", group.isImpliedBy(role2, checkedRoles));
+        Assert.assertEquals("Loop not detected", ImplicationResult.IMPLIEDBY_NO, group2.isImpliedBy(user1, checkedRoles));
         //
         EasyMock.verify(userAdmin);
     }

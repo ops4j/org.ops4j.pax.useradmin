@@ -48,12 +48,32 @@ public class AuthorizationImplTest {
         Assert.assertEquals("Name mismatch", NAME1, authorization.getName());
         //
         authorization = new AuthorizationImpl(userAdmin, null);
-        Assert.assertEquals("Name mismatch", Role.USER_ANYONE, authorization.getName());
+        Assert.assertEquals("Name mismatch", null, authorization.getName());
+//        Assert.assertEquals("Name mismatch", Role.USER_ANYONE, authorization.getName());
     }
     
-    // TODO: not yet finished
     @Test
-    public void getRoles() {
+    public void getRolesInvalidSyntaxException() {
+        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
+        
+        StorageProvider sp = EasyMock.createMock(StorageProvider.class);
+        try {
+            EasyMock.expect(userAdmin.getRoles(null)).andThrow(new InvalidSyntaxException("", null));
+        } catch (InvalidSyntaxException e) {
+            // expected
+        }
+        EasyMock.replay(userAdmin, sp);
+        //
+        Authorization authorization = new AuthorizationImpl(userAdmin, user);
+        Assert.assertNotNull("Authorization object not created", authorization);
+        Assert.assertNull("Roles found after exception was thrown", authorization.getRoles());
+        //
+        EasyMock.verify(userAdmin, sp);
+    }
+    
+    @Test
+    public void getRolesOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
         
@@ -65,9 +85,6 @@ public class AuthorizationImplTest {
             userAdmin.checkAdminPermission();
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.addMember(group1, user)).andReturn(true);
-//            userAdmin.checkAdminPermission();
-//            EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
-//            EasyMock.expect(sp.addMember(group2, user)).andReturn(true);
             EasyMock.expect(userAdmin.getRoles(null)).andReturn(new Role[] { user, group1, group2 });
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
@@ -81,7 +98,6 @@ public class AuthorizationImplTest {
             EasyMock.expect(sp.getRequiredMembers(userAdmin, group2)).andReturn(new ArrayList<Role>());
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             Collection<Role> group2Members = new ArrayList<Role>();
-            group2Members.add(user);
             EasyMock.expect(sp.getMembers(userAdmin, group2)).andReturn(group2Members);
         } catch (StorageException e) {
             Assert.fail("Unexpected StorageException: " + e.getMessage());
@@ -91,12 +107,10 @@ public class AuthorizationImplTest {
         EasyMock.replay(userAdmin, sp);
         //
         group1.addMember(user);
-//        group2.addMember(user);
         //
         String[] roles = authorization.getRoles();
-        for (String role : roles) {
-            System.out.println("roles = " + role);
-        }
+        Assert.assertNotNull("No authorized roles found", roles);
+        Assert.assertEquals("Not exactly 2 authorized roles found", 2, roles.length);
         //
         EasyMock.verify(userAdmin, sp);
     }

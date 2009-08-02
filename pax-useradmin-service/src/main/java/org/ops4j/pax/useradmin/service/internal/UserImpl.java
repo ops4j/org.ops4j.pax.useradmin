@@ -34,7 +34,7 @@ public class UserImpl extends RoleImpl implements User {
      * The credentials stored for this user.
      */
     private UserCredentials m_credentials = null;
-
+    
     /**
      * Constructor.
      * 
@@ -84,17 +84,19 @@ public class UserImpl extends RoleImpl implements User {
     }
 
     /**
-     * Checks if this user is implied by the given role.
+     * Checks if this user is implied by the given role. Users are only implied
+     * by themselves.
      * 
      * @param role The role to check.
      * @param checkedRoles Used for loop detection.
      * @return True if this role is implied by the given one, false otherwise.
      */
-    protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
+    protected ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
-            return (false);
+            return ImplicationResult.IMPLIEDBY_LOOPDETECTED;
         }
         checkedRoles.add(getName());
-        return getName().equals(role.getName()); // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
+        return getName().equals(role.getName()) ? ImplicationResult.IMPLIEDBY_YES : ImplicationResult.IMPLIEDBY_NO;
+        // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
     }
 }

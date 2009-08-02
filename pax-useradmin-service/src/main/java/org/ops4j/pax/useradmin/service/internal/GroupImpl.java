@@ -150,49 +150,39 @@ public class GroupImpl extends UserImpl implements Group {
      * @param checkedRoles Used for loop detection.
      * @return True if this role is implied by the given one, false otherwise.
      */
-    protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
-        if (checkedRoles.contains(getName())) {
-            return false;
-        }
-        checkedRoles.add(getName());
-        if (getName().equals(role.getName())) {
-            return true;
-        }
-        //
-        boolean isImplied = false;
-        //
-        Role[] members = getRequiredMembers();
-        if (null != members) {
-            isImplied = true;
-            Collection<String> requiredCheckedRoles = new ArrayList<String>(checkedRoles);
-            for (Role member : members) {
-                if (requiredCheckedRoles.contains(member.getName())) {
-                    isImplied = false;
-                    break;
-                }
-                if (!((RoleImpl) member).isImpliedBy(role, requiredCheckedRoles)) {
-                    isImplied = false;
-                    break;
+    protected ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles) {
+        // check if this group is implied
+        ImplicationResult isImplied = super.isImpliedBy(role, checkedRoles);
+        if (ImplicationResult.IMPLIEDBY_NO != isImplied) {
+            return isImplied;
+        } else {
+            // check if all required members are implied
+            Role[] members = getRequiredMembers();
+            if (null != members) {
+                Collection<String> localCheckedRoles = new ArrayList<String>(checkedRoles);
+                for (Role member : members) {
+                    isImplied = ((RoleImpl) member).isImpliedBy(role,
+                                                                localCheckedRoles);
+                    if (ImplicationResult.IMPLIEDBY_YES != isImplied) {
+                        // not implied because not all required members are
+                        // implied or a loop was detected
+                        return isImplied;
+                    }
                 }
             }
-        }
-        //
-        if (!isImplied) {
             members = getMembers();
             if (null != members) {
-                Collection<String> basicCheckedRoles = new ArrayList<String>(checkedRoles);
+                Collection<String> localCheckedRoles = new ArrayList<String>(checkedRoles);
                 for (Role member : members) {
-                    if (basicCheckedRoles.contains(member.getName())) {
-                        continue;
-                    }
-                    if (((RoleImpl) member).isImpliedBy(role, basicCheckedRoles)) {
-//                        return true;
-                        isImplied = true;
-                        break;
+                    isImplied = ((RoleImpl) member).isImpliedBy(role,
+                                                                localCheckedRoles);
+                    if (ImplicationResult.IMPLIEDBY_YES == isImplied) {
+                        // implied because one basic member is implied
+                        return isImplied;
                     }
                 }
             }
         }
-        return isImplied;
+        return ImplicationResult.IMPLIEDBY_NO;
     }
 }

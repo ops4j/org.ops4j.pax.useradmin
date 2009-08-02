@@ -47,6 +47,8 @@ public class RoleImpl implements Role {
      */
     private RoleProperties m_properties = null;
 
+    protected enum ImplicationResult { IMPLIEDBY_YES, IMPLIEDBY_NO, IMPLIEDBY_LOOPDETECTED };
+
     /**
      * Constructor.
      * 
@@ -102,13 +104,16 @@ public class RoleImpl implements Role {
      * 
      * @param role The role to check.
      * @param checkedRoles Used for loop detection.
-     * @return True if this role is implied by the given one, false otherwise.
+     * @return An <code>ImplicationResult</code>.
      */
-    protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
-        if (checkedRoles.contains(getName())) {
-            return (false);
-        }
-        checkedRoles.add(getName());
-        return (getName().equals(Role.USER_ANYONE));
+    protected ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles) {
+        throw new IllegalStateException("Internal error: RoleImpl.impliedBy() must not be called for roles.");
     }
+//  protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
+//        if (checkedRoles.contains(getName())) {
+//            return (false);
+//        }
+//        checkedRoles.add(getName());
+//        return (getName().equals(Role.USER_ANYONE));
+//    }
 }
