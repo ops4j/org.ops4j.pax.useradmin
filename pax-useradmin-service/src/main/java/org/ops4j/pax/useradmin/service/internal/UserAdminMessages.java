@@ -21,7 +21,7 @@ package org.ops4j.pax.useradmin.service.internal;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public final class UserAdminMessages {
+public interface UserAdminMessages {
 
     public static String MSG_INVALID_NAME            = "The 'name' parameter is not allowed to be null";
     public static String MSG_INVALID_ROLE_TYPE       = "Only GROUP or USER is allowed as role type";
