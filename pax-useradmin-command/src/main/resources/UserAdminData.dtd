@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE UserAdminData [
+    <!--
+      Data interchange format for OSGi UserAdmin services.
+      -->
+    <!-- Data consists of users and groups - both of them are roles 
+         that have properties and/or credentials assigned.
+      -->
+    <!ELEMENT Users (Role)*>
+    <!ELEMENT Groups (Role)*>
+    
+    <!ELEMENT Role (Attribute)*>
+    <!ATTLIST Role 
+              name #REQUIRED
+              >
+    
+    <!ELEMENT Attribute>
+    <!ATTLIST Attribute
+              type (property|credential|member)       #REQUIRED
+              key                                     #REQUIRED
+              value                             CDATA #REQUIRED
+              >
+              <!-- Note: for type property or credential the key/value pairs are
+                         stored in the appropriate list. Member types are expected
+                         to have the member name as key while the value specifies
+                         the type of membership as either 'basic' or 'required'.
+                         Default is 'basic'.
+                -->
+]>

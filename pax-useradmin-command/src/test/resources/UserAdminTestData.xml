@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE UserAdminData SYSTEM "UserAdminData.dtd">
+<UserAdminData>
+  <Users>
+    <Role name="jdeveloper">
+      <attribute type = "property"
+                 key  = "uid"
+                 value = "Joe Developer" />
+    </Role>
+    <Role name="jdoe">
+      <attribute type = "property"
+                 key  = "uid"
+                 value = "John Doe" />
+    </Role>
+  </Users>
+  <Groups>
+    <Role name="people">
+      <attribute type = "property"
+                 key  = "cn"
+                 value = "people" />
+      <attribute type = "member"
+                 key  = "jdeveloper"
+                 value = "basic" />
+      <attribute type = "member"
+                 key  = "jdoe"
+                 value = "basic" />
+    </Role>
+    <Role name="developers">
+      <attribute type = "property"
+                 key  = "cn"
+                 value = "developers" />
+      <attribute type = "member"
+                 key  = "people"
+                 value = "required" />
+      <attribute type = "member"
+                 key  = "jdeveloper"
+                 value = "basic" />
+    </Role>
+  </Groups>
+</UserAdminData>
