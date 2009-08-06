@@ -48,51 +48,10 @@ public class XMLContentImporter implements ContentHandler {
         m_writer = writer;
     }
 
-    /**
-     * @see ContentHandler#endDocument()
-     */
-    public void endDocument() throws SAXException {
-        try {
-            m_writer.close();
-        } catch (CommandException e) {
-            throw new SAXException("Internal error - CommandException caught: " + e.getMessage(), e);
-        }
-    }
-
-    /** 
-     * @see ContentHandler#endElement(String, String, String)
-     */
-    public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
-            m_state = State.initial;
-        } else if (XMLConstants.ELEMENT_USERS.equals(localName)) {
-            m_state = State.initial;
-        } else if (XMLConstants.ELEMENT_ROLE.equals(localName)) {
-            //
-            if (!(m_state == State.readingGroup || m_state == State.readingUser)) {
-                throw new SAXException("Illegal state: not reading users or groups.");
-            }
-            try {
-                Role role = m_writer.createRole(Role.GROUP,
-                                                m_currentRoleName,
-                                                m_currentProperties,
-                                                m_currentCredentials);
-                if (m_state == State.readingGroup) {
-                    m_writer.addMembers(role,
-                                        m_currentBasicMembers,
-                                        m_currentRequiredMembers);
-                }
-            } catch (CommandException e) {
-                throw new SAXException("Could not create role '" + m_currentRoleName + "'", e);
-            }
-        }
-    }
-
     /** 
      * @see ContentHandler#startElement(String, String, String, Attributes)
      */
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-        
         if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
             m_state = State.readingGroup;
             m_currentRoleName = null;
@@ -128,8 +87,42 @@ public class XMLContentImporter implements ContentHandler {
         }
     }
 
+    /** 
+     * @see ContentHandler#endElement(String, String, String)
+     */
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
+            m_state = State.initial;
+        } else if (XMLConstants.ELEMENT_USERS.equals(localName)) {
+            m_state = State.initial;
+        } else if (XMLConstants.ELEMENT_ROLE.equals(localName)) {
+            //
+            if (!(m_state == State.readingGroup || m_state == State.readingUser)) {
+                throw new SAXException("Illegal state: not reading users or groups.");
+            }
+            try {
+                Role role = m_writer.createRole(Role.GROUP,
+                                                m_currentRoleName,
+                                                m_currentProperties,
+                                                m_currentCredentials);
+                if (m_state == State.readingGroup) {
+                    m_writer.addMembers(role,
+                                        m_currentBasicMembers,
+                                        m_currentRequiredMembers);
+                }
+            } catch (CommandException e) {
+                throw new SAXException("Could not create role '" + m_currentRoleName + "'", e);
+            }
+        }
+    }
+
     // not implemented ...
     
+    /**
+     * @see ContentHandler#endDocument()
+     */
+    public void endDocument() throws SAXException {}
+
     /*
      * (non-Javadoc)
      * 

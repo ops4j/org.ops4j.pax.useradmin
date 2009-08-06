@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ops4j.pax.useradmin.command.internal.service;
 
 import java.util.Collection;
@@ -30,21 +29,22 @@ import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
 
 /**
+ * UserAdminDataWriter implementation which writes data to an UserAdmin service.
+ * 
  * @author Matthias Kuespert
- * @since  04.08.2009
+ * @since 04.08.2009
  */
 public class ServiceDataWriter implements UserAdminDataWriter {
 
     private UserAdmin m_service = null;
-    
-    
+
     public ServiceDataWriter(BundleContext context, String id) throws CommandException {
         m_service = ServiceUtils.getUserAdminService(context, id);
         if (null == m_service) {
             throw new CommandException("Could not find UserAdmin service in bundle: " + id);
         }
     }
-    
+
     /**
      * @see UserAdminDataWriter#addMembers(Role, Collection, Collection)
      */
@@ -52,32 +52,37 @@ public class ServiceDataWriter implements UserAdminDataWriter {
                            Collection<String> basicMembers,
                            Collection<String> requiredMembers) throws CommandException {
         if (Role.GROUP != role.getType()) {
-            throw new CommandException("Role '" + role.getName() + "' is not a group: type is "
+            throw new CommandException(  "Role '" + role.getName()
+                                       + "' is not a group: type is "
                                        + role.getType());
         }
         Group group = (Group) role;
         for (String memberName : basicMembers) {
             Role member = m_service.getRole(memberName);
             if (null == member) {
-                throw new CommandException("Basic member role '" + memberName + "' not found for group '" + role.getName() + "'");
+                throw new CommandException(  "Basic member role '" + memberName
+                                           + "' not found for group '"
+                                           + role.getName() + "'");
             }
             group.addMember(member);
         }
         for (String memberName : requiredMembers) {
             Role member = m_service.getRole(memberName);
             if (null == member) {
-                throw new CommandException("Required member role '" + memberName + "' not found for group '" + role.getName() + "'");
+                throw new CommandException(  "Required member role '" + memberName
+                                           + "' not found for group '"
+                                           + role.getName() + "'");
             }
             group.addRequiredMember(member);
         }
-   }
+    }
 
     /**
      * @see UserAdminDataWriter#close()
      */
     public void close() throws CommandException {
     }
-    
+
     /**
      * @see UserAdminDataWriter#createRole(int, String, Map, Map)
      */
@@ -103,5 +108,4 @@ public class ServiceDataWriter implements UserAdminDataWriter {
         }
         return role;
     }
-
 }

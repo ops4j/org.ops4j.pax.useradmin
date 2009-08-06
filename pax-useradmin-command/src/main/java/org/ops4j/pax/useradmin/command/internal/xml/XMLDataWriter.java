@@ -33,6 +33,8 @@ import org.ops4j.pax.useradmin.command.spi.UserAdminDataWriter;
 import org.osgi.service.useradmin.Role;
 
 /**
+ * UserAdminDataWriter implementation which writes data to an XML file.
+ * 
  * @author Matthias Kuespert
  * @since  04.08.2009
  */

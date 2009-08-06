@@ -15,28 +15,41 @@
  */
 package org.ops4j.pax.useradmin.command.internal.service;
 
-import org.ops4j.pax.useradmin.command.CommandException;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.useradmin.UserAdmin;
 
 /**
+ * Utility methods.
+ * 
  * @author Matthias Kuespert
- * @since  05.08.2009
+ * @since 05.08.2009
  */
 public class ServiceUtils {
 
-    protected static UserAdmin getUserAdminService(BundleContext context, String bundleName) throws CommandException {
+    /**
+     * Retrieves a UserAdmin service that is provided by the bundle with the
+     * given name.
+     * 
+     * @param context The BundleContext of the calling bundle.
+     * @param bundleName The symbolic name of the bundle that provides the
+     *                   UserAdmin service.
+     * @return A UserAdmin service provided by the given bundle or null if the
+     *         bundle does not exist or does not provide such a service.
+     * @throws CommandException on internal errors only.
+     */
+    protected static UserAdmin getUserAdminService(BundleContext context, String bundleName) {
         UserAdmin service = null;
         try {
-            for (ServiceReference ref : context.getServiceReferences(UserAdmin.class.getName(), null)) {
+            for (ServiceReference ref : context.getServiceReferences(UserAdmin.class.getName(),
+                                                                     null)) {
                 if (bundleName.equals(ref.getBundle().getSymbolicName())) {
                     service = (UserAdmin) context.getService(ref);
                 }
             }
         } catch (InvalidSyntaxException e) {
-            throw new CommandException("Invalid filter syntax: " + e.getFilter());
+            // never happens since null is an allowed filter
         }
         return service;
     }

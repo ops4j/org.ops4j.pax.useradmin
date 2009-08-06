@@ -16,7 +16,7 @@
 package org.ops4j.pax.useradmin.command.internal.xml;
 
 /**
- * Constants used for interacting with XML documents.
+ * Constants used for interacting with XML documents. See UserAdminData.dtd for details.
  * 
  * @author Matthias Kuespert
  * @since 05.08.2009

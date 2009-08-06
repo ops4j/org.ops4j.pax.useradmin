@@ -27,6 +27,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * UserAdminDataReader implementation which reads data from an XML file.
+ * 
  * @author Matthias Kuespert
  * @since  05.08.2009
  */

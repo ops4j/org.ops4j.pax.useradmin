@@ -82,5 +82,6 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         // and copy the data
         //
         reader.copy(sourceId, writer);
+        writer.close();
     }
 }

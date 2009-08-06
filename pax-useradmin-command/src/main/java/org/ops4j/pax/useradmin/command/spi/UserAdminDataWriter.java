@@ -23,6 +23,8 @@ import org.ops4j.pax.useradmin.command.CommandException;
 import org.osgi.service.useradmin.Role;
 
 /**
+ * Interface which abstracts writing UserAdmin data.
+ * 
  * @author Matthias Kuespert
  * @since 04.08.2009
  */

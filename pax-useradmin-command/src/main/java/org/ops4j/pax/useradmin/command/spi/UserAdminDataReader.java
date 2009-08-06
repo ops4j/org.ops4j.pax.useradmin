@@ -19,10 +19,19 @@ package org.ops4j.pax.useradmin.command.spi;
 import org.ops4j.pax.useradmin.command.CommandException;
 
 /**
+ * Interface which abstracts reading UserAdmin data.
+ * 
  * @author Matthias Kuespert
  * @since  05.08.2009
  */
 public interface UserAdminDataReader {
 
+    /**
+     * Copies data from the source using the given UserAdminDataWriter instance.
+     * 
+     * @param sourceId
+     * @param targetWriter
+     * @throws CommandException
+     */
     void copy(String sourceId, UserAdminDataWriter targetWriter) throws CommandException;
 }
