@@ -31,10 +31,11 @@
   </developers>
 
   <modules>
-  	<module>pax-useradmin-service</module>
-  	<module>pax-useradmin-provider-ldap</module>
+    <module>pax-useradmin-service</module>
+    <module>pax-useradmin-provider-ldap</module>
     <module>pax-useradmin-provider-preferences</module>
-  	<module>pax-useradmin-itest</module>
+    <module>pax-useradmin-command</module>
+    <module>pax-useradmin-itest</module>
   	<!-- 
   	<module>pax-useradmin-provider-rdbms</module>
   	 -->
