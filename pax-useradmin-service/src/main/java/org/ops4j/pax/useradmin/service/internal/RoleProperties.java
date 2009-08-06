@@ -32,28 +32,45 @@ public class RoleProperties extends AbstractProperties {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Initializing constructor.
+     * 
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
+     */
     protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         super(role, util, properties);
     }
 
+    /**
+     * @see AbstractProperties#store(StorageProvider, String, String)
+     */
     @Override
     protected void store(StorageProvider storageProvider, String key, String value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
         storageProvider.setRoleAttribute(getRole(), key, value);
     }
 
+    /**
+     * @see AbstractProperties#store(StorageProvider, String, byte[])
+     */
     @Override
     protected void store(StorageProvider storageProvider, String key, byte[] value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
         storageProvider.setRoleAttribute(getRole(), key, value);
     }
 
+    /**
+     * @see AbstractProperties#remove(StorageProvider, String)
+     */
     @Override
     protected void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
         storageProvider.removeRoleAttribute(getRole(), key);
     }
 
+/*
+ * Activate when OSGi finally moves to Map
+ * 
     @Override
     protected void clear(StorageProvider storageProvider) throws StorageException {
         for (Object key : keySet()) {
@@ -61,4 +78,4 @@ public class RoleProperties extends AbstractProperties {
         }
         storageProvider.clearRoleAttributes(getRole());
     }
-}
+*/}

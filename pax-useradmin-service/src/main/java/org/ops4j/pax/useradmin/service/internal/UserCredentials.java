@@ -19,11 +19,12 @@ import java.util.Map;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
- * A dictionary to manage credentials and communicate changes.
+ * A dictionary to manage user credentials and communicate changes.
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009
@@ -32,14 +33,33 @@ public class UserCredentials extends AbstractProperties {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Initializing constructor.
+     * 
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
+     */
     protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
         super(user, util, properties);
     }
 
+    /**
+     * @return The owning role as user.
+     */
     private User getUser() {
         return (User) getRole();
     }
 
+    /**
+     * @see AbstractProperties#checkGetPermission(String)
+     */
+    @Override
+    protected void checkGetPermission(String key) {
+        getUtil().checkPermission((String) key, UserAdminPermission.GET_CREDENTIAL);
+    }
+
+    /**
+     * @see AbstractProperties#store(StorageProvider, String, String)
+     */
     @Override
     protected void store(StorageProvider storageProvider, String key, String value)
         throws StorageException {
@@ -47,6 +67,9 @@ public class UserCredentials extends AbstractProperties {
         storageProvider.setUserCredential(getUser(), key, value);
     }
 
+    /**
+     * @see AbstractProperties#store(StorageProvider, String, byte[])
+     */
     @Override
     protected void store(StorageProvider storageProvider, String key, byte[] value)
         throws StorageException {
@@ -54,12 +77,18 @@ public class UserCredentials extends AbstractProperties {
         storageProvider.setUserCredential(getUser(), key, value);
     }
 
+    /**
+     * @see AbstractProperties#remove(StorageProvider, String)
+     */
     @Override
     protected void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
         storageProvider.removeUserCredential(getUser(), key);
     }
 
+/*
+ * Activate when OSGi finally moves to Map
+ * 
     @Override
     protected void clear(StorageProvider storageProvider) throws StorageException {
         for (Object key : keySet()) {
@@ -67,9 +96,5 @@ public class UserCredentials extends AbstractProperties {
         }
         storageProvider.clearUserCredentials(getUser());
     }
-    
-    @Override
-    protected void checkGetPermission(String key) {
-        getUtil().checkPermission((String) key, UserAdminPermission.GET_CREDENTIAL);
-    }
+*/    
 }

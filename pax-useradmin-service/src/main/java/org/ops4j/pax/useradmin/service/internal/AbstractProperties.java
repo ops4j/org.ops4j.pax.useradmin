@@ -36,10 +36,19 @@ public abstract class AbstractProperties extends Hashtable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The role these properties belong to.
+     */
     private Role              m_role           = null;
 
+    /**
+     * The interface used to connect to the UserAdmin service.
+     */
     private UserAdminUtil     m_util           = null;
 
+    /**
+     * @return The role these properties belong to.
+     */
     protected Role getRole() {
         return m_role;
     }
@@ -51,17 +60,53 @@ public abstract class AbstractProperties extends Hashtable {
         return m_util;
     }
 
+    // abstract interface
+
+    /**
+     * Stores a String value.
+     * 
+     * @param storageProvider The StorageProvider to use.
+     * @param key The key.
+     * @param value The <code>String</code> value.
+     * @throws StorageException
+     */
     protected abstract void store(StorageProvider storageProvider, String key, String value)
     throws StorageException;
 
+    /**
+     * Stores a byte[] value.
+     * 
+     * @param storageProvider The StorageProvider to use.
+     * @param key The key.
+     * @param value The <code>byte[]</code> value.
+     * @throws StorageException
+     */
     protected abstract void store(StorageProvider storageProvider, String key, byte[] value)
     throws StorageException;
 
+    /**
+     * Removes an entry.
+     * 
+     * @param storageProvider The StorageProvider to use.
+     * @param key The key.
+     * @throws StorageException
+     */
     protected abstract void remove(StorageProvider storageProvider, String key)
-        throws StorageException;
+    throws StorageException;
 
+    /*
+     * Activate when OSGi finally moves to Map
+     * 
     protected abstract void clear(StorageProvider storageProvider) throws StorageException;
+     */
 
+    /**
+     * Initializing constructor.
+     *  
+     * @param role The role these properties belong to.
+     * @param util A UserAdmin utility interface.
+     * @param properties Initial data - maybe null
+     */
     protected AbstractProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         m_role = role;
         m_util = util;
@@ -84,6 +129,9 @@ public abstract class AbstractProperties extends Hashtable {
     protected void checkGetPermission(String key) {
     }
 
+    /**
+     * @see Hashtable#get(Object)
+     */
     @Override
     public synchronized Object get(Object key) {
         if (null == key) {
@@ -99,6 +147,9 @@ public abstract class AbstractProperties extends Hashtable {
         return super.get(key);
     }
 
+    /**
+     * @see Hashtable#put(Object, Object)
+     */
     @Override
     public synchronized Object put(Object key, Object value) {
         if (null == key) {
@@ -131,6 +182,9 @@ public abstract class AbstractProperties extends Hashtable {
         return null;
     }
 
+    /**
+     * @see Hashtable#remove(Object)
+     */
     @Override
     public synchronized Object remove(Object key) {
         if (key == null) {
@@ -153,15 +207,21 @@ public abstract class AbstractProperties extends Hashtable {
         return null;
     }
 
+    /**
+     * @see Hashtable#clear()
+     */
     @Override
     public synchronized void clear() {
-        try {
-            StorageProvider storageProvider = m_util.getStorageProvider();
-            clear(storageProvider);
-            m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
-            super.clear();
-        } catch (StorageException e) {
-            m_util.logMessage(this, e.getMessage(), LogService.LOG_ERROR);
-        }
+        throw new IllegalStateException("AbstractProperties.clear() not yet implemented");
+//        * Activate when OSGi finally moves to Map
+//        * 
+//        try {
+//            StorageProvider storageProvider = m_util.getStorageProvider();
+//            clear(storageProvider);
+//            m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
+//            super.clear();
+//        } catch (StorageException e) {
+//            m_util.logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+//        }
     }
 }
