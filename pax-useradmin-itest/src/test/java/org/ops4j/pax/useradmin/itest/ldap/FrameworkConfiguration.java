@@ -18,13 +18,8 @@ package org.ops4j.pax.useradmin.itest.ldap;
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -33,6 +28,7 @@ import junit.framework.Assert;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSConfiguration;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSServer;
+import org.ops4j.pax.useradmin.TestUtil;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
@@ -64,39 +60,6 @@ public class FrameworkConfiguration {
                                       .version("0.0.1-SNAPSHOT").startLevel(5));
     }
     
-    private static void delete(File root, boolean deleteRoot) {
-        if (root.isDirectory()) {
-            for (File f : root.listFiles()) {
-                delete(f, true);
-            }
-        }
-        if (deleteRoot) {
-            root.delete();
-        }
-    }
-    
-    private static void copyResourceToFile(String resourcePath, File directory) {
-        InputStream is = FrameworkConfiguration.class.getResourceAsStream(resourcePath);
-        Assert.assertNotNull("Could not load file: " + resourcePath, is);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(directory.getPath()
-                                                                      + resourcePath));
-            while (true) {
-                String line = reader.readLine();
-                if (null == line)
-                    break;
-                writer.append(line);
-                writer.newLine();
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail(  "Error copying resource " + resourcePath + " to "
-                        + directory.getPath() + " - " + e.getMessage());
-        }
-    }
-    
     /**
      * Standard initialization for all tests: update configuration for the StorageProvider bundle
      * 
@@ -114,18 +77,18 @@ public class FrameworkConfiguration {
         //
         File workDir = new File("./server-work");
         if (workDir.exists() && workDir.isDirectory()) {
-            delete(workDir, true);
+            TestUtil.delete(workDir, true);
         }
         //
         // clean/initialize data directory
         //
         File dataDir = new File("./server-data");
         if (dataDir.exists() && dataDir.isDirectory()) {
-            delete(dataDir, false);
+            TestUtil.delete(dataDir, false);
         } else {
             dataDir.mkdir();
         }
-        copyResourceToFile("/ldaptree-test.ldif", dataDir);
+        TestUtil.copyResourceToFile("/ldaptree-test.ldif", dataDir);
         //
         // configure ApacheDS LDAP server
         //

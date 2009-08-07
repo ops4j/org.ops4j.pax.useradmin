@@ -54,6 +54,7 @@ public class UserAdminCommandImpl implements UserAdminCommand {
     public void copyData(String sourceUri, String targetUri)  throws CommandException {
         // create the writer
         //
+        System.out.println("copy from " + sourceUri + " to " + targetUri);
         UserAdminDataWriter writer = null;
         if (targetUri.startsWith(PROTOCOL_USERADMIN)) {
             String targetId = targetUri.substring(PROTOCOL_USERADMIN.length());
@@ -70,10 +71,10 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         UserAdminDataReader reader = null;
         String sourceId = null;
         if (sourceUri.startsWith(PROTOCOL_USERADMIN)) {
-            sourceId = targetUri.substring(PROTOCOL_USERADMIN.length());
+            sourceId = sourceUri.substring(PROTOCOL_USERADMIN.length());
             reader = new ServiceDataReader(m_context);
         } else if (sourceUri.startsWith(PROTOCOL_FILE)) {
-            sourceId = targetUri.substring(PROTOCOL_FILE.length());
+            sourceId = sourceUri.substring(PROTOCOL_FILE.length());
             reader = new XMLDataReader();
         } else {
             throw new CommandException("Unsupported protocol in source URI: " + sourceUri);
@@ -81,6 +82,7 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         //
         // and copy the data
         //
+        System.out.println("---- run: " + sourceId + " to writer " + targetUri);
         reader.copy(sourceId, writer);
         writer.close();
     }

@@ -40,6 +40,8 @@ import org.osgi.service.useradmin.Role;
  */
 public class XMLDataWriter implements UserAdminDataWriter {
 
+    private static String LINE_FEED = System.getProperty("line.separator");
+    
     private PrintStream m_out = null;
 
     /**
@@ -164,8 +166,11 @@ public class XMLDataWriter implements UserAdminDataWriter {
         // write all data
         //
         m_out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        m_out.println(  "<!DOCTYPE " + XMLConstants.ELEMENT_ROOT
-                      + " SYSTEM \"" + XMLConstants.ELEMENT_ROOT + ".dtd\">");
+        m_out.println(  "<!--" + LINE_FEED
+                      + "  TODO: <!DOCTYPE " + XMLConstants.ELEMENT_ROOT
+                      + " SYSTEM \"" + XMLConstants.ELEMENT_ROOT + ".dtd\">" + LINE_FEED
+                      + "  -->"
+                      );
         m_out.println("<" + XMLConstants.ELEMENT_ROOT + ">");
         //
         m_out.println("  <" + XMLConstants.ELEMENT_USERS + ">");

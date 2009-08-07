@@ -45,9 +45,9 @@ public class XMLDataReader implements UserAdminDataReader {
             InputSource inputSource = new InputSource(sourceId);
             reader.parse(inputSource);
         } catch (SAXException e) {
-            throw new CommandException("SAXException when reading data", e);
+            throw new CommandException("SAXException when reading data from " + sourceId, e);
         } catch (IOException e) {
-            throw new CommandException("IOException when reading data", e);
+            throw new CommandException("IOException when reading data from " + sourceId, e);
         }
     }
 }

@@ -15,7 +15,9 @@
  */
 package org.ops4j.pax.useradmin.command.internal.xml;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.command.CommandException;
@@ -39,10 +41,10 @@ public class XMLContentImporter implements ContentHandler {
     private State               m_state                  = State.initial;
     private UserAdminDataWriter m_writer                 = null;
     private String              m_currentRoleName        = null;
-    private Map<String, Object> m_currentProperties      = null;
-    private Map<String, Object> m_currentCredentials     = null;
-    private Collection<String>  m_currentBasicMembers    = null;
-    private Collection<String>  m_currentRequiredMembers = null;
+    private Map<String, Object> m_currentProperties      = new HashMap<String, Object>();
+    private Map<String, Object> m_currentCredentials     = new HashMap<String, Object>();
+    private Collection<String>  m_currentBasicMembers    = new ArrayList<String>();
+    private Collection<String>  m_currentRequiredMembers = new ArrayList<String>();
 
     protected XMLContentImporter(UserAdminDataWriter writer) {
         m_writer = writer;
@@ -54,18 +56,14 @@ public class XMLContentImporter implements ContentHandler {
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
             m_state = State.readingGroup;
-            m_currentRoleName = null;
+        } else if (XMLConstants.ELEMENT_USERS.equals(localName)) {
+            m_state = State.readingUser;
+        } else if (XMLConstants.ELEMENT_ROLE.equals(localName)) {
+            m_currentRoleName = atts.getValue(XMLConstants.ATTRIBUTE_NAME);
             m_currentProperties.clear();
             m_currentCredentials.clear();
             m_currentBasicMembers.clear();
             m_currentRequiredMembers.clear();
-        } else if (XMLConstants.ELEMENT_USERS.equals(localName)) {
-            m_state = State.readingUser;
-            m_currentRoleName = null;
-            m_currentProperties.clear();
-            m_currentCredentials.clear();
-        } else if (XMLConstants.ELEMENT_ROLE.equals(localName)) {
-            m_currentRoleName = atts.getValue(XMLConstants.ATTRIBUTE_NAME);
         } else if (XMLConstants.ELEMENT_ATTRIBUTE.equals(localName)) {
             // TODO ...
             if (XMLConstants.ELEMENT_ATT_TYPE_PROPERTY.equals(atts.getValue(XMLConstants.ATTRIBUTE_TYPE))) {
@@ -101,7 +99,7 @@ public class XMLContentImporter implements ContentHandler {
                 throw new SAXException("Illegal state: not reading users or groups.");
             }
             try {
-                Role role = m_writer.createRole(Role.GROUP,
+                Role role = m_writer.createRole(m_state == State.readingGroup ? Role.GROUP : Role.USER,
                                                 m_currentRoleName,
                                                 m_currentProperties,
                                                 m_currentCredentials);
