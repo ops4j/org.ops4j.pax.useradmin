@@ -27,7 +27,7 @@ import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.TestUtil;
+import org.ops4j.pax.useradmin.Utilities;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -63,7 +63,7 @@ public class CopyTest extends CommandTestBase {
 
     @Test
     public void xml2XmlOk() {
-        TestUtil.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
+        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
         //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);
@@ -89,7 +89,7 @@ public class CopyTest extends CommandTestBase {
 
     @Test
     public void xml2ServiceOk() {
-        TestUtil.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
+        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
         //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);
@@ -111,7 +111,7 @@ public class CopyTest extends CommandTestBase {
 
     @Test
     public void xml2Service2xmlOk() {
-        TestUtil.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
+        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
         //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);

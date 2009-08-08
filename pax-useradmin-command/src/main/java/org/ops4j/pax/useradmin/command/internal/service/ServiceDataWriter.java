@@ -112,16 +112,18 @@ public class ServiceDataWriter implements UserAdminDataWriter {
             return null;
         }
         Role role = m_service.createRole(name, type);
-        Dictionary<String, Object> roleProperties = role.getProperties();
-        for (Entry<String, Object> entry : properties.entrySet()) {
-            // create property for role
-            roleProperties.put(entry.getKey(), entry.getValue());
-        }
-        //
-        Dictionary<String, Object> roleCredentials = ((User) role).getCredentials();
-        for (Entry<String, Object> entry : credentials.entrySet()) {
-            // create credential for role
-            roleCredentials.put(entry.getKey(), entry.getValue());
+        if (null != role) {
+            Dictionary<String, Object> roleProperties = role.getProperties();
+            for (Entry<String, Object> entry : properties.entrySet()) {
+                // create property for role
+                roleProperties.put(entry.getKey(), entry.getValue());
+            }
+            //
+            Dictionary<String, Object> roleCredentials = ((User) role).getCredentials();
+            for (Entry<String, Object> entry : credentials.entrySet()) {
+                // create credential for role
+                roleCredentials.put(entry.getKey(), entry.getValue());
+            }
         }
         return role;
     }

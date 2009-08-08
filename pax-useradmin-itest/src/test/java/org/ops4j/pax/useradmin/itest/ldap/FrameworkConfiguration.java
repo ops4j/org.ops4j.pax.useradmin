@@ -28,7 +28,7 @@ import junit.framework.Assert;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSConfiguration;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSServer;
-import org.ops4j.pax.useradmin.TestUtil;
+import org.ops4j.pax.useradmin.Utilities;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
@@ -77,18 +77,18 @@ public class FrameworkConfiguration {
         //
         File workDir = new File("./server-work");
         if (workDir.exists() && workDir.isDirectory()) {
-            TestUtil.delete(workDir, true);
+            Utilities.delete(workDir, true);
         }
         //
         // clean/initialize data directory
         //
         File dataDir = new File("./server-data");
         if (dataDir.exists() && dataDir.isDirectory()) {
-            TestUtil.delete(dataDir, false);
+            Utilities.delete(dataDir, false);
         } else {
             dataDir.mkdir();
         }
-        TestUtil.copyResourceToFile("/ldaptree-test.ldif", dataDir);
+        Utilities.copyResourceToFile("/ldaptree-test.ldif", dataDir);
         //
         // configure ApacheDS LDAP server
         //

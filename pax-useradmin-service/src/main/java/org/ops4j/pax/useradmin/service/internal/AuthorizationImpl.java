@@ -32,10 +32,22 @@ import org.osgi.service.useradmin.User;
  */
 public class AuthorizationImpl implements Authorization {
 
+    /**
+     * The user <code>Role</code> we are managing.
+     */
     private User          m_user      = null;
 
+    /**
+     * The <code>UserAdmin</code> service used.
+     */
     private UserAdminImpl m_userAdmin = null;
 
+    /**
+     * Initializing constructor.
+     * 
+     * @param userAdmin The <code>UserAdmin</code> service to use authorization.
+     * @param user The <code>User</code> instance whose authorization is managed.
+     */
     protected AuthorizationImpl(UserAdminImpl userAdmin, User user) {
         m_userAdmin = userAdmin;
         m_user = user;
@@ -48,6 +60,9 @@ public class AuthorizationImpl implements Authorization {
         return null != m_user ? m_user.getName() : null;
     }
 
+    /**
+     * @see Authorization#getRoles()
+     */
     public String[] getRoles() {
         Collection<String> roleNames = new ArrayList<String>();
         try {
@@ -66,10 +81,15 @@ public class AuthorizationImpl implements Authorization {
             }
         } catch (InvalidSyntaxException e) {
             // will never be reached because UserAdmin.getRoles() allows null filters
+            throw new IllegalStateException(  "Unexpected InvalidSyntaxException caught while using null filter: "
+                                            + e.getMessage() + " for filter: " + e.getFilter(), e);
         }
         return null;
     }
 
+    /**
+     * @see Authorization#hasRole(String)
+     */
     public boolean hasRole(String name) {
 //        String[] roles = getRoles();
 //        if (null != roles) {
