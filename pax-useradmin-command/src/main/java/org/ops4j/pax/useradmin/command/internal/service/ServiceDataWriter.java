@@ -36,8 +36,18 @@ import org.osgi.service.useradmin.UserAdmin;
  */
 public class ServiceDataWriter implements UserAdminDataWriter {
 
+    /**
+     * The UserAdmin service data is written to.
+     */
     private UserAdmin m_service = null;
 
+    /**
+     * Initializing constructor.
+     * 
+     * @param context The BundleContext
+     * @param id The symbolic name of the bundle whose UserAdmin service should be used.
+     * @throws CommandException If no UserAdmin service is provided by the specified bundle.
+     */
     public ServiceDataWriter(BundleContext context, String id) throws CommandException {
         m_service = ServiceUtils.getUserAdminService(context, id);
         if (null == m_service) {
@@ -51,6 +61,9 @@ public class ServiceDataWriter implements UserAdminDataWriter {
     public void addMembers(Role role,
                            Collection<String> basicMembers,
                            Collection<String> requiredMembers) throws CommandException {
+        if (null == role) {
+            return;
+        }
         if (Role.GROUP != role.getType()) {
             throw new CommandException(  "Role '" + role.getName()
                                        + "' is not a group: type is "
@@ -93,6 +106,10 @@ public class ServiceDataWriter implements UserAdminDataWriter {
                            Map<String, Object> credentials) throws CommandException {
         if (!((type == Role.USER) || (type == Role.GROUP))) {
             throw new CommandException("Invalid role type: " + type);
+        }
+        if (!Role.USER_ANYONE.equals(name)) {
+            // ignore USER_ANYONE
+            return null;
         }
         Role role = m_service.createRole(name, type);
         Dictionary<String, Object> roleProperties = role.getProperties();

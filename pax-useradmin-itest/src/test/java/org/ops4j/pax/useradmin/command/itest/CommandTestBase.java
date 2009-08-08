@@ -26,7 +26,6 @@ import org.ops4j.pax.exam.Option;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * Abstract base class for all command integration tests.
@@ -82,18 +81,6 @@ public abstract class CommandTestBase {
                                       .startLevel(6));
     }
 
-    /**
-     * @return The <code>UserAdmin</code> service instance to test.
-     */
-//    protected UserAdmin getUserAdminService() {
-//        BundleContext context = getBundleContext();
-//        ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
-//        Assert.assertNotNull("No UserAdmin service reference found", ref);
-//        UserAdmin userAdmin = (UserAdmin) context.getService(ref);
-//        Assert.assertNotNull("No UserAdmin service found", userAdmin);
-//        return userAdmin;
-//    }
-    
     /**
      * @return The <code>Command</code> to test.
      */

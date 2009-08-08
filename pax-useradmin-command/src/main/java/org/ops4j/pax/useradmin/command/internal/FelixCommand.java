@@ -38,7 +38,6 @@ public class FelixCommand implements Command {
      * @see Command#execute(String, PrintStream, PrintStream)
      */
     public void execute(String commandLine, PrintStream out, PrintStream err) {
-//        System.out.println("Argument was: " + commandLine);
         String[] arguments = commandLine.split(" ");
         if (arguments.length <= 2) {
             System.out.println("Not enough arguments in commandline: " + commandLine);
@@ -60,7 +59,6 @@ public class FelixCommand implements Command {
             err.println("Unknown function for userAdmin command: " + arguments[1] + " in command-line " + commandLine);
             return;
         }
-        System.out.println("Noop on: " + commandLine);
     }
 
     /**

@@ -16,6 +16,8 @@
                  value = "Joe Developer"
                  />
     </Role>
+    <Role name="user.anyone">
+    </Role>
   </Users>
   <Groups>
     <Role name="people">

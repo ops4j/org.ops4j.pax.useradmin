@@ -17,6 +17,7 @@ package org.ops4j.pax.useradmin.command.internal.service;
   
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,21 +46,25 @@ public class ServiceDataReader implements UserAdminDataReader {
     }
     
     /**
+     * Creates the given role in the TargetWriter.
      * 
      * @param user
      * @param targetWriter
      * @return
      * @throws CommandException
      */
+    @SuppressWarnings(value = "unchecked")
     private Role createRole(User user, UserAdminDataWriter targetWriter) throws CommandException {
         Map<String, Object> properties = new HashMap<String, Object>();
-        while (user.getProperties().keys().hasMoreElements()) {
-            String key = (String) user.getProperties().keys().nextElement();
+        Enumeration<String> keys = user.getProperties().keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
             properties.put(key, user.getProperties().get(key));
         }
         Map<String, Object> credentials = new HashMap<String, Object>();
-        while (user.getCredentials().keys().hasMoreElements()) {
-            String key = (String) user.getCredentials().keys().nextElement();
+        keys = user.getCredentials().keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
             credentials.put(key, user.getCredentials().get(key));
         }
         return targetWriter.createRole(user.getType(), user.getName(), properties, credentials);
@@ -75,25 +80,33 @@ public class ServiceDataReader implements UserAdminDataReader {
         }
         try {
             Role[] roles = service.getRoles(null);
-            for (Role role : roles) {
-                if (Role.USER == role.getType()) {
-                    createRole((User) role, targetWriter);
+            if (null != roles) {
+                for (Role role : roles) {
+                    if (Role.USER == role.getType()) {
+                        createRole((User) role, targetWriter);
+                    }
                 }
-            }
-            for (Role role : roles) {
-                if (Role.GROUP == role.getType()) {
-                    Group group = (Group) role;
-                    Role groupRole = createRole(group, targetWriter);
-                    //
-                    Collection<String> basicMembers = new ArrayList<String>();
-                    for (Role member : group.getMembers()) {
-                        basicMembers.add(member.getName());
+                for (Role role : roles) {
+                    if (Role.GROUP == role.getType()) {
+                        Group group = (Group) role;
+                        Role groupRole = createRole(group, targetWriter);
+                        //
+                        Collection<String> basicMembers = new ArrayList<String>();
+                        Role[] members = group.getMembers();
+                        if (null != members) {
+                            for (Role member : members) {
+                                basicMembers.add(member.getName());
+                            }
+                        }
+                        Collection<String> requiredMembers = new ArrayList<String>();
+                        members = group.getRequiredMembers();
+                        if (null != members) {
+                            for (Role member : members) {
+                                requiredMembers.add(member.getName());
+                            }
+                        }
+                        targetWriter.addMembers(groupRole, basicMembers, requiredMembers);
                     }
-                    Collection<String> requiredMembers = new ArrayList<String>();
-                    for (Role member : group.getRequiredMembers()) {
-                        requiredMembers.add(member.getName());
-                    }
-                    targetWriter.addMembers(groupRole, basicMembers, requiredMembers);
                 }
             }
         } catch (InvalidSyntaxException e) {

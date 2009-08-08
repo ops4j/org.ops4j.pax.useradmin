@@ -34,6 +34,9 @@ import org.xml.sax.SAXException;
  */
 public class XMLContentImporter implements ContentHandler {
 
+    /**
+     * States while reading roles.
+     */
     private enum State {
         initial, readingUser, readingGroup
     };
@@ -65,12 +68,14 @@ public class XMLContentImporter implements ContentHandler {
             m_currentBasicMembers.clear();
             m_currentRequiredMembers.clear();
         } else if (XMLConstants.ELEMENT_ATTRIBUTE.equals(localName)) {
-            // TODO ...
+            //
             if (XMLConstants.ELEMENT_ATT_TYPE_PROPERTY.equals(atts.getValue(XMLConstants.ATTRIBUTE_TYPE))) {
-                m_currentProperties.put(atts.getValue(XMLConstants.ATTRIBUTE_KEY), atts.getValue(XMLConstants.ATTRIBUTE_VALUE));
+                m_currentProperties.put(atts.getValue(XMLConstants.ATTRIBUTE_KEY),
+                                        atts.getValue(XMLConstants.ATTRIBUTE_VALUE));
             }
             if (XMLConstants.ELEMENT_ATT_TYPE_CREDENTIAL.equals(atts.getValue(XMLConstants.ATTRIBUTE_TYPE))) {
-                m_currentCredentials.put(atts.getValue(XMLConstants.ATTRIBUTE_KEY), atts.getValue(XMLConstants.ATTRIBUTE_VALUE));
+                m_currentCredentials.put(atts.getValue(XMLConstants.ATTRIBUTE_KEY),
+                                         atts.getValue(XMLConstants.ATTRIBUTE_VALUE));
             }
             if (XMLConstants.ELEMENT_ATT_TYPE_MEMBER.equals(atts.getValue(XMLConstants.ATTRIBUTE_TYPE))) {
                 String memberId = atts.getValue(XMLConstants.ATTRIBUTE_KEY);
@@ -103,7 +108,7 @@ public class XMLContentImporter implements ContentHandler {
                                                 m_currentRoleName,
                                                 m_currentProperties,
                                                 m_currentCredentials);
-                if (m_state == State.readingGroup) {
+                if (null != role && m_state == State.readingGroup) {
                     m_writer.addMembers(role,
                                         m_currentBasicMembers,
                                         m_currentRequiredMembers);
@@ -121,84 +126,43 @@ public class XMLContentImporter implements ContentHandler {
      */
     public void endDocument() throws SAXException {}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+    /** 
+     * @see ContentHandler#characters(char[], int, int)
      */
-    public void characters(char[] ch, int start, int length) throws SAXException {
-        // TODO Auto-generated method stub
+    public void characters(char[] ch, int start, int length) throws SAXException {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
+    /** 
+     * @see ContentHandler#endPrefixMapping(String)
      */
-    public void endPrefixMapping(String prefix) throws SAXException {
-        // TODO Auto-generated method stub
-    }
+    public void endPrefixMapping(String prefix) throws SAXException {}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
+    /** 
+     * @see ContentHandler#ignorableWhitespace(char[], int, int)
      */
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-        // TODO Auto-generated method stub
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#processingInstruction(java.lang.String,
-     * java.lang.String)
+    /** 
+     * @see ContentHandler#processingInstruction(String, String)
      */
-    public void processingInstruction(String target, String data) throws SAXException {
-        // TODO Auto-generated method stub
+    public void processingInstruction(String target, String data) throws SAXException {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
+    /** 
+     * @see ContentHandler#setDocumentLocator(Locator)
      */
-    public void setDocumentLocator(Locator locator) {
-        // TODO Auto-generated method stub
+    public void setDocumentLocator(Locator locator) {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
+    /** 
+     * @see ContentHandler#skippedEntity(String)
      */
-    public void skippedEntity(String name) throws SAXException {
-        // TODO Auto-generated method stub
+    public void skippedEntity(String name) throws SAXException {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#startDocument()
+    /** 
+     * @see ContentHandler#startDocument()
      */
-    public void startDocument() throws SAXException {
-        // TODO Auto-generated method stub
+    public void startDocument() throws SAXException {}
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String,
-     * java.lang.String)
+    /** 
+     * @see ContentHandler#startPrefixMapping(String, String)
      */
-    public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        // TODO Auto-generated method stub
-
-    }
+    public void startPrefixMapping(String prefix, String uri) throws SAXException {}
 }

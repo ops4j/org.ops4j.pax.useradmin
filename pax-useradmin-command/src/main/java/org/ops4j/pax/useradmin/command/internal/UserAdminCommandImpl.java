@@ -27,7 +27,7 @@ import org.ops4j.pax.useradmin.command.spi.UserAdminDataWriter;
 import org.osgi.framework.BundleContext;
 
 /**
- * Main UserAdmin command implementation. This should eveolve to the main
+ * Main UserAdmin command implementation. This should evolve to the main
  * interface to various OSGi frameworks.
  * 
  * @author Matthias Kuespert
@@ -54,7 +54,7 @@ public class UserAdminCommandImpl implements UserAdminCommand {
     public void copyData(String sourceUri, String targetUri)  throws CommandException {
         // create the writer
         //
-        System.out.println("copy from " + sourceUri + " to " + targetUri);
+//        System.out.println("copy from " + sourceUri + " to " + targetUri);
         UserAdminDataWriter writer = null;
         if (targetUri.startsWith(PROTOCOL_USERADMIN)) {
             String targetId = targetUri.substring(PROTOCOL_USERADMIN.length());
@@ -82,7 +82,6 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         //
         // and copy the data
         //
-        System.out.println("---- run: " + sourceId + " to writer " + targetUri);
         reader.copy(sourceId, writer);
         writer.close();
     }

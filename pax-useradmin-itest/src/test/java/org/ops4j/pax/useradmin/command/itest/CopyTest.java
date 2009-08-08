@@ -108,4 +108,22 @@ public class CopyTest extends CommandTestBase {
         }
         command.execute("userAdmin copyData userAdmin://org.ops4j.pax.useradmin.pax-useradmin-service file://" + FILE_OUTPUT_XML, System.out, System.out);
     }
+
+    @Test
+    public void xml2Service2xmlOk() {
+        TestUtil.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
+        //
+        Command command = getCommand("userAdmin");
+        Assert.assertNotNull("Command not found", command);
+        command.execute("userAdmin copyData file://" + FILE_INPUT_XML + " userAdmin://org.ops4j.pax.useradmin.pax-useradmin-service", System.out, System.out);
+        //
+        File out = new File(FILE_OUTPUT_XML);
+        if (out.exists()) {
+            out.delete();
+        }
+        command.execute("userAdmin copyData userAdmin://org.ops4j.pax.useradmin.pax-useradmin-service file://" + FILE_OUTPUT_XML, System.out, System.out);
+        Assert.assertTrue("No " + FILE_OUTPUT_XML + " generated", out.exists());
+        Assert.assertTrue("Empty " + FILE_OUTPUT_XML + " generated", out.length() > 0);
+//        Assert.assertEquals("Input and output differ in size", new File(FILE_INPUT_XML).length(), out.length());
+    }
 }
