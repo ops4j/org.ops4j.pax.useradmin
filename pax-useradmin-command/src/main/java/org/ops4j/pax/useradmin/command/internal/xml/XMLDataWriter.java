@@ -22,10 +22,13 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.command.CommandException;
@@ -102,9 +105,9 @@ public class XMLDataWriter implements UserAdminDataWriter {
         }
     }
     
-    private Collection<RoleData> m_users = new HashSet<RoleData>();
+    private List<RoleData> m_users = new ArrayList<RoleData>();
     
-    private Collection<RoleData> m_groups = new HashSet<RoleData>();
+    private List<RoleData> m_groups = new ArrayList<RoleData>();
     
     public XMLDataWriter(String id) throws CommandException {
         File file = new File(id);
@@ -163,6 +166,19 @@ public class XMLDataWriter implements UserAdminDataWriter {
      * @see UserAdminDataWriter#close()
      */
     public void close() throws CommandException {
+        // sort the XML results to be able to compare the whole file when unit
+        // testing
+        Collections.sort(m_users, new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                return role1.getName().compareTo(role2.getName());
+            }
+        });
+        Collections.sort(m_groups, new Comparator<Role>() {
+            public int compare(Role role1, Role role2) {
+                return role1.getName().compareTo(role2.getName());
+            }
+        });
+        //
         // write all data
         //
         m_out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
