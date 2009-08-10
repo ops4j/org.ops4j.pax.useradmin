@@ -31,22 +31,22 @@ import org.osgi.service.useradmin.User;
 public interface UserAdminFactory {
 
     /**
-     * Create a <code>UserImpl</code> instance.
+     * Create a <code>User</code> instance.
      * 
      * @param name The name of the user.
      * @param properties The properties of the user.
      * @param credentials The credentials of the user.
-     * @return A new <code>UserImpl</code> instance.
+     * @return A new <code>User</code> instance.
      */
     User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials);
 
     /**
-     * Create a <code>GroupImpl</code> instance.
+     * Create a <code>Group</code> instance.
      * 
      * @param name The name of the group.
      * @param properties The properties of the group.
      * @param credentials The credentials of the group.
-     * @return A new <code>GroupImpl</code> instance.
+     * @return A new <code>Group</code> instance.
      */
     Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials);
 }

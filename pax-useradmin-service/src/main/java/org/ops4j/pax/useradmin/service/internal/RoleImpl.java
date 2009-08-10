@@ -27,7 +27,7 @@ import org.osgi.service.useradmin.Role;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public class RoleImpl implements Role {
+public abstract class RoleImpl implements Role {
 
     /**
      * The name of the role.
@@ -47,7 +47,14 @@ public class RoleImpl implements Role {
      */
     private RoleProperties m_properties = null;
 
-    protected enum ImplicationResult { IMPLIEDBY_YES, IMPLIEDBY_NO, IMPLIEDBY_LOOPDETECTED };
+    /**
+     * States used as return value for isImpliedBy() calls.
+     */
+    protected enum ImplicationResult {
+        IMPLIEDBY_YES,           // given role is implied by this one
+        IMPLIEDBY_NO,            // given role is not implied by this one
+        IMPLIEDBY_LOOPDETECTED   // detected a loop - e.g. a group containing itself.
+    };
 
     /**
      * Constructor.
@@ -106,14 +113,8 @@ public class RoleImpl implements Role {
      * @param checkedRoles Used for loop detection.
      * @return An <code>ImplicationResult</code>.
      */
-    protected ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles) {
-        throw new IllegalStateException("Internal error: RoleImpl.impliedBy() must not be called for roles.");
-    }
-//  protected boolean isImpliedBy(Role role, Collection<String> checkedRoles) {
-//        if (checkedRoles.contains(getName())) {
-//            return (false);
-//        }
-//        checkedRoles.add(getName());
-//        return (getName().equals(Role.USER_ANYONE));
+    protected abstract ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles);
+//    {
+//        throw new IllegalStateException("Internal error: RoleImpl.impliedBy() must not be called.");
 //    }
 }

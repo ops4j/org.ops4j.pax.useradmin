@@ -57,23 +57,23 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void constructNoName() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        new RoleImpl(null, userAdmin, getProperties());
+        new UserImpl(null, userAdmin, getProperties(), null);
         Assert.fail("No exception when creating role with invalid name");
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void constructNoAdmin() {
-        new RoleImpl(NAME, null, getProperties());
+        new UserImpl(NAME, null, getProperties(), null);
         Assert.fail("No exception when creating role with invalid UserAdmin instance");
     }
 
     @Test
     public void constructNullProperties() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         Assert.assertNotNull("Could not create RoleImpl instance", role);
         Assert.assertEquals("Mismatching name", NAME, role.getName());
-        Assert.assertEquals("Invalid type", Role.ROLE, role.getType());
+        Assert.assertEquals("Invalid type", Role.USER, role.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, role.getAdmin());
         Assert.assertNotNull("Invalid properties", role.getProperties());
         Assert.assertEquals("Too many initial properties", 0, role.getProperties().size());
@@ -82,10 +82,10 @@ public class RoleImplTest {
     @Test
     public void constructEmptyProperties() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, new HashMap<String, Object>());
+        RoleImpl role = new UserImpl(NAME, userAdmin, new HashMap<String, Object>(), null);
         Assert.assertNotNull("Could not create RoleImpl instance", role);
         Assert.assertEquals("Mismatching name", NAME, role.getName());
-        Assert.assertEquals("Invalid type", Role.ROLE, role.getType());
+        Assert.assertEquals("Invalid type", Role.USER, role.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, role.getAdmin());
         Assert.assertNotNull("Invalid properties", role.getProperties());
         Assert.assertEquals("Too many initial properties", 0, role.getProperties().size());
@@ -95,10 +95,10 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void constructOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, getProperties());
+        RoleImpl role = new UserImpl(NAME, userAdmin, getProperties(), null);
         Assert.assertNotNull("Could not create RoleImpl instance", role);
         Assert.assertEquals("Mismatching name", NAME, role.getName());
-        Assert.assertEquals("Invalid type", Role.ROLE, role.getType());
+        Assert.assertEquals("Invalid type", Role.USER, role.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, role.getAdmin());
         Dictionary properties = role.getProperties(); 
         Assert.assertNotNull(properties);
@@ -109,7 +109,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void getPropertyNullKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -127,7 +127,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void getPropertyEmptyKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -145,7 +145,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void getPropertyWrongKeyType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -163,7 +163,7 @@ public class RoleImplTest {
     @Test
     public void getPropertyOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, getProperties());
+        RoleImpl role = new UserImpl(NAME, userAdmin, getProperties(), null);
         EasyMock.replay(userAdmin);
         //
         Assert.assertEquals("Mismatching value", VALUE1, role.getProperties().get(KEY1));
@@ -176,7 +176,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyNullKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -195,7 +195,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyEmptyKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -214,7 +214,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyWrongKeyType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -233,7 +233,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyNullValue() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -252,7 +252,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyWrongValueType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -271,7 +271,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyStorageException() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         StorageException exception = new StorageException("");
@@ -306,7 +306,7 @@ public class RoleImplTest {
     @SuppressWarnings(value = "unchecked")
     public void addPropertyOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -333,7 +333,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void removePropertyNullKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -351,7 +351,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void removePropertyEmptyKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -369,7 +369,7 @@ public class RoleImplTest {
     @Test (expected = IllegalArgumentException.class)
     public void removePropertyWrongKeyType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, null);
+        RoleImpl role = new UserImpl(NAME, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -387,7 +387,7 @@ public class RoleImplTest {
     @Test
     public void removePropertyStorageException() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, getProperties());
+        RoleImpl role = new UserImpl(NAME, userAdmin, getProperties(), null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         StorageException exception = new StorageException("");
@@ -421,7 +421,7 @@ public class RoleImplTest {
     @Test
     public void removePropertyOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role = new RoleImpl(NAME, userAdmin, getProperties());
+        RoleImpl role = new UserImpl(NAME, userAdmin, getProperties(), null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {
@@ -448,16 +448,17 @@ public class RoleImplTest {
     // Note: a test for the clear() method is not needed since the Dictionary
     // class does not provide a clear method
 
-    @Test (expected = IllegalStateException.class)
+    @Test // (expected = IllegalStateException.class)
     public void impliedByOk() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
-        RoleImpl role1 = new RoleImpl(NAME, userAdmin, getProperties());
-        RoleImpl role2 = new RoleImpl(Role.USER_ANYONE, userAdmin, getProperties());
+        RoleImpl role1 = new UserImpl(NAME, userAdmin, getProperties(), null);
+        RoleImpl role2 = new UserImpl(Role.USER_ANYONE, userAdmin, getProperties(), null);
         //
         EasyMock.replay(userAdmin);
         //
         Collection<String> checkedRoles = new ArrayList<String>();
-        Assert.assertEquals("", ImplicationResult.IMPLIEDBY_YES, role2.isImpliedBy(role1, checkedRoles));
+        Assert.assertEquals("Role does not imply itself", ImplicationResult.IMPLIEDBY_YES, role1.isImpliedBy(role1, checkedRoles));
+        Assert.assertEquals("Role does not imply user.anyone", ImplicationResult.IMPLIEDBY_YES, role2.isImpliedBy(role1, checkedRoles));
 //        checkedRoles.clear();
 //        Assert.assertEquals("", ImplicationResult.IMPLIEDBY_YES, role2.isImpliedBy(null, checkedRoles));
 //        checkedRoles.clear();

@@ -67,7 +67,11 @@ public class AuthorizationImplTest {
         //
         Authorization authorization = new AuthorizationImpl(userAdmin, user);
         Assert.assertNotNull("Authorization object not created", authorization);
-        Assert.assertNull("Roles found after exception was thrown", authorization.getRoles());
+        try {
+            Assert.assertNull("Roles found after exception was thrown", authorization.getRoles());
+        } catch (IllegalStateException e) {
+            // expected
+        }
         //
         EasyMock.verify(userAdmin, sp);
     }

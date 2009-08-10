@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
+import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * The interface used to maintain persistent UserAdmin data.
@@ -35,6 +36,8 @@ public interface StorageProvider {
      * Create a new user with the given name. The user initially has no
      * properties or credentials assigned.
      * 
+     * @see UserAdmin#createRole(String, int)
+     * 
      * @param factory The <code>UserAdminFactory</code> used to create the
      *            implementation object.
      * @param name The user name.
@@ -47,6 +50,8 @@ public interface StorageProvider {
     /**
      * Create a new group with the given name. The group initially has no
      * properties or credentials assigned.
+     * 
+     * @see UserAdmin#createRole(String, int)
      * 
      * @param factory The <code>UserAdminFactory</code> used to create the
      *            implementation object.
@@ -61,6 +66,8 @@ public interface StorageProvider {
      * Deletes the role with the given name. The role is also removed from all
      * groups it is a member of.
      * 
+     * @see UserAdmin#removeRole(String)
+     * 
      * @param role The <code>Role</code> to delete.
      * @throws StorageException if the role could not be deleted.
      */
@@ -68,41 +75,189 @@ public interface StorageProvider {
 
     // group management
 
+    /**
+     * Retrieve basic members of the given group. Eventually creates new Role
+     * objects via the given factory.
+     * 
+     * @see Group#getMembers()
+     * 
+     * @param factory The <code>UserAdminFactory</code> used to create member
+     *                roles.
+     * @param group The <code>Group</code> whose members are retrieved.
+     * @return A collection of <code>Role</code> objects that are basic members
+     *         of the given group.
+     * @throws StorageException
+     */
     Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException;
 
+    /**
+     * Retrieve required members of the given group. Eventually creates new Role
+     * objects via the given factory.
+     * 
+     * @see Group#getRequiredMembers()
+     * 
+     * @param factory The <code>UserAdminFactory</code> used to create member
+     *                roles.
+     * @param group The <code>Group</code> whose members are retrieved.
+     * @return A collection of <code>Role</code> objects that are required members
+     *         of the given group.
+     * @throws StorageException
+     */
     Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException;
 
+    /**
+     * Adds a role as a basic member to a group.
+     * 
+     * @see Group#addMember(Role)
+     * 
+     * @param group The <code>Group</code> to add the <code>Role</code> as basic member.
+     * @param role The <code>Role</code> to add.
+     * @return True if the given role was added - false otherwise.
+     * @throws StorageException
+     */
     boolean addMember(Group group, Role role) throws StorageException;
 
+    /**
+     * Adds a role as a required member to a group.
+     * 
+     * @see Group#addRequiredMember(Role)
+     * 
+     * @param group The <code>Group</code> to add the <code>Role</code> as required member.
+     * @param role The <code>Role</code> to add.
+     * @return True if the given role was added - false otherwise.
+     * @throws StorageException
+     */
     boolean addRequiredMember(Group group, Role role) throws StorageException;
 
+    /**
+     * Removes a member from the given group.
+     * 
+     * @see Group#removeMember(Role)
+     * 
+     * @param group
+     * @param role
+     * @return
+     * @throws StorageException
+     */
     boolean removeMember(Group group, Role role) throws StorageException;
 
     // property management
 
+    /**
+     * Sets a <code>String</code> attribute to a role.
+     * 
+     * @param role The <code>Role</code> to set the attribute to.
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     * @throws StorageException
+     */
     void setRoleAttribute(Role role, String key, String value) throws StorageException;
 
+    /**
+     * Sets a <code>byte[]</code> attribute to a role.
+     * 
+     * @param role The <code>Role</code> to set the attribute to.
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     * @throws StorageException
+     */
     void setRoleAttribute(Role role, String key, byte[] value) throws StorageException;
 
+    /**
+     * Removes an attribute from a role.
+     * 
+     * @param role The <code>Role</code> to remove the attribute from.
+     * @param key The key of the attribute.
+     * @throws StorageException
+     */
     void removeRoleAttribute(Role role, String key) throws StorageException;
 
+    /**
+     * Removes all attributes from the given role.
+     * 
+     * @param role The <code>Role</code> to remove the attribute(s) from.
+     * @throws StorageException
+     */
     void clearRoleAttributes(Role role) throws StorageException;
 
     // credential management
 
+    /**
+     * Sets a <code>String</code> credential to a user.
+     * 
+     * @param user The <code>User</code> to set the credential to.
+     * @param key The key of the credential.
+     * @param value The value of the credential.
+     * @throws StorageException
+     */
     void setUserCredential(User user, String key, String value) throws StorageException;
 
+    /**
+     * Sets a <code>byte[]</code> credential to a role.
+     * 
+     * @param user The <code>User</code> to set the credential to.
+     * @param key The key of the credential.
+     * @param value The value of the credential.
+     * @throws StorageException
+     */
     void setUserCredential(User user, String key, byte[] value) throws StorageException;
 
+    /**
+     * Removes a credential from a role.
+     * 
+     * @param user The <code>User</code> to remove the credential from.
+     * @param key The key of the credential.
+     * @throws StorageException
+     */
     void removeUserCredential(User user, String key) throws StorageException;
 
+    /**
+     * Removes all credentials for a user.
+     * 
+     * @param user The <code>User</code> to remove the credentials for.
+     * @throws StorageException
+     */
     void clearUserCredentials(User user) throws StorageException;
 
-    // getters & finders
+    // role getters & finders
 
+    /**
+     * Returns the role with the given name.
+     * 
+     * @see UserAdmin#getRole(String)
+     * 
+     * @param factory The <code>UserAdminFactory</code> used to eventually create the
+     *                implementation object.
+     * @param name The role to find.
+     * @return A <code>Role</code> implementation.
+     * @throws StorageException
+     */
     Role getRole(UserAdminFactory factory, String name) throws StorageException;
 
+    /**
+     * Retrieves the user with the given attributes.
+     * 
+     * @see UserAdmin#getUser(String, String)
+     * 
+     * @param factory The <code>UserAdminFactory</code> used to eventually create the
+     *                implementation object.
+     * @param key The attribute key to search for.
+     * @param value The attribute value to search for.
+     * @return The <code>User</code> object matching the query.
+     * @throws StorageException
+     */
     User getUser(UserAdminFactory factory, String key, String value) throws StorageException;
 
+    /**
+     * Returns the roles that match the given filter.
+     * 
+     * @see UserAdmin#getRoles(String)
+     * 
+     * @param factory The <code>UserAdminFactory</code> used to eventually create the
+     *                implementation object.
+     * @param filter 
+     * @return
+     * @throws StorageException
+     */
     Collection<Role> findRoles(UserAdminFactory factory, String filter) throws StorageException;
 }

@@ -96,7 +96,8 @@ public class UserImpl extends RoleImpl implements User {
             return ImplicationResult.IMPLIEDBY_LOOPDETECTED;
         }
         checkedRoles.add(getName());
-        return getName().equals(role.getName()) ? ImplicationResult.IMPLIEDBY_YES : ImplicationResult.IMPLIEDBY_NO;
+        return    getName().equals(Role.USER_ANYONE) 
+               || getName().equals(role.getName())   ? ImplicationResult.IMPLIEDBY_YES : ImplicationResult.IMPLIEDBY_NO;
         // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
     }
 }
