@@ -1,0 +1,72 @@
+
+    --------------------------
+    Pax UserAdmin Introduction
+    --------------------------
+    Matthias Kuespert
+    -----------------
+    2009 August 08
+    --------------
+
+Overview
+
+  The Pax UserAdmin project aims to leverage the standard OSGi UserAdmin specification as specified in chapter 107
+  of the OSGi Service Platform Service Compendium - actually Release 4, Version 4.2/Draft.
+  
+  Main goal is to provide 'enterprise value' - all the tools and handles needed to manage large amounts of user
+  data, often having to deal with one or even more legacy systems.
+  
+  This includes features like:
+  
+    * transfer data from one UserAdmin service instance to another
+  
+    * transfer data from and to files and other streams
+  
+    * ability to transparently switch between different storage technologies
+  
+  Any feedback, test-experiences or 'value adding' feature requests are welcomed on the {{{mail-lists.html}mailing list}}.
+
+  
+Architecture & Design
+
+  The Pax UserAdmin architecture is based on a standard OSGi UserAdmin service using the
+  {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI
+  to access underlying storage mechanisms (e.g. Ldap).
+
+  Services implementing the StorageProvider interface are detected dynamically when they are started. Each service must
+  define a provider-type property which must be globally unique in the system.  
+  
+  For each new StorageProvider service type found a new UserAdmin service instance is created. If a StorageProvider
+  service for a registered type is stopped, the corresponding UserAdmin service is also stopped.
+
+  When locating UserAdmin services, the using bundle may use framework filters to narrow the search by
+  the provider-type property.
+
+  The decoupling of the OSGi service management code from the actual storage access offers advantages for developers
+  as well as deployers and system maintainers: developers can concentrate on the actual storage access code while
+  deployers may easily combine arbitrary StorageProvider services.
+  
+  Although simple, this architecture allows complex configurations, e.g. having multiple UserAdmin services in
+  one framework to transfer data from one to the other.
+
+  
+  
+Distribution
+
+  The Pax UserAdmin project is distributed as a set of OSGi bundles:
+  
+  * the {{{service/index.html}pax-useradmin-service}} bundle
+
+  The Pax UserAdmin service is a lightweight OSGi service that implements the standard UserAdmin service
+  API and connects it to an underlying storage using a dynamic plugin-mechanism based on the
+  {{StorageProvider}} SPI.
+
+  * currently two pax-useradmin-provider-<type> bundles: {{{provider-ldap/index.html}Ldap}} or {{{provider-preferences/index.html}PreferencesService}} based.
+
+  Storage providers for the OSGi PreferencesService and Ldap are included in the distribution. More may
+  be added - see StorageProvider discovery.
+
+  * the {{{command/index.html}pax-useradmin-command}} bundle (optional)
+
+  Currently only available in the Felix shell. The bundle provides a command to transfer data between files and/or service instances.
+    
+~~  * a {{{ui-eclipse/index.html}pax-useradmin-ui-eclipse}} bundle (optional)
