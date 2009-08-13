@@ -25,6 +25,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.itest.AuthorizationManagement;
+import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -37,9 +38,15 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
     @Inject
     private BundleContext m_context;
 
+    @Override
     protected BundleContext getBundleContext() {
         return m_context;
     };
+
+    @Override
+    protected String getProviderType() {
+        return ConfigurationConstants.STORAGEPROVIDER_TYPE;
+    }
 
     @Configuration
     public static Option[] configure() {

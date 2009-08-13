@@ -15,9 +15,15 @@
  */
 package org.ops4j.pax.useradmin.provider.preferences.internal;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Activator which starts the PreferencesService based
@@ -32,13 +38,19 @@ public class Activator implements BundleActivator {
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        context.registerService(StorageProvider.class.getName(), new StorageProviderImpl(context),
-                                null);
+        Dictionary<String, String> properties = new Hashtable<String, String>();
+        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
+                       ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        //
+        context.registerService(StorageProvider.class.getName(),
+                                new StorageProviderImpl(context),
+                                properties);
     }
 
     /**
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
+        // nothing to do
     }
 }

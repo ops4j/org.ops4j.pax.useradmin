@@ -19,7 +19,9 @@ import static org.ops4j.pax.exam.CoreOptions.*;
 
 import org.junit.Assert;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.useradmin.UserAdmin;
 
@@ -38,6 +40,8 @@ public abstract class UserAdminTestBase {
      */
     protected abstract BundleContext getBundleContext();
 
+    protected abstract String getProviderType();
+    
     /**
      * @return The basic OSGi framework configuration used to run the tests.
      */
@@ -65,10 +69,23 @@ public abstract class UserAdminTestBase {
      */
     protected UserAdmin getUserAdmin() {
         BundleContext context = getBundleContext();
-        ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
-        Assert.assertNotNull("No UserAdmin service reference found", ref);
-        UserAdmin userAdmin = (UserAdmin) context.getService(ref);
-        Assert.assertNotNull("No UserAdmin service found", userAdmin);
-        return userAdmin;
+        try {
+            for (ServiceReference reference : context.getServiceReferences(UserAdmin.class.getName(), null)) {
+                String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
+                if (null != type) {
+                    if (type.equals(getProviderType())) {
+                        return (UserAdmin) context.getService(reference);
+                    }
+                }
+            }
+        } catch (InvalidSyntaxException e) {
+        }
+        Assert.fail("No UserAdmin service found for provider " + getProviderType());
+        return null;
+//        ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
+//        Assert.assertNotNull("No UserAdmin service reference found", ref);
+//        UserAdmin userAdmin = (UserAdmin) context.getService(ref);
+//        Assert.assertNotNull("No UserAdmin service found", userAdmin);
+//        return userAdmin;
     }
 }

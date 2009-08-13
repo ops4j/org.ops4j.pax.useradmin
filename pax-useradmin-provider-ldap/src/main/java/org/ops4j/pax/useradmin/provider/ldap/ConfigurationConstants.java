@@ -23,6 +23,8 @@ public class ConfigurationConstants {
 
     public static final String SERVICE_PID                   = "org.ops4j.pax.useradmin.provider.ldap";
 
+    public static final String STORAGEPROVIDER_TYPE          = "Ldap";
+
     public static final String ATTR_OBJECTCLASS              = "objectClass";
     public static final String PROTOCOL_LDAP                 = "ldap";
 

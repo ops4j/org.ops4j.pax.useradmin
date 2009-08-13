@@ -33,26 +33,31 @@
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.prefs</artifactId>
       <version>1.0.2</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.shell</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-junit</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-container-default</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ops4j.pax.ldapserver</groupId>
@@ -69,6 +74,12 @@
     <dependency>
       <groupId>org.ops4j.pax.useradmin</groupId>
       <artifactId>pax-useradmin-provider-ldap</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.useradmin</groupId>
+      <artifactId>pax-useradmin-provider-preferences</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

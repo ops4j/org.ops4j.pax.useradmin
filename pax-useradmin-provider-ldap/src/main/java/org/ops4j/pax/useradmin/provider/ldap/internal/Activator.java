@@ -19,6 +19,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -36,35 +37,24 @@ import com.novell.ldap.LDAPConnection;
 public class Activator implements BundleActivator {
 
     /**
-     * The service implementation provided by the bundle.
-     */
-    private StorageProviderImpl m_serviceImpl = null;
-    
-    /**
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        m_serviceImpl = new StorageProviderImpl(context, new LDAPConnection());
-        
-//        Dictionary<String, String> properties = new Hashtable<String, String>();
-//        properties.put(StorageProviderImpl.PROP_LDAP_SERVER_URL, StorageProviderImpl.DEFAULT_LDAP_SERVER_URL);
-//        properties.put(StorageProviderImpl.PROP_LDAP_SERVER_PORT, StorageProviderImpl.DEFAULT_LDAP_SERVER_PORT);
-//        properties.put(StorageProviderImpl.PROP_LDAP_ROOT_DN, StorageProviderImpl.DEFAULT_LDAP_ROOT_DN);
-//        m_serviceImpl.updated(properties);
-        
-        
-        Dictionary<String, String> serviceProperties = new Hashtable<String, String>();
-        serviceProperties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
-        context.registerService(new String[] { StorageProvider.class.getName(), ManagedService.class.getName() }, m_serviceImpl, serviceProperties);
+        StorageProviderImpl serviceImpl = new StorageProviderImpl(context, new LDAPConnection());
+        //
+        Dictionary<String, String> properties = new Hashtable<String, String>();
+        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
+        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
+                       ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        context.registerService(new String[] { StorageProvider.class.getName(),
+                                               ManagedService.class.getName() },
+                                serviceImpl, properties);
     }
 
     /**
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        if (null != m_serviceImpl) {
-//            m_serviceImpl.stop();
-        }
     }
 
 }

@@ -24,6 +24,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.itest.UserManagement;
+import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -41,7 +42,12 @@ public class UserManagementTest extends UserManagement {
 
     protected BundleContext getBundleContext() {
         return m_context;
-    };
+    }
+    
+    @Override
+    protected String getProviderType() {
+        return ConfigurationConstants.STORAGEPROVIDER_TYPE;
+    }
 
     @Configuration
     public static Option[] configure() {

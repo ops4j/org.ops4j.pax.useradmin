@@ -1,4 +1,14 @@
+##
+## Bnd instructions for building the bundle
+##
+Bundle-Activator: \
+  org.ops4j.pax.useradmin.service.internal.Activator
 
-Bundle-Activator: org.ops4j.pax.useradmin.service.internal.Activator
-Embed-Dependency: *;scope=compile|runtime
-Export-Package: !${bundle.namespace}.internal.*,${bundle.namespace}.spi.*;version="${pom.version}"
+# Import-Package: \
+#  org.apache.commons.logging.*
+
+#  org.apache.commons.logging.factory.*
+
+#Export-Package: \
+#  !${bundle.namespace}.internal.*,\
+#  ${bundle.namespace}.*;version="${pom.version}"
