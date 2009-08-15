@@ -28,13 +28,13 @@ public class ConfigurationConstants {
     public static final String ATTR_OBJECTCLASS              = "objectClass";
     public static final String PROTOCOL_LDAP                 = "ldap";
 
-    public static final String PROP_LDAP_SERVER_URL          = "org.ops4j.pax.user.ldap.server.url";
-    public static final String PROP_LDAP_SERVER_PORT         = "org.ops4j.pax.user.ldap.server.port";
-    public static final String PROP_LDAP_ROOT_DN             = "org.ops4j.pax.user.ldap.root.dn";
-    public static final String PROP_LDAP_ROOT_USERS          = "org.ops4j.pax.user.ldap.root.users";
-    public static final String PROP_LDAP_ROOT_GROUPS         = "org.ops4j.pax.user.ldap.root.groups";
-    public static final String PROP_LDAP_ACCESS_USER         = "org.ops4j.pax.user.ldap.access.user";
-    public static final String PROP_LDAP_ACCESS_PWD          = "org.ops4j.pax.user.ldap.access.pwd";
+    public static final String PROP_LDAP_SERVER_URL          = "org.ops4j.pax.useradmin.ldap.server.url";
+    public static final String PROP_LDAP_SERVER_PORT         = "org.ops4j.pax.useradmin.ldap.server.port";
+    public static final String PROP_LDAP_ROOT_DN             = "org.ops4j.pax.useradmin.ldap.root.dn";
+    public static final String PROP_LDAP_ROOT_USERS          = "org.ops4j.pax.useradmin.ldap.root.users";
+    public static final String PROP_LDAP_ROOT_GROUPS         = "org.ops4j.pax.useradmin.ldap.root.groups";
+    public static final String PROP_LDAP_ACCESS_USER         = "org.ops4j.pax.useradmin.ldap.access.user";
+    public static final String PROP_LDAP_ACCESS_PWD          = "org.ops4j.pax.useradmin.ldap.access.pwd";
 
     public static final String DEFAULT_LDAP_SERVER_URL       = "localhost";
     public static final String DEFAULT_LDAP_SERVER_PORT      = "8099";
@@ -42,16 +42,16 @@ public class ConfigurationConstants {
     public static final String DEFAULT_LDAP_ROOT_USERS       = "ou=people";
     public static final String DEFAULT_LDAP_ROOT_GROUPS      = "ou=groups";
 
-    public static final String PROP_USER_OBJECTCLASS         = "org.ops4j.pax.user.ldap.user.objectclass";
-    public static final String PROP_USER_ATTR_ID             = "org.ops4j.pax.user.ldap.user.attr.id";
-    public static final String PROP_USER_ATTR_MANDATORY      = "org.ops4j.pax.user.ldap.user.attr.mandatory";
-    public static final String PROP_USER_ATTR_CREDENTIAL     = "org.ops4j.pax.user.ldap.user.attr.credential";
+    public static final String PROP_USER_OBJECTCLASS         = "org.ops4j.pax.useradmin.ldap.user.objectclass";
+    public static final String PROP_USER_ATTR_ID             = "org.ops4j.pax.useradmin.ldap.user.attr.id";
+    public static final String PROP_USER_ATTR_MANDATORY      = "org.ops4j.pax.useradmin.ldap.user.attr.mandatory";
+    public static final String PROP_USER_ATTR_CREDENTIAL     = "org.ops4j.pax.useradmin.ldap.user.attr.credential";
 
-    public static final String PROP_GROUP_OBJECTCLASS        = "org.ops4j.pax.user.ldap.group.objectclass";
-    public static final String PROP_GROUP_ATTR_ID            = "org.ops4j.pax.user.ldap.group.attr.id";
-    public static final String PROP_GROUP_ATTR_MANDATORY     = "org.ops4j.pax.user.ldap.group.attr.mandatory";
-    public static final String PROP_GROUP_ATTR_MEMBER        = "org.ops4j.pax.user.ldap.group.attr.member";
-    public static final String PROP_GROUP_ATTR_CREDENTIAL    = "org.ops4j.pax.user.ldap.group.attr.credential";
+    public static final String PROP_GROUP_OBJECTCLASS        = "org.ops4j.pax.useradmin.ldap.group.objectclass";
+    public static final String PROP_GROUP_ATTR_ID            = "org.ops4j.pax.useradmin.ldap.group.attr.id";
+    public static final String PROP_GROUP_ATTR_MANDATORY     = "org.ops4j.pax.useradmin.ldap.group.attr.mandatory";
+    public static final String PROP_GROUP_ATTR_MEMBER        = "org.ops4j.pax.useradmin.ldap.group.attr.member";
+    public static final String PROP_GROUP_ATTR_CREDENTIAL    = "org.ops4j.pax.useradmin.ldap.group.attr.credential";
 
     public static final String DEFAULT_USER_OBJECTCLASS      = "organizationalPerson, inetOrgPerson, person, top";
     public static final String DEFAULT_USER_ATTR_ID          = "uid";
