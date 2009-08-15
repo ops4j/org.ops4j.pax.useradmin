@@ -28,18 +28,16 @@ Overview
   
 Architecture & Design
 
-  The Pax UserAdmin architecture is based on a standard OSGi UserAdmin service using the
-  {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI
-  to access underlying storage mechanisms (e.g. Ldap).
+~~  The Pax UserAdmin architecture is based on a standard OSGi UserAdmin service using the
+~~  {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI
+~~  to access underlying storage mechanisms (e.g. Ldap).
 
-  Services implementing the StorageProvider interface are detected dynamically when they are started. Each service must
-  define a provider-type property which must be globally unique in the system.  
+  The Pax UserAdmin architecture is based on the {{{http://www.osgi.org/blog/2007/02/osgi-extender-model.html}Extender Pattern}}: a core
+  extender bundle tracks all services that implement the {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI 
+  and manages OSGi UserAdmin service instances for each provider detected.
   
-  For each new StorageProvider service type found a new UserAdmin service instance is created. If a StorageProvider
-  service for a registered type is stopped, the corresponding UserAdmin service is also stopped.
-
-  When locating UserAdmin services, the using bundle may use framework filters to narrow the search by
-  the provider-type property.
+  Therefor UserAdmin service instances are not necessarily started when the bundle is started - they are started
+  when a new StorageProvider service is detected.
 
   The decoupling of the OSGi service management code from the actual storage access offers advantages for developers
   as well as deployers and system maintainers: developers can concentrate on the actual storage access code while
@@ -48,7 +46,33 @@ Architecture & Design
   Although simple, this architecture allows complex configurations, e.g. having multiple UserAdmin services in
   one framework to transfer data from one to the other.
 
+  StorageProvider Types
+
+  Services implementing the StorageProvider interface must define a provider-type service property which must be globally unique
+  in the system. This property is also set to the UserAdmin service for that provider, so standard OSGi filter mechanism
+  can be used to locate services.
   
+  Standard types delivered together with the project are:
+  
+*--------------+--------+
+ - LDAP        | access to LDAP stores via the ldap:// protocol
+*--------------+--------+
+ - Preferences | access to data stored via the OSGi Preferences service
+*--------------+--------+
+Standard StorageProvider Types
+  
+  More types may be defined by 3rd party implementations.
+  
+~~  
+~~  Services implementing the StorageProvider interface are detected dynamically when they are started. Each service must
+~~  define a provider-type property which must be globally unique in the system.  
+  
+~~  For each new StorageProvider service type found a new UserAdmin service instance is created. If a StorageProvider
+~~  service for a registered type is stopped, the corresponding UserAdmin service is also stopped.
+
+~~  Since the UserAdmin services always have the same provider-type property set as their underlying storage-provider,
+~~  a bundle may use framework filters to narrow the search by the provider-type property.
+
   
 Distribution
 

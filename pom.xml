@@ -60,7 +60,7 @@
       <url>scpexe://www.ops4j.org/var/http/www.ops4j.org/projects/pax/useradmin</url>
       <url>file:///Users/Matthias/Work/Projects/ESB/workspace-useradmin/useradmin/target/deploy</url>
        -->
-      <url>file://${basedir}/target/deploy</url>
+      <url>file://${USERADMIN_DEPLOY_DIR}</url>
     </site>
   </distributionManagement>
 
@@ -140,6 +140,15 @@
         -->
         <version>2.2</version>
       </plugin>
+      <!--
+         Codehaus dashboard plugin configuration 
+         Note: putting this into pluginManagement doesn't work: dashboard-report not linked
+        -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dashboard-maven-plugin</artifactId>
+        <version>1.0.0-beta-1</version>
+      </plugin>
       <!-- PMD/CPD configuration
         -->
       <plugin>
@@ -208,14 +217,6 @@
               <_include>-osgi.bnd</_include>
             </instructions>
           </configuration>
-        </plugin>
-        <!--
-         | Codehaus dashboard plugin configuration 
-          -->
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>dashboard-maven-plugin</artifactId>
-          <version>1.0.0-beta-1</version>
         </plugin>
       </plugins>
     </pluginManagement>
