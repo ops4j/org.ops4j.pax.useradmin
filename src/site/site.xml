@@ -20,6 +20,7 @@
 
     <menu name="Pax UserAdmin">
       <item name="Introduction" href="/index.html"/>
+      <item name="Quickstart" href="/quickstart.html"/>
       <item name="User Guide" href="/userguide.html"/>
     </menu>
 

@@ -1,0 +1,157 @@
+Quickstart
+
+  Describes how to get started without fuzz - please read {{{index.html}the introduction}} first.
+
+  <<Basic Framework Configuration & Startup>>
+  
+  All examples use {{{http://paxrunner.ops4j.org/space/Pax+Runner}Pax-Runner}} to run an OSGi
+  framework and assume Pax-Runner is already installed as described
+  {{{http://paxrunner.ops4j.org/display/paxrunner/Installation}here}}.
+
+  The following snippets show the Pax-Runner configurations for various use cases. Just copy the content of the snippet
+  to a file (if not noted otherwise <runner.args>) and run <pax-run.sh> or <pax-run.bat> in the same directory. This will download
+  all specified bundles and framework-code and start the framework in a subdirectory <runner>. 
+
+  See the {{{http://paxrunner.ops4j.org/display/paxrunner/Options}Pax-Runner options page}} for details on how
+  to configure Pax-Runner.
+
+  <<Bundles>>
+
+  The Pax UserAdmin collaborates with the following bundles:
+
+  * <<Service Bundles>>
+
+*-------------------+-----------------------------+--------+
+ Service            | Tested Implementation(s)    | Purpose
+*-------------------+-----------------------------+--------+
+ - OSGi LogService  | {{{http://wiki.ops4j.org/display/paxlogging/Pax+Logging}Pax Logging}} | Service used to log messages for later analysis. 
+*-------------------+-----------------------------+--------+
+ - OSGi EventAdmin  | {{{http://felix.apache.org/site/apache-felix-event-admin.html}Felix Event Admin}} | Delivers events.
+*-------------------+-----------------------------+--------+
+ - OSGi ConfigAdmin | {{{http://felix.apache.org/site/apache-felix-configuration-admin-service.html}Felix Configuration Admin}} | Delivers configuration data to services.
+*-------------------+-----------------------------+--------+
+ - OSGi Preferences | {{{http://felix.apache.org/site/apache-felix-preferences-service.html}Felix Preferences Service}} | Manages persistent storage of preferences.
+*-------------------+-----------------------------+--------+
+
+
+  * <<Util Bundles>>
+  
+*------------------------------+--------+
+ Tested Implementation         | Purpose
+*------------------------------+--------+
+ {{{}Pax LdapServer/ApacheDS}} | A bundelized version of the {{{http://directory.apache.org/}Apache Directory Service}}. 
+*------------------------------+--------+
+ {{{}Felix Fileinstall}}       | TODO: do we really need this one 
+*------------------------------+--------+
+
+Single StorageProvider Configuration
+
+  The most simple use case is having a single StorageProvider/UserAdmin pair running in an OSGi
+  framework.
+  
+   [[1]] Preferences
+
+------------
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
+scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
+#
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
+------------
+
+   [[2]] LDAP with bundled LDAP server
+
+   Using the LDAP provider together with the pax-ldapserver-apacheds bundle allows to
+   run everything without custom configuration:
+       
+------------
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
+scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+------------
+
+   [[3]] LDAP with external LDAP server
+
+   If an external LDAP server is used, the framework configuration is bit shorter (as we
+   can omit the bundled LDAP server):
+   
+------------
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
+scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+------------
+
+   but the LDAP provider must be configured to access the external LDAP server. Configuration is done
+   via the OSGi ConfigAdmin service using the PID <org.ops4j.pax.useradmin.provider.ldap> - a simple
+   example configuration file may look like:
+
+------------
+org.ops4j.pax.user.ldap.server.url = ldap.ops4j.org
+org.ops4j.pax.user.ldap.server.port = 8099
+org.ops4j.pax.user.ldap.root.dn = dc=ops4j,dc=org
+------------
+
+   Store this file as <configuration/org.ops4j.pax.useradmin.provider.ldap.cfg>
+  
+Multi StorageProvider Configuration
+
+  Sometimes it is desirable to have more than on UserAdmin/StorageProvider pair running in the same
+  framework, i.e. if you want to use the UserAdmin command to copy user data from one instance to 
+  another.
+  
+   [[1]] Preferences and Ldap (bundled) provider
+   
+------------
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
+scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
+scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
+scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
+scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
+------------
+
+   [[2]] Two providers of the same type
+   
+   Sorry this not implemented. Please use the UserAdmin command to export the data to an intermediate XML file
+   and then run a different framework configuration and import the data.
+
+
+
+The UserAdmin Command
+
+   The <<useradmin>> command allows complex manipulation of user data. Its general synopsis is:
+   
+------------
+  > useradmin <subcommand> [<parameter-list>]
+------------
+
+   where <parameter-list> depends on the actual subcommand used.
+
+  [[1]] copyData Subcommand
+
+  The <<copyData>> subcommand takes two mandatory parameters:
+
+------------
+  > useradmin copyData <source-uri> <target-uri>
+------------
+
+  Both URIs may denote either a file (starting with file://) or a UserAdmin instance (starting with useradmin://). The
+  source-URI describes the source from which to copy data and the target-URI the target to which the data is written.
+

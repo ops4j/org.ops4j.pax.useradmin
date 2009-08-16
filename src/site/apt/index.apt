@@ -23,7 +23,8 @@ Overview
   
     * ability to transparently switch between different storage technologies
   
-  Any feedback, test-experiences or 'value adding' feature requests are welcomed on the {{{mail-lists.html}mailing list}}.
+  The current effort is very straightforward - any feedback, test-experiences or 'value adding' feature requests
+  to make it more sophisticated are welcomed on the {{{mail-lists.html}mailing list}}.
 
   
 Architecture & Design
@@ -46,7 +47,7 @@ Architecture & Design
   Although simple, this architecture allows complex configurations, e.g. having multiple UserAdmin services in
   one framework to transfer data from one to the other.
 
-  StorageProvider Types
+  <<StorageProvider Types>>
 
   Services implementing the StorageProvider interface must define a provider-type service property which must be globally unique
   in the system. This property is also set to the UserAdmin service for that provider, so standard OSGi filter mechanism
@@ -63,6 +64,11 @@ Standard StorageProvider Types
   
   More types may be defined by 3rd party implementations.
   
+  <<Useradmin URI Protocol>>
+
+   To identify UserAdmin instances a new URI protocol <<<useradmin://<provider-type>>> is introduced.
+   A useradmin URI consists of the protocol prefix and a provider-type, i.e. useradmin://Ldap
+   
 ~~  
 ~~  Services implementing the StorageProvider interface are detected dynamically when they are started. Each service must
 ~~  define a provider-type property which must be globally unique in the system.  
