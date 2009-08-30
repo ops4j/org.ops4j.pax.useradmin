@@ -15,7 +15,7 @@ Quickstart
   See the {{{http://paxrunner.ops4j.org/display/paxrunner/Options}Pax-Runner options page}} for details on how
   to configure Pax-Runner.
 
-  <<Bundles>>
+  <<Additional Bundles>>
 
   The Pax UserAdmin collaborates with the following bundles:
 
@@ -41,12 +41,12 @@ Quickstart
 *------------------------------+--------+
  {{{}Pax LdapServer/ApacheDS}} | A bundelized version of the {{{http://directory.apache.org/}Apache Directory Service}}. 
 *------------------------------+--------+
- {{{}Felix Fileinstall}}       | TODO: do we really need this one 
+ {{{}Felix Fileinstall}}       | Watches a directory and acts on adding/removing files from it. 
 *------------------------------+--------+
 
 Single StorageProvider Configuration
 
-  The most simple use case is having a single StorageProvider/UserAdmin pair running in an OSGi
+  The most common use case is having a single StorageProvider/UserAdmin pair running in an OSGi
   framework.
   
    [[1]] Preferences

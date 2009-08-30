@@ -6,7 +6,7 @@
   <parent>
     <artifactId>master</artifactId>
     <groupId>org.ops4j.pax</groupId>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
   </parent>
   
   <groupId>org.ops4j.pax</groupId>
@@ -17,26 +17,50 @@
   
   <description>Pax UserAdmin - OPS4J implementation of the OSGi UserAdmin service and more ...</description>
   
+  <profiles>
+    <profile>
+      <id>all</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+      <modules>
+        <module>pax-useradmin-service</module>
+        <module>pax-useradmin-provider-preferences</module>
+        <module>pax-useradmin-provider-ldap</module>
+        <module>pax-useradmin-command</module>
+        <module>pax-useradmin-itest</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>no-itest</id>
+      <modules>
+        <module>pax-useradmin-service</module>
+        <module>pax-useradmin-provider-preferences</module>
+        <module>pax-useradmin-provider-ldap</module>
+        <module>pax-useradmin-command</module>
+      </modules>
+    </profile>
+  </profiles>
+
+    <!--
   <modules>
     <module>pax-useradmin-service</module>
     <module>pax-useradmin-provider-preferences</module>
     <module>pax-useradmin-provider-ldap</module>
     <module>pax-useradmin-command</module>
     <module>pax-useradmin-itest</module>
-    <!--
-    -->
     
-    <!-- 
     <module>pax-useradmin-provider-rdbms</module>
-     -->
   </modules>
+    -->
   
   <developers>
     <developer>
       <id>mkuespert</id>
       <name>Matthias Kuespert</name>
-      <email>matthias@kuespert-web.de</email>
+      <email>mkuespert@googlemail.com</email>
       <organization>MK Software</organization>
+      <organizationUrl>http://www.kuespert-web.de</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -53,14 +77,14 @@
     <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin</developerConnection>
   </scm>
 
+  <properties>
+    <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/useradmin</site.deploy.dir>
+  </properties>
+
   <distributionManagement>
     <site>
       <id>useradmin-website</id>
-      <!-- 
-      <url>scpexe://www.ops4j.org/var/http/www.ops4j.org/projects/pax/useradmin</url>
-      <url>file:///Users/Matthias/Work/Projects/ESB/workspace-useradmin/useradmin/target/deploy</url>
-       -->
-      <url>file://${USERADMIN_DEPLOY_DIR}</url>
+      <url>${site.deploy.dir}</url>
     </site>
   </distributionManagement>
 
@@ -156,6 +180,7 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
           <aggregate>true</aggregate>
+          <targetJdk>1.5</targetJdk>
         </configuration>
       </plugin>
       <!-- Javadoc configuration

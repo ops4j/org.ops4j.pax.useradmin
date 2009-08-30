@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Pax UserAdmin">
 
+  <!-- 
   <bannerLeft>
     <name>${project.name}</name>
   </bannerLeft>
-
+   -->
+   
   <bannerRight>
     <name>OPS4J</name>
     <src>ops4j-logo.png</src>
     <href>http://www.ops4j.org</href>
   </bannerRight>
 
+  <version position="left"/>
+  
   <body>
     <links>
       <item name="Pax" href="http://www.ops4j.org/projects/pax/" />
-      <item name="OPS4J" href="http://wiki.ops4j.org" />
       <item name="OSGi" href="http://www.osgi.org/" />
     </links>
 
@@ -25,14 +28,10 @@
     </menu>
 
     <menu name="Bundles">
-        <item name="pax-useradmin-service" href="/service/index.html"/>
-        <item name="pax-useradmin-provider SPI" href="/provider-overview.html">
-          <item name="pax-useradmin-provider-preferences" href="/provider-preferences/index.html"/>
-          <item name="pax-useradmin-provider-ldap" href="/provider-ldap/index.html"/>
-        </item>
-        <item name="pax-useradmin-command" href="/command/index.html">
-          <item name="copyData command" href="/command/copydata.html"/>
-        </item>
+        <item name="pax-useradmin-service" href="/bundles/service.html"/>
+        <item name="pax-useradmin-provider-preferences" href="/bundles/provider-preferences.html"/>
+        <item name="pax-useradmin-provider-ldap" href="/bundles/provider-ldap.html"/>
+        <item name="pax-useradmin-command" href="/bundles/command.html"/>
         <!-- 
         <item name="pax-useradmin-ui" href="/ui-overview.html">
           <item name="pax-useradmin-ui-eclipse" href="/ui-eclipse/index.html"/>
@@ -40,18 +39,20 @@
         </item>
          -->
     </menu>
-
+    
+    <!--
     <menu name="Usage">
       <item name="Usage Examples" href="examples.html" >
         <item name="Preferences Provider" href="/provider-preferences/examples.html"/>
         <item name="LDAP Provider" href="/provider-ldap/examples.html"/>
       </item>
       
-      <item name="Other resources">
-        <item name="Wiki" href="http://wiki.ops4j.org/confluence/display/ops4j/Pax+UserAdmin" />
-      </item>
     </menu>
-  
+    -->
+    
+    <menu name="Other resources">
+        <item name="Wiki" href="http://wiki.ops4j.org/confluence/display/ops4j/Pax+UserAdmin" />
+    </menu>
 
     <!-- 
     <menu ref="modules"/>

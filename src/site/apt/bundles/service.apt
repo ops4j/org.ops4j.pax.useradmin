@@ -1,0 +1,50 @@
+
+
+Pax UserAdmin Service Bundle
+
+  This bundle contains the UserAdmin service implementation and SPI as well as the extender logic that 
+  creates the UserAdmin service instances whenever a new StorageProvider service is detected.
+
+  <<UserAdmin service implementation>>
+  
+  The UserAdmin service is a straightforward implementation of the OSGi UserAdmin specification. View
+  source code {{{../xref/org/ops4j/pax/useradmin/service/internal/package-summary.html}here}}.
+  
+  It forwards all data manipulation requests to the StorageProvider service which is bound to
+  the service instance.
+  
+  <<StorageProvider SPI>>
+
+  The {{{../xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider SPI}} is
+  an interface that must be implemented by storage provider services in order to be detected by
+  the UserAdmin bundles extender logic.
+  
+  The Pax UserAdmin project contains two StorageProvider implementations:
+
+  [[1]] Preferences Provider
+  
+  The {{{../bundles/provider-preferences.html}preferences provider bundle}} contains an implementation that uses
+  the OSGi Preferences service as backend storage.
+  
+  [[2]] LDAP Provider
+  
+  The {{{../bundles/provider-ldap.html}LDAP provider bundle}} contains an implementation that uses
+  a LDAP server as backend storage.
+
+  []
+  
+  <<Extender Logic>>
+  
+  The extender pattern is implemented in the {{{../xref/org/ops4j/pax/useradmin/service/internal/Activator.html}bundle activator}}
+  using the OSGi ServiceTrackerCustomizer: every time a service iplementing the StorageProvider interface is detected a new UserAdmin
+  service is created unless a UserAdmin for that provider type already exists.
+
+Coordinates
+
+*---------------+---------+
+ Group id:      | org.ops4j.pax.useradmin
+*---------------+---------+
+ Artifact id:   | pax-useradmin-service
+*---------------+---------+
+ Version:       | 0.0.1-SNAPSHOT
+*---------------+---------+

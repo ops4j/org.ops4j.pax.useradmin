@@ -1,0 +1,15 @@
+
+Command Bundle
+
+  The command bundle contains commands for high-level maintainance of 
+  user data, i.e. transferring data from one storage implementation to another.
+
+Coordinates
+
+*---------------+---------+
+ Group id:      | org.ops4j.pax.useradmin
+*---------------+---------+
+ Artifact id:   | pax-useradmin-command
+*---------------+---------+
+ Version:       | 0.0.1-SNAPSHOT
+*---------------+---------+

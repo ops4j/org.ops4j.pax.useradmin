@@ -10,7 +10,7 @@
 Overview
 
   The Pax UserAdmin project aims to leverage the standard OSGi UserAdmin specification as specified in chapter 107
-  of the OSGi Service Platform Service Compendium - actually Release 4, Version 4.2/Draft.
+  of the latest {{{http://www.osgi.org/Specifications/Drafts}OSGi Service Platform Release 4 Compendium Specification Version 4.2 Public Draft}}.
   
   Main goal is to provide 'enterprise value' - all the tools and handles needed to manage large amounts of user
   data, often having to deal with one or even more legacy systems.
@@ -24,7 +24,7 @@ Overview
     * ability to transparently switch between different storage technologies
   
   The current effort is very straightforward - any feedback, test-experiences or 'value adding' feature requests
-  to make it more sophisticated are welcomed on the {{{mail-lists.html}mailing list}}.
+  to make the implementation more sophisticated are welcomed on the {{{mail-lists.html}mailing list}}.
 
   
 Architecture & Design
@@ -33,12 +33,18 @@ Architecture & Design
 ~~  {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI
 ~~  to access underlying storage mechanisms (e.g. Ldap).
 
-  The Pax UserAdmin architecture is based on the {{{http://www.osgi.org/blog/2007/02/osgi-extender-model.html}Extender Pattern}}: a core
-  extender bundle tracks all services that implement the {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider}} SPI 
-  and manages OSGi UserAdmin service instances for each provider detected.
+  The Pax UserAdmin architecture is based on the {{{http://www.osgi.org/blog/2007/02/osgi-extender-model.html}Extender Pattern}}: a
+  ServiceTracker tracks all services that implement the {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider SPI}}
+  and manages OSGi {{{xref/org/ops4j/pax/useradmin/service/internal/UserAdminImpl.html}UserAdmin service instances}} for each provider it detects.
   
-  Therefor UserAdmin service instances are not necessarily started when the bundle is started - they are started
-  when a new StorageProvider service is detected.
+~~  Thus the complexity of user data management is broken down into 3 layers:
+  
+~~  [[1]] SPI - persistence details
+~~  [[2]] OSGi framework - service dynamics
+~~  [[3]] OSGi Specification - UserAdmin API
+  
+~~  Therefor UserAdmin service instances are not necessarily started when the bundle is started - they are started
+~~  when a new StorageProvider service is detected.
 
   The decoupling of the OSGi service management code from the actual storage access offers advantages for developers
   as well as deployers and system maintainers: developers can concentrate on the actual storage access code while
@@ -62,7 +68,7 @@ Architecture & Design
 *--------------+--------+
 Standard StorageProvider Types
   
-  More types may be defined by 3rd party implementations.
+  More provider types may be defined by 3rd party implementations.
   
   <<Useradmin URI Protocol>>
 
@@ -84,19 +90,17 @@ Distribution
 
   The Pax UserAdmin project is distributed as a set of OSGi bundles:
   
-  * the {{{service/index.html}pax-useradmin-service}} bundle
+  * the {{{bundles/service.html}pax-useradmin-service}} bundle containing the extender logic and core service implementation
 
-  The Pax UserAdmin service is a lightweight OSGi service that implements the standard UserAdmin service
-  API and connects it to an underlying storage using a dynamic plugin-mechanism based on the
-  {{StorageProvider}} SPI.
+~~  The Pax UserAdmin service is a lightweight OSGi service that implements the standard UserAdmin service
+~~  API and connects it to an underlying storage using a dynamic plugin-mechanism based on the
+~~  {{StorageProvider}} SPI.
 
-  * currently two pax-useradmin-provider-<type> bundles: {{{provider-ldap/index.html}Ldap}} or {{{provider-preferences/index.html}PreferencesService}} based.
+  * currently two pax-useradmin-provider-<type> bundles: {{{bundles/provider-ldap.html}Ldap}} and {{{bundles/provider-preferences.html}PreferencesService}} based.
 
-  Storage providers for the OSGi PreferencesService and Ldap are included in the distribution. More may
-  be added - see StorageProvider discovery.
+~~  Storage providers for the OSGi PreferencesService and Ldap are included in the distribution. More may
+~~  be added - see StorageProvider discovery.
 
-  * the {{{command/index.html}pax-useradmin-command}} bundle (optional)
-
-  Currently only available in the Felix shell. The bundle provides a command to transfer data between files and/or service instances.
+  * the {{{bundles/command.html}pax-useradmin-command}} bundle which provides a command to transfer data between files and/or service instances.
     
 ~~  * a {{{ui-eclipse/index.html}pax-useradmin-ui-eclipse}} bundle (optional)

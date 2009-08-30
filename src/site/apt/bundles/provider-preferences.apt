@@ -1,0 +1,18 @@
+
+Preferences Provider Bundle
+
+  The {{{../xref/org/ops4j/pax/useradmin/provider/preferences/internal/StorageProviderImpl.html}Preferences Provider implementation}} of the StorageProvider SPI uses
+  the OSGi Preferences service as backend storage for persisting user data.
+  
+  The layout of the storage is compatible to the layout used by
+  the {{{http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.equinox.useradmin/}Equinox UserAdmin implementation}}.
+
+Coordinates
+
+*---------------+---------+
+ Group id:      | org.ops4j.pax.useradmin
+*---------------+---------+
+ Artifact id:   | pax-useradmin-provider-preferences
+*---------------+---------+
+ Version:       | 0.0.1-SNAPSHOT
+*---------------+---------+
