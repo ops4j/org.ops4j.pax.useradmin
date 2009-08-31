@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ops4j.pax.useradmin.itest.ldap;
+package org.ops4j.pax.useradmin.itest.service.ldap;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.*;

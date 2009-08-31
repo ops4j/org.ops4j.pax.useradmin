@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 
 import junit.framework.Assert;
 
-import org.ops4j.pax.useradmin.itest.ldap.FrameworkConfiguration;
+import org.ops4j.pax.useradmin.itest.service.ldap.FrameworkConfiguration;
 
 /**
  * Static utility methods.

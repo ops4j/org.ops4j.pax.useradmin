@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ops4j.pax.useradmin.itest.ldap;
+package org.ops4j.pax.useradmin.itest.service.preferences;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
@@ -24,27 +24,22 @@ import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.itest.UserManagement;
-import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
+import org.ops4j.pax.useradmin.itest.service.AuthorizationManagement;
+import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
 
 /**
- * Testing the user-management parts of the preferences service based
- * implementation of the UserAdmin service.
- * 
  * @author Matthias Kuespert
- * @since 09.07.2009
+ * @since 12.07.2009
  */
 @RunWith(JUnit4TestRunner.class)
-public class UserManagementTest extends UserManagement {
+public class AuthorizationManagementTest extends AuthorizationManagement {
 
     @Inject
     private BundleContext m_context;
 
+    @Override
     protected BundleContext getBundleContext() {
-        if (null == m_context) {
-            throw new IllegalStateException("No bundle context injected");
-        }
         return m_context;
     };
 
@@ -52,45 +47,20 @@ public class UserManagementTest extends UserManagement {
     protected String getProviderType() {
         return ConfigurationConstants.STORAGEPROVIDER_TYPE;
     }
-    
+
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
                        FrameworkConfiguration.get());
     }
-    
+
     @Before
     public void setup() {
-        FrameworkConfiguration.setup(getBundleContext());
+        super.setup();
     }
 
     @Test
-    public void createAndFindUserOk() {
-        super.createAndFindUserOk();
-    }
-
-    @Test
-    public void createAndFindGroupOk() {
-        super.createAndFindGroupOk();
-    }
-
-    @Test
-    public void createAndRemoveUserOk() {
-        super.createAndRemoveUserOk();
-    }
-
-    @Test
-    public void createAndRemoveUserWithGroupsOk() {
-        super.createAndRemoveUserWithGroupsOk();
-    }
-
-    @Test
-    public void setAndGetAttributesOk() {
-        super.setAndGetAttributesOk();
-    }
-
-    @Test
-    public void setAndGetCredentialsOk() {
-        super.setAndGetCredentialsOk();
+    public void hasRole() {
+        super.hasRole();
     }
 }

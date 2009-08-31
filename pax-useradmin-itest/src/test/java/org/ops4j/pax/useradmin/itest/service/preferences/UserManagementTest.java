@@ -13,36 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ops4j.pax.useradmin.itest.preferences;
+package org.ops4j.pax.useradmin.itest.service.preferences;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.itest.AuthorizationManagement;
+import org.ops4j.pax.useradmin.itest.service.UserManagement;
 import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
 
 /**
+ * Testing the user-management parts of the preferences service based
+ * implementation of the UserAdmin service.
+ * 
  * @author Matthias Kuespert
- * @since 12.07.2009
+ * @since 09.07.2009
  */
 @RunWith(JUnit4TestRunner.class)
-public class AuthorizationManagementTest extends AuthorizationManagement {
+public class UserManagementTest extends UserManagement {
 
     @Inject
     private BundleContext m_context;
 
-    @Override
     protected BundleContext getBundleContext() {
         return m_context;
-    };
-
+    }
+    
     @Override
     protected String getProviderType() {
         return ConfigurationConstants.STORAGEPROVIDER_TYPE;
@@ -54,13 +55,28 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
                        FrameworkConfiguration.get());
     }
 
-    @Before
-    public void setup() {
-        super.setup();
+    @Test
+    public void createAndFindUserOk() {
+        super.createAndFindUserOk();
     }
 
     @Test
-    public void hasRole() {
-        super.hasRole();
+    public void createAndFindGroupOk() {
+        super.createAndFindGroupOk();
+    }
+
+    @Test
+    public void createAndRemoveUserOk() {
+        super.createAndRemoveUserOk();
+    }
+
+    @Test
+    public void setAndGetAttributesOk() {
+        super.setAndGetAttributesOk();
+    }
+
+    @Test
+    public void setAndGetCredentialsOk() {
+        super.setAndGetCredentialsOk();
     }
 }

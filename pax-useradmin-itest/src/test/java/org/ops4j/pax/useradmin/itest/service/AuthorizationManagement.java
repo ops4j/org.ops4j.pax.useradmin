@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ops4j.pax.useradmin.itest;
+package org.ops4j.pax.useradmin.itest.service;
 
 import junit.framework.Assert;
 

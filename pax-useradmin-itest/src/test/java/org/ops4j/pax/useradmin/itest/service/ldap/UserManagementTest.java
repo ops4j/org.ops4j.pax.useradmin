@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ops4j.pax.useradmin.itest.preferences;
+package org.ops4j.pax.useradmin.itest.service.ldap;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.itest.UserManagement;
-import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
+import org.ops4j.pax.useradmin.itest.service.UserManagement;
+import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -41,18 +42,26 @@ public class UserManagementTest extends UserManagement {
     private BundleContext m_context;
 
     protected BundleContext getBundleContext() {
+        if (null == m_context) {
+            throw new IllegalStateException("No bundle context injected");
+        }
         return m_context;
-    }
-    
+    };
+
     @Override
     protected String getProviderType() {
         return ConfigurationConstants.STORAGEPROVIDER_TYPE;
     }
-
+    
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
                        FrameworkConfiguration.get());
+    }
+    
+    @Before
+    public void setup() {
+        FrameworkConfiguration.setup(getBundleContext());
     }
 
     @Test
@@ -68,6 +77,11 @@ public class UserManagementTest extends UserManagement {
     @Test
     public void createAndRemoveUserOk() {
         super.createAndRemoveUserOk();
+    }
+
+    @Test
+    public void createAndRemoveUserWithGroupsOk() {
+        super.createAndRemoveUserWithGroupsOk();
     }
 
     @Test

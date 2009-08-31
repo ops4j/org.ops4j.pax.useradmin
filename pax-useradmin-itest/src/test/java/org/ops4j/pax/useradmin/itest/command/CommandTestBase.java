@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ops4j.pax.useradmin.command.itest;
+package org.ops4j.pax.useradmin.itest.command;
 
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
