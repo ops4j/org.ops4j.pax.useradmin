@@ -12,7 +12,7 @@
   <groupId>org.ops4j.pax</groupId>
   <artifactId>useradmin</artifactId>
   <packaging>pom</packaging>
-  <name>OPS4J Pax UserAdmin</name>
+  <name>OPS4J - Pax UserAdmin</name>
   <version>0.0.1-SNAPSHOT</version>
   
   <description>Pax UserAdmin - OPS4J implementation of the OSGi UserAdmin service and more ...</description>

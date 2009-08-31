@@ -2,6 +2,19 @@ Quickstart
 
   Describes how to get started without fuzz - please read {{{index.html}the introduction}} first.
 
+  <<Build from source>>
+  
+  Prior to running the examples the latest sources must be checked out and built. This done by issuing
+  the following commands:
+  
+---
+  svn co https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin
+  cd useradmin
+  ./src/scripts/build-all.sh -Dfile://`pwd`/target/deploy [ -Pno-itest ]
+---
+  
+  The <no-itest> profile may be used to shorten compile time.
+  
   <<Basic Framework Configuration & Startup>>
   
   All examples use {{{http://paxrunner.ops4j.org/space/Pax+Runner}Pax-Runner}} to run an OSGi
@@ -39,9 +52,9 @@ Quickstart
 *------------------------------+--------+
  Tested Implementation         | Purpose
 *------------------------------+--------+
- {{{}Pax LdapServer/ApacheDS}} | A bundelized version of the {{{http://directory.apache.org/}Apache Directory Service}}. 
+ {{{http://www.ops4j.org/projects/pax/ldapserver/apacheds/index.html}Pax LdapServer/ApacheDS}} | A bundelized version of the {{{http://directory.apache.org/}Apache Directory Service}}. 
 *------------------------------+--------+
- {{{}Felix Fileinstall}}       | Watches a directory and acts on adding/removing files from it. 
+ {{{http://felix.apache.org/site/apache-felix-file-install.html}Felix Fileinstall}}            | Watches a directory and acts on adding/removing files from it. 
 *------------------------------+--------+
 
 Single StorageProvider Configuration

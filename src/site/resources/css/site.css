@@ -1,0 +1,11 @@
+#bannerLeft {
+    float: center;
+    text-align: center;
+    margin-top: 50px;
+}
+#bannerRight {
+    float: center;
+    right: 20px;
+    margin-right: 40px;
+    margin-top: 20px;
+}
