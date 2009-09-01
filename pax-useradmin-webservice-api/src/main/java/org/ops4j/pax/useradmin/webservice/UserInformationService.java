@@ -21,9 +21,29 @@ package org.ops4j.pax.useradmin.webservice;
  */
 public interface UserInformationService {
 
+    /**
+     * Authenticates a user for a given role using the specified password.
+     * 
+     * @param name The user name.
+     * @param password The passowrd as MD5 encrypted char array.
+     * @param role The role wich autentication is asked for.
+     * @return True if the given user is authenticated for the given role - false otherwise.
+     */
     boolean authenticate(String name, byte[] password, String role);
 
+    /**
+     * Authenticates a user using the specified password and returns all roles this user is authorized to.
+     * 
+     * @param name The user name.
+     * @param password The passowrd as MD5 encrypted char array.
+     * @return An array of role names that the user is authorized to.
+     */
     String[] authenticate(String name, byte[] password);
     
+    /**
+     * Returns all user names.
+     * 
+     * @return An array of user names.
+     */
     String getUsers();
 }
