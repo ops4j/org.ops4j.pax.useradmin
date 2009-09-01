@@ -23,5 +23,7 @@ public interface UserInformationService {
 
     boolean authenticate(String name, byte[] password, String role);
 
+    String[] authenticate(String name, byte[] password);
+    
     String getUsers();
 }

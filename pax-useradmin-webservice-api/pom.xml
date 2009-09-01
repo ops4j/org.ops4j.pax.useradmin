@@ -22,21 +22,6 @@
   <name>${bundle.symbolicName}</name>
   <description>The OPS4j Pax UserAdmin Webservice API</description>
 
- <!-- 
-  <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
- -->
- 
   <build>
     <plugins>
       <plugin>
