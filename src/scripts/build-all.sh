@@ -2,7 +2,7 @@
 #
 while getopts ":M:P:D:" o ; do
    case $o in
-     M ) MAVEN_DIR="$OPTARG/bin/" ;;
+     M ) MAVEN_DIR="$OPTARG" ;;
      P ) PROFILE="-P$OPTARG" ;;
      D ) DEPLOY_DIR="-D$OPTARG" ;;
      esac
@@ -10,6 +10,7 @@ done
 #
 if [ ! -z ${MAVEN_DIR} ] ; then
   MAVEN_OPT=-M${MAVEN_DIR}
+  MAVEN_DIR=${MAVEN_DIR}/bin/
 else
   MAVEN_OPT=
 fi
