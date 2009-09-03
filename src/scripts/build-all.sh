@@ -15,4 +15,4 @@ else
 fi
 #
 DEPLOY_SCRIPT=`dirname $0`/deploy-site.sh
-${MAVEN_DIR}mvn ${PROFILE} clean install site && ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE} ${DEPLOY_DIR}
+${MAVEN_DIR}mvn ${PROFILE} clean install && ${MAVEN_DIR}mvn ${PROFILE} site && ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE} ${DEPLOY_DIR}
