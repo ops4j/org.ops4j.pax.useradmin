@@ -4,7 +4,7 @@
 #
 while getopts ":M:P:D:" o ; do
    case $o in
-     M ) MAVEN_DIR=$OPTARG/bin/ ;;
+     M ) MAVEN_DIR="$OPTARG/bin/" ;;
      P ) PROFILE="-P $OPTARG" ;;
      D ) DEPLOY_DIR="-Dsite.deploy.dir=$OPTARG" ;;
      esac
