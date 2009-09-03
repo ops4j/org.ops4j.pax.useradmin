@@ -71,12 +71,8 @@
   </developers>
 
   <scm>
-    <!--
     <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin</connection>
     <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin</developerConnection>
-     -->
-    <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin</connection>
-    <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin</developerConnection>
   </scm>
 
   <properties>
