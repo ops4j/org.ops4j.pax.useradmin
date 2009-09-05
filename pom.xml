@@ -209,6 +209,12 @@
           </groups>
         </configuration>
       </plugin>
+      <!-- Changelog configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changelog-plugin</artifactId>
+      </plugin>
     </plugins>
   </reporting>
 
