@@ -113,7 +113,7 @@ public abstract class UserManagement extends UserAdminTestBase {
         Assert.assertNull("Unexpected user found", userAdmin.getRole(USER_NAME));
     }
     
-    protected void createAndRemoveUserWithGroupsOk() {
+    protected void createAndRemoveUserWithGroupsOk(int initialGroupSize) {
         UserAdmin userAdmin = getUserAdmin();
         User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
         Assert.assertNotNull("Could not create user", user);
@@ -125,7 +125,7 @@ public abstract class UserManagement extends UserAdminTestBase {
         group.addMember(user);
         Role[] members = group.getMembers();
         Assert.assertNotNull("No members found", members);
-        Assert.assertEquals("Mismatching member count", 1, members.length);
+        Assert.assertEquals("Mismatching member count", 1 + initialGroupSize, members.length);
         //
         // remove user
         //

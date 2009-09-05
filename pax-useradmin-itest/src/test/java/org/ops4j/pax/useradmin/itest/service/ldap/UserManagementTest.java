@@ -81,7 +81,7 @@ public class UserManagementTest extends UserManagement {
 
     @Test
     public void createAndRemoveUserWithGroupsOk() {
-        super.createAndRemoveUserWithGroupsOk();
+        super.createAndRemoveUserWithGroupsOk(1);
     }
 
     @Test

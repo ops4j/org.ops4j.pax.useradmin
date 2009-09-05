@@ -35,6 +35,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.log.LogService;
+import org.osgi.service.useradmin.Role;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -72,6 +74,27 @@ public class FrameworkConfiguration {
         Assert.assertNotNull("No ConfigurationAdmin service reference found", refConfigAdmin);
         ConfigurationAdmin configAdmin = (ConfigurationAdmin) context.getService(refConfigAdmin);
         Assert.assertNotNull("No ConfigurationAdmin service found", configAdmin);
+        //
+        // configure Pax Logging
+        //
+        ServiceReference refLog = context.getServiceReference(LogService.class.getName());
+        Assert.assertNotNull("No LogService reference found", refLog);
+        //
+        try {
+            Configuration config = configAdmin.getConfiguration("org.ops4j.pax.logging",
+                                                                refLog.getBundle().getLocation());
+            Dictionary<String, String> properties = config.getProperties();
+            if (null == properties) {
+                properties = new Hashtable<String, String>();
+            }
+            properties.put("log4j.rootLogger",                           "INFO, A1");
+            properties.put("log4j.appender.A1",                          "org.apache.log4j.ConsoleAppender");
+            properties.put("log4j.appender.A1.layout",                   "org.apache.log4j.PatternLayout");
+            properties.put("log4j.appender.A1.layout.ConversionPattern", "%d [%t] %-5p %c - %m%n");
+            config.update(properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //
         // clean ApacheDS working directory
         //
@@ -154,6 +177,8 @@ public class FrameworkConfiguration {
                            ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
             properties.put(ConfigurationConstants.PROP_LDAP_ROOT_DN,
                            ConfigurationConstants.DEFAULT_LDAP_ROOT_DN);
+            properties.put(ConfigurationConstants.PROP_GROUP_ALLOW_EMPTY, "no");
+            properties.put(ConfigurationConstants.PROP_GROUP_DEFAULT_MEMBER, Role.USER_ANYONE);
             config.update(properties);
         } catch (IOException e) {
             e.printStackTrace();

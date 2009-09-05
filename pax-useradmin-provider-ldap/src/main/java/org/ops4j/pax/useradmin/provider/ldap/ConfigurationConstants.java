@@ -17,7 +17,7 @@ package org.ops4j.pax.useradmin.provider.ldap;
 
 /**
  * @author Matthias Kuespert
- * @since  18.07.2009
+ * @since 18.07.2009
  */
 public class ConfigurationConstants {
 
@@ -53,6 +53,9 @@ public class ConfigurationConstants {
     public static final String PROP_GROUP_ATTR_MEMBER        = "org.ops4j.pax.useradmin.ldap.group.attr.member";
     public static final String PROP_GROUP_ATTR_CREDENTIAL    = "org.ops4j.pax.useradmin.ldap.group.attr.credential";
 
+    public static final String PROP_GROUP_ALLOW_EMPTY        = "org.ops4j.pax.useradmin.ldap.group.allowEmpty";
+    public static final String PROP_GROUP_DEFAULT_MEMBER     = "org.ops4j.pax.useradmin.ldap.group.defaultMember";
+
     public static final String DEFAULT_USER_OBJECTCLASS      = "organizationalPerson, inetOrgPerson, person, top";
     public static final String DEFAULT_USER_ATTR_ID          = "uid";
     public static final String DEFAULT_USER_ATTR_MANDATORY   = "cn, sn";
@@ -63,4 +66,9 @@ public class ConfigurationConstants {
     public static final String DEFAULT_GROUP_ATTR_MANDATORY  = "userPassword";
     public static final String DEFAULT_GROUP_ATTR_MEMBER     = "member";
     public static final String DEFAULT_GROUP_ATTR_CREDENTIAL = "userPassword";
+
+    public static final String DEFAULT_GROUP_ALLOW_EMPTY     = "no";
+
+    // TODO: is this a good default? Better: user.nobody?
+    public static final String DEFAULT_GROUP_DEFAULT_MEMBER  = "user.anyone";
 }

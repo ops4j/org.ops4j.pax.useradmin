@@ -46,7 +46,9 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
     private Group group3 = null;
     private Group group4 = null;
     
-    protected void setup() {
+    protected void setup(boolean groupsAreNeverEmpty) {
+        int defGroupSize = groupsAreNeverEmpty ? 1 : 0;
+        //
         UserAdmin userAdmin = getUserAdmin();
         user1 = (User) userAdmin.createRole(USER_NAME1, Role.USER);
         user2 = (User) userAdmin.createRole(USER_NAME2, Role.USER);
@@ -62,19 +64,28 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
         Assert.assertNotNull("Group3 is null", group3);
         Assert.assertNotNull("Group4 is null", group4);
         //
+        System.out.println("-------- Ading member to Group: " + group1.getName());
         Assert.assertTrue(group1.addMember(user2));
+        System.out.println("-------- Group: " + group1.getName());
         Assert.assertNotNull("Group has no members", group1.getMembers());
-        Assert.assertEquals("Mismatching member count", 1, group1.getMembers().length);
+        for (Role role : group1.getMembers()) {
+            System.out.println("     - " + role.getName());
+        }
+        Assert.assertEquals("Mismatching member count", 1 + defGroupSize, group1.getMembers().length);
         //
         Assert.assertTrue(group2.addMember(user1));
         Assert.assertTrue(group2.addMember(user2));
+        System.out.println("-------- Group: " + group2.getName());
+        for (Role role : group2.getMembers()) {
+            System.out.println("     - " + role.getName());
+        }
         Assert.assertNotNull("Group has no members", group2.getMembers());
-        Assert.assertEquals("Mismatching member count", 2, group2.getMembers().length);
+        Assert.assertEquals("Mismatching member count", 2 + defGroupSize, group2.getMembers().length);
         //
         Assert.assertTrue(group3.addMember(user1));
         Assert.assertTrue(group3.addMember(group4));
         Assert.assertNotNull("Group has no members", group3.getMembers());
-        Assert.assertEquals("Mismatching member count", 2, group3.getMembers().length);
+        Assert.assertEquals("Mismatching member count", 2 + defGroupSize, group3.getMembers().length);
     }
     
     protected void hasRole() {
