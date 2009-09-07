@@ -56,7 +56,7 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
 
     @Before
     public void setup() {
-        super.setup(false);
+        super.setup();
     }
 
     @Test

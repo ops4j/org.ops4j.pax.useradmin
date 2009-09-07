@@ -48,9 +48,9 @@ public class StorageProviderImplTest {
         m_properties.put(ConfigurationConstants.PROP_LDAP_ACCESS_PWD, "");
         //
         m_properties.put(ConfigurationConstants.PROP_USER_OBJECTCLASS, ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
-        m_properties.put(ConfigurationConstants.PROP_GROUP_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
+        m_properties.put(ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS);
         m_properties.put(ConfigurationConstants.PROP_USER_ATTR_ID, ConfigurationConstants.DEFAULT_USER_ATTR_ID);
-        m_properties.put(ConfigurationConstants.PROP_GROUP_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
+        m_properties.put(ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
     }
     
 	@Test

@@ -57,7 +57,7 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
     @Before
     public void setup() {
         FrameworkConfiguration.setup(getBundleContext());
-        super.setup(true /* special LDAP configuration: see allowEmptyGroups */);
+        super.setup();
     }
 
     @Test
