@@ -1,0 +1,7 @@
+
+Preferences Configuration Options
+
+  The {{{../../xref/org/ops4j/pax/useradmin/provider/preferences/ConfigurationConstants.html}Preferences Configuration Constants}} interface
+  defines all configuration options.
+  
+  So far the preferences provider does not recognize any operational options.

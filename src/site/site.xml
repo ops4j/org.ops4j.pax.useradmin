@@ -29,8 +29,14 @@
 
     <menu name="Bundles">
         <item name="pax-useradmin-service" href="/bundles/service.html"/>
-        <item name="pax-useradmin-provider-preferences" href="/bundles/provider-preferences.html"/>
-        <item name="pax-useradmin-provider-ldap" href="/bundles/provider-ldap.html"/>
+        <item collapse="true" name="pax-useradmin-provider-preferences" href="/bundles/provider-preferences/overview.html">
+          <item name="Storage Layout" href="/bundles/provider-preferences/layout.html"/>
+          <item name="Configuration" href="/bundles/provider-preferences/configuration.html"/>
+        </item>
+        <item collapse="true" name="pax-useradmin-provider-ldap" href="/bundles/provider-ldap/overview.html">
+          <item name="Storage Layout" href="/bundles/provider-ldap/layout.html"/>
+          <item name="Configuration" href="/bundles/provider-ldap/configuration.html"/>
+        </item>
         <item name="pax-useradmin-command" href="/bundles/command.html"/>
         <!-- 
         <item name="pax-useradmin-ui" href="/ui-overview.html">

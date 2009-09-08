@@ -1,9 +1,15 @@
 
 LDAP Provider Bundle
 
-  The {{{../xref/org/ops4j/pax/useradmin/provider/ldap/internal/StorageProviderImpl.html}LDAP Provider implementation}} of the StorageProvider SPI uses
+  The {{{../../xref/org/ops4j/pax/useradmin/provider/ldap/internal/StorageProviderImpl.html}LDAP Provider implementation}} of the StorageProvider SPI uses
   a LDAP server as backend storage for persisting user data.
-  
+
+  See also:
+    
+    * {{{layout.html}LDAP Storage Layout}}
+    
+    * {{{configuration.html}LDAP Configuration}} and the {{{../../quickstart.html}quickstart guide}}
+
 Coordinates
 
 *---------------+---------+
@@ -13,4 +19,4 @@ Coordinates
 *---------------+---------+
  Version:       | 0.0.1-SNAPSHOT
 *---------------+---------+
-  
+

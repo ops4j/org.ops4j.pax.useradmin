@@ -1,0 +1,13 @@
+
+Preferences Storage Layout
+
+  The preferences storage-layout used by the Eclipse implementation is based on a
+  single root: this root contains all entries - users as well as groups.
+
+Main Node:
+
+  The main node contains all user and group entries. Groups only differ from users by having a <members> sub-node.
+  
+  The <members> node holds all member-ids of the group in a map - the value being <basic> or <required>.
+    
+

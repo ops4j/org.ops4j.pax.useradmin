@@ -23,12 +23,12 @@ Pax UserAdmin Service Bundle
 
   [[1]] Preferences Provider
   
-  The {{{../bundles/provider-preferences.html}preferences provider bundle}} contains an implementation that uses
+  The {{{../bundles/provider-preferences/overview.html}preferences provider bundle}} contains an implementation that uses
   the OSGi Preferences service as backend storage.
   
   [[2]] LDAP Provider
   
-  The {{{../bundles/provider-ldap.html}LDAP provider bundle}} contains an implementation that uses
+  The {{{../bundles/provider-ldap/overview.html}LDAP provider bundle}} contains an implementation that uses
   a LDAP server as backend storage.
 
   []
@@ -36,7 +36,7 @@ Pax UserAdmin Service Bundle
   <<Extender Logic>>
   
   The extender pattern is implemented in the {{{../xref/org/ops4j/pax/useradmin/service/internal/Activator.html}bundle activator}}
-  using the OSGi ServiceTrackerCustomizer: every time a service iplementing the StorageProvider interface is detected a new UserAdmin
+  using the OSGi ServiceTrackerCustomizer: every time a service implementing the StorageProvider interface is detected a new UserAdmin
   service is created unless a UserAdmin for that provider type already exists.
 
 Coordinates

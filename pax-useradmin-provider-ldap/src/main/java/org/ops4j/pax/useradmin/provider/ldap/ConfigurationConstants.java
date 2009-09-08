@@ -56,9 +56,6 @@ public class ConfigurationConstants {
     public static final String PROP_GROUP_ENTRY_ATTR_MEMBER        = "org.ops4j.pax.useradmin.ldap.group.entry.attr.member";
     public static final String PROP_GROUP_ENTRY_ATTR_CREDENTIAL    = "org.ops4j.pax.useradmin.ldap.group.entry.attr.credential";
 
-    public static final String PROP_GROUP_ALLOW_EMPTY              = "org.ops4j.pax.useradmin.ldap.group.allowEmpty";
-    public static final String PROP_GROUP_DEFAULT_MEMBER           = "org.ops4j.pax.useradmin.ldap.group.defaultMember";
-
     public static final String DEFAULT_USER_OBJECTCLASS            = "organizationalPerson, inetOrgPerson, person, top";
     public static final String DEFAULT_USER_ATTR_ID                = "uid";
     public static final String DEFAULT_USER_ATTR_MANDATORY         = "cn, sn";

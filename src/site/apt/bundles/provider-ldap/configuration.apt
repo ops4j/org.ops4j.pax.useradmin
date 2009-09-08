@@ -1,0 +1,73 @@
+LDAP Configuration Options
+
+  The {{{../../xref/org/ops4j/pax/useradmin/provider/ldap/ConfigurationConstants.html}LDAP Configuration Constants}} interface
+  defines all configuration options.
+  
+~~ * service.pid * org.ops4j.pax.useradmin.provider.ldap * Identifies the configuration
+
+Mandatory server access options
+  
+*----------+-----------+
+  Name     | Usage 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.server.url | The URL of the LDAP server to use as backend storage. 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.server.port | The port on the LDAP server to use. 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.access.user
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.access.pwd
+*----------*-----------*
+
+Mandatory root definition options
+
+*----------+-----------+
+  Name     | Usage 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.dn
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.users
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.groups
+*----------*-----------*
+
+User identification options
+
+*----------+-----------+
+  Name     | Usage 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.objectclass | List of objectclass attribute values that identify a user.
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.id | The ID attribute that is used by the user entry.
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.mandatory | List of mandatory attributes for a user entry.
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.credential | 
+*----------*-----------*
+
+Group identification options
+
+*----------+-----------+
+  Name     | Usage 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.objectclass | The objectclass attribute values that identify a group.
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.attr.id | The ID attribute that is used by the group entry.
+*----------*-----------*
+
+Sub-Group identification options
+
+*----------+-----------+
+  Name     | Usage 
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.objectclass
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.id
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.mandatory
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.member
+*----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.credential
+*----------*-----------*
+  

@@ -1,0 +1,225 @@
+
+LDAP Storage Layout
+
+  The LDAP provider uses two root nodes to store its data: a <users> node and a <groups> node.
+  
+Users Node
+  
+  The users node contains all user entries. There is no further grouping - all user entries are on the same level.
+  
+  The LDAP storage for the users from the example in 107.3.2 from OSGI companion spec would look like:
+
+---------------------------  
+- <users-root>.<domain>
+   
+  - elmer
+  - fudd
+  - marvin
+  - pepe
+  - daffy
+  - foghorn
+---------------------------  
+    
+  
+~~  [[2]] <<Groups Node>>
+
+Groups Node
+
+  Since groups can have <basic> and <required> members the organization of the groups tree is a bit more complex: the groups root 
+  node contains an organizational node for each group. Each of those nodes may contain group entries of type <basic> or <required>.
+  
+  The LDAP storage for the example groups from table 107.14 in the OSGI companion specification would look like:
+  
+---------------------------  
+- <groups-root>.<domain>
+   
+  - residents
+    - residents.basic
+      - elmer
+      - fudd
+      - marvin
+      - pepe
+
+  - buddies
+    - buddies.basic
+      - daffy
+      - foghorn
+   
+  - children
+    - children.basic
+      - marvin
+      - pepe
+   
+  - adults
+    - adults.basic
+      - elmer
+      - fudd
+
+  - administrators
+    - administrators.basic
+      - elmer
+
+---------------------------  
+
+  And the action groups from table 107.15 would look like:
+  
+---------------------------  
+
+  - alarmSystemControl
+    - alarmSystemControl.basic
+      - residents
+    - alarmSystemControl.required
+      - administrators
+
+  - internetAccess
+    - internetAccess.basic
+      - residents
+    - internetAccess.required
+      - adults
+
+  - temperatureControl
+    - temperatureControl.basic
+      - residents
+    - temperatureControl.required
+      - adults
+
+  - photoAlbumEdit
+    - photoAlbumEdit.basic
+      - residents
+      - children
+      - adults
+
+  - photoAlbumView
+    - photoAlbumView.basic
+      - residents
+      - buddies
+
+  - portForwarding
+    - portForwarding.basic
+      - residents
+    - portForwarding.required
+      - administrators
+
+---------------------------  
+
+LDIF Example
+
+  To see what this looks like in the LDAP tree let's start to create an LDIF file for the example mentioned above.
+
+  We assume an organization (osgi.org) which stores the users and group nodes directly in the organization
+  root node and uses the default configuration settings whenever possible:
+  
+---------------------------  
+# ------------------------
+# Example root context entry
+# ------------------------
+dn: dc=osgi,dc=org
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+dc: osgi
+o: OSGi
+description: The context entry for suffix dc=osgi,dc=org
+
+# The people ...
+dn: ou=people,dc=osgi,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+description: The people at osgi.org
+
+# The groups ...
+dn: ou=groups,dc=osgi,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+description: The groups at osgi.org
+---------------------------  
+
+  All that is left now to make the UserAdmin service working on an empty system is to add the
+  initial user: the <user.anyone> role defined in the Role interface:
+ 
+---------------------------  
+dn: uid=user.anyone,ou=people,dc=ops4j,dc=org
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+uid: user.anyone
+cn: user.anyone
+sn: user.anyone
+# note: userPassword contains credential tuples consisting of an ID and a password. The ID may be the wildcard char '*' which matches all IDs.
+#       Therefor the second credential is superfluous - it's just used for testing
+#
+userPassword: *,notNeededForThisUser
+userPassword: some authority;testPwd
+---------------------------  
+
+  This is the minimal initial structure needed to store user data.
+  
+  Now we can start to add other users (Elmer, Fudd, ...) and then add the basic 
+  example groups, i.e. <Residents>:
+
+---------------------------
+#
+# The residents group
+#
+dn: ou=residents,ou=groups,dc=osgi,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: residents
+description: The residents group at osgi.org
+#
+# - basic members sub-group
+#
+dn: cn=residents.basic,ou=users,ou=groups,dc=osgi,dc=org
+objectclass: top
+objectclass: simpleSecurityObject
+objectClass: groupOfNames
+cn: residents.basic
+userPassword: some authority;testPwd
+member: uid=elmer,ou=people,dc=osgi,dc=org
+---------------------------  
+
+  The other example groups can be added the same way.
+  
+  Now the real fun starts - let's add a action group that not only relies on other groups,
+  but also has required members:
+
+---------------------------
+#
+# The alarmSystemControl group
+#
+dn: ou=alarmSystemControl,ou=groups,dc=osgi,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: alarmSystemControl
+description: The alarmSystemControl group at osgi.org
+#
+# - basic members sub-group
+#
+dn: cn=alarmSystemControl.basic,ou=users,ou=groups,dc=osgi,dc=org
+objectclass: top
+objectclass: simpleSecurityObject
+objectClass: groupOfNames
+cn: alarmSystemControl.basic
+userPassword: some authority;testPwd
+member: ou=residents,ou=groups,dc=osgi,dc=org
+#
+# - required members sub-group
+#
+dn: cn=alarmSystemControl.required,ou=users,ou=groups,dc=osgi,dc=org
+objectclass: top
+objectclass: simpleSecurityObject
+objectClass: groupOfNames
+cn: alarmSystemControl.required
+userPassword: some authority;testPwd
+member: ou=administrators,ou=groups,dc=osgi,dc=org
+---------------------------  
+
+  This allows only <residents> that also are included in the <administrators> group to access the alarm system.
+
+  Cool, isn't it :-)
+  
+  And there's another goodie: most LDAP configuration (objectclasses, DNs and attributes) are configurable: check
+  out the {{{configuration.html}configuration page}} for details.
