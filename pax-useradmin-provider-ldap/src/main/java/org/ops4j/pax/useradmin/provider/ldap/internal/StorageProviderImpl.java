@@ -53,8 +53,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     private static final String BASIC_EXT                  = ".basic";
     private static final String REQUIRED_EXT               = ".required";
 
-    private static final String PATTERN_YES_TRUE           = "(yes|true)";
-
     private static final String PATTERN_SPLIT_LIST_VALUE   = ", *";
 
     // configuration
@@ -66,7 +64,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     private String              m_rootDN                   = ConfigurationConstants.DEFAULT_LDAP_ROOT_DN;
     private String              m_rootUsersDN              = ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS
-                                                                           + "," + m_rootDN;
+                                                                                    + "," + m_rootDN;
     private String              m_rootGroupsDN             = ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS
                                                                                     + "," + m_rootDN;
 
@@ -83,10 +81,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     private String              m_groupEntryMandatoryAttr  = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MANDATORY;
     private String              m_groupEntryMemberAttr     = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER;
     private String              m_groupEntryCredentialAttr = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_CREDENTIAL;
-
-    private boolean             m_doAllowEmptyGroups       = ConfigurationConstants.DEFAULT_GROUP_ALLOW_EMPTY
-                                                                                   .matches(PATTERN_YES_TRUE);
-    private String              m_defaultGroupMember       = ConfigurationConstants.DEFAULT_GROUP_DEFAULT_MEMBER;
 
     /**
      * The connection which is used for access.
@@ -215,11 +209,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         m_groupEntryMemberAttr = getOptionalProperty(properties,
                                                      ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER,
                                                      ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
-        // todo: obsolete?
-        m_doAllowEmptyGroups = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ALLOW_EMPTY,
-                                                   ConfigurationConstants.DEFAULT_GROUP_ALLOW_EMPTY).matches(PATTERN_YES_TRUE);
-        m_defaultGroupMember = getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_DEFAULT_MEMBER,
-                                                   ConfigurationConstants.DEFAULT_GROUP_DEFAULT_MEMBER);
     }
 
     // StorageProvider interface
@@ -277,14 +266,12 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return m_groupIdAttr + "=" + groupName + "," + m_rootGroupsDN;
     }
 
-    private String getBasicGroupDN(String groupName) {
-        return m_groupEntryIdAttr + "=" + groupName + BASIC_EXT + ",ou=" + groupName + "," + m_rootGroupsDN;
+    private String getGroupDN(String groupName, String ext) {
+        return m_groupEntryIdAttr + "=" + groupName + ext + ","
+                                        + m_groupIdAttr + "=" + groupName + ","
+                                        + m_rootGroupsDN;
     }
 
-    private String getRequiredGroupDN(String groupName) {
-        return m_groupEntryIdAttr + "=" + groupName + REQUIRED_EXT + ",ou=" + groupName + "," + m_rootGroupsDN;
-    }
-    
     private String getRoleDN(Role role) throws StorageException {
         String dn;
         switch (role.getType()) {
@@ -293,7 +280,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                 break;
             case Role.GROUP:
                 dn = getGroupDN(role.getName());
-                // dn = m_groupEntryIdAttr + "=" + role.getName() + "," + m_rootGroupsDN;
                 break;
             default:
                 throw new StorageException("Invalid role type '" + role.getType() + "'");
@@ -449,9 +435,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * @return The LDAP entry that was created for this group entry.
      * @throws LDAPException if an LDAP error occurs.
      */
-    private LDAPEntry createGroupEntry(LDAPConnection connection, boolean isBasic, Group group, Role initialMember) throws LDAPException {
-        String entryName = group.getName() + (isBasic ? BASIC_EXT : REQUIRED_EXT);
-        //
+    private LDAPEntry createGroupEntry(LDAPConnection connection,
+                                       String entryName,
+                                       Group group,
+                                       Role initialMember) throws LDAPException, StorageException {
         // set objectclass attributes
         //
         LDAPAttributeSet attributes = new LDAPAttributeSet();
@@ -463,8 +450,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         //
         // add initial user
         //
-        String initialUserDN = getUserDN(initialMember.getName());
-        attributes.add(new LDAPAttribute(m_groupEntryMemberAttr, initialUserDN));
+        String initialMemberDN = getRoleDN(initialMember);
+        attributes.add(new LDAPAttribute(m_groupEntryMemberAttr, initialMemberDN));
         //
         // set all mandatory attributes to name
         //
@@ -479,6 +466,84 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return entry;
     }
 
+    @SuppressWarnings(value = "unchecked")
+    private Collection<Role> getMembers(LDAPConnection connection,
+                                        UserAdminFactory factory,
+                                        Group group,
+                                        String groupEntryDN) throws LDAPException, StorageException {
+        Collection<Role> roles = new ArrayList<Role>();
+        //
+        // get the group ou-entry
+        //
+        LDAPEntry groupEntry = getEntry(connection, getGroupDN(group.getName()));
+        if (null == groupEntry) {
+            throw new StorageException(  "Internal error: entry for group '" + group.getName()
+                                         + "' could not be retrieved.");
+        }
+        // if there is a <name>.basic group return its members
+        LDAPEntry subGroupEntry = getEntry(connection, groupEntryDN);
+        if (null != subGroupEntry) {
+            Iterator<LDAPAttribute> it = subGroupEntry.getAttributeSet().iterator();
+            while (it.hasNext()) {
+                LDAPAttribute attribute = it.next();
+                if (m_groupEntryMemberAttr.equals(attribute.getName())) {
+                    for (String userDN : attribute.getStringValueArray()) {
+                        LDAPEntry userEntry = getEntry(connection,userDN);
+                        if (null == userEntry) {
+                            throw new StorageException(  "Internal error: group member '" + userDN
+                                                         + "' could not be retrieved.");
+                        }
+                        Role role = createRole(factory, userEntry);
+                        roles.add(role);
+                    }
+                }
+            }
+        }
+        return roles;
+    }
+    
+    @SuppressWarnings(value = "unchecked")
+    private boolean addMember(LDAPConnection connection,
+                              Group group,
+                              String ext,
+                              Role member) throws LDAPException, StorageException {
+        // get the group main entry
+        //
+        LDAPEntry groupEntry = getEntry(connection, getGroupDN(group.getName()));
+        if (null == groupEntry) {
+            throw new StorageException(  "Internal error: entry for group '" + group.getName()
+                                       + "' could not be retrieved.");
+        }
+        // if there is no <name>.<ext> group create it
+        LDAPEntry subGroupEntry = getEntry(connection, getGroupDN(group.getName(), ext));
+        if (null == subGroupEntry) {
+            subGroupEntry = createGroupEntry(connection, group.getName() + ext, group, member);
+        } else {
+            // add role to group entry
+            String roleDN = getRoleDN(member);
+            Iterator<LDAPAttribute> it = subGroupEntry.getAttributeSet().iterator();
+            while (it.hasNext()) {
+                LDAPAttribute attribute = it.next();
+                if (m_groupEntryMemberAttr.equals(attribute.getName())) {
+                    // check the member values
+                    for (String memberDN : attribute.getStringValueArray()) {
+                        if (roleDN.equals(memberDN)) {
+                            // ignore already existing members
+                            return false;
+                        }
+                    }
+                    // add new member
+                    attribute.addValue(roleDN);
+                    LDAPModification modification = new LDAPModification(LDAPModification.REPLACE,
+                                                                         new LDAPAttribute(attribute));
+                    connection.modify(subGroupEntry.getDN(), modification);
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Removes the given DN from the group members.
      * 
@@ -488,7 +553,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * @return True if the member was sucessfully removed - false otherwise.
      * @throws LDAPException if an LDAP error occurs.
      */
-    private boolean removeGroupMember(LDAPConnection connection, LDAPEntry groupEntry, String memberDN) throws LDAPException {
+    @SuppressWarnings(value = "unchecked")
+    private boolean removeGroupMember(LDAPConnection connection,
+                                      LDAPEntry groupEntry,
+                                      String memberDN) throws LDAPException {
         if (null != groupEntry) {
             Iterator<LDAPAttribute> it = groupEntry.getAttributeSet().iterator();
             while (it.hasNext()) {
@@ -542,6 +610,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    /**
+     * @see StorageProvider#createGroup(UserAdminFactory, String)
+     */
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         // create ou as container for basic and required group objects
         //
@@ -566,6 +637,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    /**
+     * @see StorageProvider#deleteRole(Role)
+     */
     public boolean deleteRole(Role role) throws StorageException {
         String dn = getRoleDN(role);
         LDAPConnection connection = openConnection();
@@ -581,100 +655,44 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
-    @SuppressWarnings(value = "unchecked")
+    /**
+     * @see StorageProvider#getMembers(UserAdminFactory, Group)
+     */
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
-        // check if a <name>.basic group exists
-        // if yes return members
-        Collection<Role> roles = new ArrayList<Role>();
         LDAPConnection connection = openConnection();
         try {
-            // get the group ou-entry
-            //
-            LDAPEntry groupEntry = getEntry(connection, getGroupDN(group.getName()));
-            if (null == groupEntry) {
-                throw new StorageException(  "Internal error: entry for group '" + group.getName()
-                                             + "' could not be retrieved.");
-            }
-            // if there is a <name>.basic group return its members
-            LDAPEntry basicGroupEntry = getEntry(connection, getBasicGroupDN(group.getName()));
-            if (null != basicGroupEntry) {
-                Iterator<LDAPAttribute> it = basicGroupEntry.getAttributeSet().iterator();
-                while (it.hasNext()) {
-                    LDAPAttribute attribute = it.next();
-                    if (m_groupEntryMemberAttr.equals(attribute.getName())) {
-                        for (String userDN : attribute.getStringValueArray()) {
-                            // TODO: should we have a ldap.ignoreDefaultMemberInAPI option?
-//                            if (userDN.startsWith(USER_NOBODY)) {
-//                                // ignore dummy user
-//                                continue;
-//                            }
-                            LDAPEntry userEntry = getEntry(connection,userDN);
-                            if (null == userEntry) {
-                                throw new StorageException(  "Internal error: group member '" + userDN
-                                                             + "' could not be retrieved.");
-                            }
-                            Role role = createRole(factory, userEntry);
-                            roles.add(role);
-                        }
-                    }
-                }
-            }
+            return getMembers(connection, factory, group, getGroupDN(group.getName(), BASIC_EXT));
         } catch (LDAPException e) {
             throw new StorageException(  "Error retrieving role with name '" + group.getName() + "': "
                                        + e.getMessage() + " / " + e.getLDAPErrorMessage());
         } finally {
             closeConnection();
         }
-        return roles;
     }
     
+    /**
+     * @see StorageProvider#getRequiredMembers(UserAdminFactory, Group)
+     */
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
-        // TODO: add required member handling
-        throw new IllegalStateException("required member handling is not yet implemented");
-    }
-    
-    @SuppressWarnings(value = "unchecked")
-    public boolean addMember(Group group, Role role) throws StorageException {
-        // check if a <name>.basic group exists
-        // if no create it
-        
         LDAPConnection connection = openConnection();
         try {
-            // get the group main entry
-            //
-            LDAPEntry groupEntry = getEntry(connection, getGroupDN(group.getName()));
-            if (null == groupEntry) {
-                throw new StorageException(  "Internal error: entry for group '" + group.getName()
-                                           + "' could not be retrieved.");
-            }
-            // if there is no <name>.basic group create it
-            LDAPEntry basicGroupEntry = getEntry(connection, getBasicGroupDN(group.getName()));
-            if (null == basicGroupEntry) {
- 
-                basicGroupEntry = createGroupEntry(connection, true, group, role);
-            } else {
-                // add role to group entry
-                String roleDN = getRoleDN(role);
-                Iterator<LDAPAttribute> it = basicGroupEntry.getAttributeSet().iterator();
-                while (it.hasNext()) {
-                    LDAPAttribute attribute = it.next();
-                    if (m_groupEntryMemberAttr.equals(attribute.getName())) {
-                        // check the member values
-                        for (String memberDN : attribute.getStringValueArray()) {
-                            if (roleDN.equals(memberDN)) {
-                                // ignore already existing members
-                                return false;
-                            }
-                        }
-                        // add new member
-                        attribute.addValue(roleDN);
-                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE,
-                                                                             new LDAPAttribute(attribute)); // new LDAPAttribute(m_groupEntryMemberAttr, roleDN));
-                        connection.modify(basicGroupEntry.getDN(), modification);
-                        break;
-                    }
-                }
-            }
+            return getMembers(connection, factory, group, getGroupDN(group.getName(), REQUIRED_EXT));
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error retrieving role with name '" + group.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
+    }
+    
+    /**
+     * @see StorageProvider#addMember(Group, Role)
+     */
+    public boolean addMember(Group group, Role role) throws StorageException {
+        LDAPConnection connection = openConnection();
+        try {
+            
+            return addMember(connection, group, BASIC_EXT, role);
         } catch (LDAPException e) {
             throw new StorageException(  "Error adding member role with name '" +role.getName()
                                        + "' to group '" + group.getName() + "': "
@@ -682,14 +700,27 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         } finally {
             closeConnection();
         }
-        return true;
     }
     
+    /**
+     * @see StorageProvider#addRequiredMember(Group, Role)
+     */
     public boolean addRequiredMember(Group group, Role role) throws StorageException {
-        // TODO: add required member handling
-        throw new IllegalStateException("required member handling is not yet implemented");
+        LDAPConnection connection = openConnection();
+        try {
+            return addMember(connection, group, REQUIRED_EXT, role);
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error adding required member role with name '" + role.getName()
+                                       + "' to group '" + group.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
+    /**
+     * @see StorageProvider#removeMember(Group, Role)
+     */
     public boolean removeMember(Group group, Role role) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
@@ -700,8 +731,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                 throw new StorageException(  "Internal error: entry for group '" + group.getName()
                                              + "' could not be retrieved.");
             }
-            LDAPEntry basicGroupEntry = getEntry(connection, getBasicGroupDN(group.getName()));
-            LDAPEntry requiredGroupEntry = getEntry(connection, getRequiredGroupDN(group.getName()));
+            LDAPEntry basicGroupEntry = getEntry(connection, getGroupDN(group.getName(), BASIC_EXT));
+            LDAPEntry requiredGroupEntry = getEntry(connection, getGroupDN(group.getName(), REQUIRED_EXT));
             String memberDN = getRoleDN(role);
             //
             return removeGroupMember(connection, basicGroupEntry, memberDN) || removeGroupMember(connection, requiredGroupEntry, memberDN);
@@ -714,6 +745,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    /**
+     * @see StorageProvider#setRoleAttribute(Role, String, String)
+     */
     public void setRoleAttribute(Role role, String key, String value) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
             throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
@@ -741,6 +775,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
 
+    /**
+     * @see StorageProvider#setRoleAttribute(Role, String, byte[])
+     */
     public void setRoleAttribute(Role role, String key, byte[] value) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
             throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
@@ -768,6 +805,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    /**
+     * @see StorageProvider#removeRoleAttribute(Role, String)
+     */
     public void removeRoleAttribute(Role role, String key) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
             throw new StorageException(  "Cannot remove '" + ConfigurationConstants.ATTR_OBJECTCLASS
@@ -813,7 +853,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public void setUserCredential(User user, String key, String value) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
-//            LDAPEntry entry = readEntry(connection, user.getName());
             LDAPEntry entry = getEntryForName(connection, user.getName());
             if (null == entry) {
                 throw new StorageException("Could not find user '" + user.getName() + "'");
@@ -897,11 +936,13 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         throw new IllegalStateException("credential handling is not yet implemented");
     }
     
+    /**
+     * @see StorageProvider#getRole(UserAdminFactory, String)
+     */
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
             LDAPEntry entry = getEntryForName(connection, name);
-//            LDAPEntry entry = readEntry(connection, name);
             return null != entry ? createRole(factory, entry) : null;
         } catch (LDAPException e) {
             throw new StorageException(  "Error finding role with name '" + name + "': "
@@ -911,6 +952,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
     
+    /**
+     * @see StorageProvider#getUser(UserAdminFactory, String, String)
+     */
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
@@ -951,7 +995,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         LDAPConnection connection = openConnection();
         Collection<Role> roles = new ArrayList<Role>();
         try {
-            // TODO check
             LDAPSearchResults result = connection.search(m_rootUsersDN, LDAPConnection.SCOPE_ONE,
                                                          filterString, null, false);
             while (result.hasMore()) {

@@ -72,9 +72,4 @@ public class ConfigurationConstants {
     public static final String DEFAULT_GROUP_ENTRY_ATTR_MANDATORY  = "userPassword";
     public static final String DEFAULT_GROUP_ENTRY_ATTR_MEMBER     = "member";
     public static final String DEFAULT_GROUP_ENTRY_ATTR_CREDENTIAL = "userPassword";
-
-    public static final String DEFAULT_GROUP_ALLOW_EMPTY           = "no";
-
-    // TODO: is this a good default? Better: user.nobody?
-    public static final String DEFAULT_GROUP_DEFAULT_MEMBER        = "user.anyone";
 }

@@ -34,7 +34,7 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
     private static final String USER_NAME2 = "jdeveloper";
     
     private static final String GROUP_NAME1 = "developers";
-    private static final String GROUP_NAME2 = "people";
+    private static final String GROUP_NAME2 = "staff";
     private static final String GROUP_NAME3 = "admins";
     private static final String GROUP_NAME4 = "additional-admins";
     
@@ -63,7 +63,7 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
         Assert.assertNotNull("Group3 is null", group3);
         Assert.assertNotNull("Group4 is null", group4);
         //
-        System.out.println("-------- Ading member to Group: " + group1.getName());
+        System.out.println("-------- Adding member to Group: " + group1.getName());
         Assert.assertTrue(group1.addMember(user2));
         System.out.println("-------- Group: " + group1.getName());
         Assert.assertNotNull("Group has no members", group1.getMembers());
@@ -74,12 +74,16 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
         //
         Assert.assertTrue(group2.addMember(user1));
         Assert.assertTrue(group2.addMember(user2));
+        Assert.assertTrue(group2.addMember(group3));
+        Assert.assertTrue(group2.addRequiredMember(group1));
         System.out.println("-------- Group: " + group2.getName());
         for (Role role : group2.getMembers()) {
             System.out.println("     - " + role.getName());
         }
         Assert.assertNotNull("Group has no members", group2.getMembers());
-        Assert.assertEquals("Mismatching member count", 2, group2.getMembers().length);
+        Assert.assertEquals("Mismatching member count", 3, group2.getMembers().length);
+        Assert.assertNotNull("Group has no required members", group2.getRequiredMembers());
+        Assert.assertEquals("Mismatching member count", 1, group2.getRequiredMembers().length);
         //
         Assert.assertTrue(group3.addMember(user1));
         Assert.assertTrue(group3.addMember(group4));
@@ -90,7 +94,15 @@ public abstract class AuthorizationManagement extends UserAdminTestBase {
     protected void hasRole() {
         UserAdmin userAdmin = getUserAdmin();
         Authorization auth = userAdmin.getAuthorization(user1);
-        Assert.assertNotNull("No Authorization found", auth);
-        Assert.assertTrue("Role not authorized", auth.hasRole(GROUP_NAME3));
+        Assert.assertNotNull("No Authorization found for user " + user1.getName(), auth);
+        Assert.assertFalse("User " + user1.getName() + " is authorized for group " + GROUP_NAME1, auth.hasRole(GROUP_NAME1));
+        Assert.assertFalse("User " + user1.getName() + " is authorized for group " + GROUP_NAME2, auth.hasRole(GROUP_NAME2));
+        Assert.assertTrue("User " + user1.getName() + " not authorized for group " + GROUP_NAME3, auth.hasRole(GROUP_NAME3));
+
+        auth = userAdmin.getAuthorization(user2);
+        Assert.assertNotNull("No Authorization found for user " + user2.getName(), auth);
+        Assert.assertTrue("User " + user2.getName() + " not authorized for group " + GROUP_NAME1, auth.hasRole(GROUP_NAME1));
+        Assert.assertTrue("User " + user2.getName() + " not authorized for group " + GROUP_NAME2, auth.hasRole(GROUP_NAME2));
+        Assert.assertFalse("User " + user2.getName() + " is authorized for group " + GROUP_NAME3, auth.hasRole(GROUP_NAME3));
     }
 }

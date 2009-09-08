@@ -62,7 +62,6 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
 
     @Test
     public void hasRole() {
-        // TODO - reactivate: 
-        // super.hasRole();
+        super.hasRole();
     }
 }
