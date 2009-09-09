@@ -5,69 +5,69 @@ LDAP Configuration Options
   
 ~~ * service.pid * org.ops4j.pax.useradmin.provider.ldap * Identifies the configuration
 
-Mandatory server access options
+Server access options
   
-*----------+-----------+
-  Name     | Usage 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.server.url | The URL of the LDAP server to use as backend storage. 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.server.port | The port on the LDAP server to use. 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.access.user
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.access.pwd
-*----------*-----------*
+*----------+-----------+-----------+
+  Name     | Default   | Usage 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.server.url | localhost | The URL of the LDAP server to use as backend storage. 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.server.port | 8099 | The port on the LDAP server to use. 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.access.user | <none> | The username to access the LDAP server.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.access.pwd | <none> | The password used to access the LDAP server.
+*----------*-----------*-----------*
 
-Mandatory root definition options
+Root definition options
 
-*----------+-----------+
-  Name     | Usage 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.root.dn
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.root.users
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.root.groups
-*----------*-----------*
+*----------+-----------+-----------+
+  Name     | Default   | Usage 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.dn | dc=ops4j,dc=org | The root DN appended to the <root.user> and <root.groups> options to form a fully qualified DN.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.users | ou=people | The DN of the LDAP entry that holds the user data.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.root.groups | ou=groups | The DN of the LDAP entry that holds the group data.
+*----------*-----------*-----------*
 
 User identification options
 
-*----------+-----------+
-  Name     | Usage 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.user.objectclass | List of objectclass attribute values that identify a user.
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.user.attr.id | The ID attribute that is used by the user entry.
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.user.attr.mandatory | List of mandatory attributes for a user entry.
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.user.attr.credential | 
-*----------*-----------*
+*----------+-----------+-----------+
+  Name     | Default   | Usage 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.objectclass | organizationalPerson, inetOrgPerson, person, top | List of objectclass attribute values that identify a user.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.id | uid | The ID attribute that is used by the user entry.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.mandatory | cn, sn | List of mandatory attributes for a user entry.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.user.attr.credential | userPassword | The attribute used to store credentials.
+*----------*-----------*-----------*
 
 Group identification options
 
-*----------+-----------+
-  Name     | Usage 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.objectclass | The objectclass attribute values that identify a group.
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.attr.id | The ID attribute that is used by the group entry.
-*----------*-----------*
+*----------+-----------+-----------+
+  Name     | Default   | Usage 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.objectclass | organizationalUnit, top | The objectclass attribute values that identify a group.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.attr.id | ou | The ID attribute that is used by the group entry.
+*----------*-----------*-----------*
 
 Sub-Group identification options
 
-*----------+-----------+
-  Name     | Usage 
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.objectclass
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.id
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.mandatory
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.member
-*----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.credential
-*----------*-----------*
+*----------+-----------+-----------+
+  Name     | Default   | Usage 
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.objectclass | groupOfNames, simpleSecurityObject, top | The objectclass attribute values that identify a sub-group.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.id | cn | The ID attribute that is used for the sub-group entry.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.mandatory | userPassword | List of mandatory attributes for a sub-group entry.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.member | member | The attribute used to store members.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.entry.attr.credential | userPassword | The attribute used to store credentials.
+*----------*-----------*-----------*
   

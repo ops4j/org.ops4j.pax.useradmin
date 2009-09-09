@@ -7,7 +7,7 @@ Users Node
   
   The users node contains all user entries. There is no further grouping - all user entries are on the same level.
   
-  The LDAP storage for the users from the example in 107.3.2 from OSGI companion spec would look like:
+  The LDAP storage for the users from the example in chapter 107.3.2 of the OSGI companion spec would look like:
 
 ---------------------------  
 - <users-root>.<domain>

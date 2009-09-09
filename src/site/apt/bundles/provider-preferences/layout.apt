@@ -1,13 +1,43 @@
 
 Preferences Storage Layout
 
-  The preferences storage-layout used by the Eclipse implementation is based on a
-  single root: this root contains all entries - users as well as groups.
-
-Main Node:
-
-  The main node contains all user and group entries. Groups only differ from users by having a <members> sub-node.
+  The preferences StorageProvider uses the same layout as the {{{http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.equinox.useradmin/}Equinox UserAdmin implementation}}.
   
-  The <members> node holds all member-ids of the group in a map - the value being <basic> or <required>.
-    
+  The layout is quite straightforward: one root contains {{{http://www.osgi.org/javadoc/r4v41/org/osgi/service/prefs/Preferences.html}Preferences}}
+  objects for all roles - users as well as groups. Groups only differ from users by having a <members> sub-node. 
 
+User Node
+
+  A user preference node has the role-name as name. It also has an <type> attribute that specifies the role type (user or group).
+  
+  User properties and credentials are stored in two sub-nodes: each of those nodes has a attribute with the property name and value,
+  a <types> sub-node contains an attribute with the property name and an boolean indicator for its type. 
+  
+  User Elmer from the example in chapter 107.3.2 of the OSGI companion spec would be stored like:
+  
+---------------------------
+  - <root node>
+    - elmer
+      - type = 1
+      - properties
+            - types
+                   fullName = true 
+            - fullName = Elmer Fudd
+      - credentials
+            - types
+                   pwd = false 
+            - pwd = ...
+---------------------------
+
+Group Node
+
+---------------------------
+  - <root node>
+  
+    - alarmSystemControl
+      ... type, properties and credentials as above ...
+      
+      - members
+        - residents = false
+        - administrators = true
+---------------------------
