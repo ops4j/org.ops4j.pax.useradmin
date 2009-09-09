@@ -40,6 +40,10 @@ public abstract class UserAdminTestBase {
      */
     protected abstract BundleContext getBundleContext();
 
+    /** Abstract method to retrieve the type of StorageProvider the bundle provides.
+     * 
+     * @return An identifying string value.
+     */
     protected abstract String getProviderType();
     
     /**
@@ -82,10 +86,5 @@ public abstract class UserAdminTestBase {
         }
         Assert.fail("No UserAdmin service found for provider " + getProviderType());
         return null;
-//        ServiceReference ref = context.getServiceReference(UserAdmin.class.getName());
-//        Assert.assertNotNull("No UserAdmin service reference found", ref);
-//        UserAdmin userAdmin = (UserAdmin) context.getService(ref);
-//        Assert.assertNotNull("No UserAdmin service found", userAdmin);
-//        return userAdmin;
     }
 }

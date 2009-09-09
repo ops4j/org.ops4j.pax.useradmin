@@ -16,13 +16,21 @@
 package org.ops4j.pax.useradmin.provider.ldap;
 
 /**
+ * Definition of constants and default values used for configuration.
+ * 
  * @author Matthias Kuespert
  * @since 18.07.2009
  */
 public class ConfigurationConstants {
 
+    /**
+     * The PID of the service used to identify configuration data.
+     */
     public static final String SERVICE_PID                         = "org.ops4j.pax.useradmin.provider.ldap";
 
+    /**
+     * The provider type of this <code>StorageProvider</code>.
+     */
     public static final String STORAGEPROVIDER_TYPE                = "Ldap";
 
     public static final String ATTR_OBJECTCLASS                    = "objectClass";

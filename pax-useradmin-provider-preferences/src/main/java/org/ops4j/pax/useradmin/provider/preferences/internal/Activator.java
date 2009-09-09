@@ -23,11 +23,9 @@ import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 /**
- * Activator which starts the PreferencesService based
- * <code>StorageProvider</code> service.
+ * Activator of the Pax UserAdmin Preferences StorageProvider bundle.
  * 
  * @author Matthias Kuespert
  * @since 08.07.2009
@@ -35,12 +33,19 @@ import org.osgi.framework.ServiceReference;
 public class Activator implements BundleActivator {
 
     /**
+     * Create and register the <code>StorageProvider</code> service.
+     * 
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
+        //
+        // set service properties
+        //
         Dictionary<String, String> properties = new Hashtable<String, String>();
         properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
                        ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        //
+        // create & register service implementation
         //
         context.registerService(StorageProvider.class.getName(),
                                 new StorageProviderImpl(context),
@@ -51,6 +56,5 @@ public class Activator implements BundleActivator {
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        // nothing to do
     }
 }

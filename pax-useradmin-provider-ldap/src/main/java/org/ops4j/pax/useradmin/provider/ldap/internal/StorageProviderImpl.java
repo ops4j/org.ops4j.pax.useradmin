@@ -27,7 +27,6 @@ import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.useradmin.Group;
@@ -43,7 +42,7 @@ import com.novell.ldap.LDAPModification;
 import com.novell.ldap.LDAPSearchResults;
 
 /**
- * A LDAP based implementation of the StorageProvider SPI.
+ * A LDAP based implementation of the <code>StorageProvider</code> SPI.
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009
@@ -52,7 +51,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
 
     private static final String BASIC_EXT                  = ".basic";
     private static final String REQUIRED_EXT               = ".required";
-
+    
     private static final String PATTERN_SPLIT_LIST_VALUE   = ", *";
 
     // configuration
@@ -92,17 +91,14 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * 
      * @param connection Unit tests can provide a mock via this parameter.
      */
-    protected StorageProviderImpl(BundleContext context, LDAPConnection connection) {
+    protected StorageProviderImpl(LDAPConnection connection) {
         if (null == connection) {
             throw new IllegalArgumentException("Internal error: no LDAPConnection object specified when constructing the StorageProvider instance.");
         }
         m_connection = connection;
-        if (null == context) {
-            throw new IllegalArgumentException("Internal error: no BundleContext object specified when constructing the StorageProvider instance.");
-        }
     }
 
-    // ManagedService interface
+    // ManagedService interface implementation
     
     /**
      * Retrieves a property and throws an exception if not found.
@@ -211,7 +207,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                                                      ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
     }
 
-    // StorageProvider interface
+    // StorageProvider interface implementation
+    //
+    // - private methods
     
     /**
      * Opens a connection to the LDAP server.
@@ -258,20 +256,50 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
     }
 
+    /**
+     * Returns a DN for the given user name.
+     * 
+     * @param userName A valid user name.
+     * 
+     * @return A DN that identifies a valid user.
+     */
     private String getUserDN(String userName) {
         return m_userIdAttr + "=" + userName + "," + m_rootUsersDN;
     }
-    
+
+    /**
+     * Returns a DN for the given group name.
+     * 
+     * @param groupName A valid group name.
+     * 
+     * @return A DN that identifies a valid group.
+     */
     private String getGroupDN(String groupName) {
         return m_groupIdAttr + "=" + groupName + "," + m_rootGroupsDN;
     }
 
+    /**
+     * Returns a DN for a sub-group of the given group name.
+     * 
+     * @param groupName A valid group name.
+     * @param ext The extension that identifies the sub-group.
+     * 
+     * @return A DN that identifies a valid sub-group.
+     */
     private String getGroupDN(String groupName, String ext) {
         return m_groupEntryIdAttr + "=" + groupName + ext + ","
                                         + m_groupIdAttr + "=" + groupName + ","
                                         + m_rootGroupsDN;
     }
 
+    /**
+     * Returns the DN for the given role.
+     * 
+     * @param role The role to lookup.
+     * 
+     * @return A valid DN the identifies the role.
+     * @throws StorageException if the type of the role is not <code>Role.USER</code> or <code>Role.GROUP</code>.
+     */
     private String getRoleDN(Role role) throws StorageException {
         String dn;
         switch (role.getType()) {
@@ -292,6 +320,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * 
      * @param configuredClasslist The classes to check for.
      * @param objectClasses The list to check.
+     * 
      * @return True if all classes are found in the list.
      */
     private boolean configuredClassedContainedInObjectClasses(String configuredClasslist, String[] objectClasses) {
@@ -314,6 +343,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * Calculates a role type from the list of object classes specified for the given LDAP entry.
      * 
      * @param entry The LDAP entry to check.
+     * 
      * @return A role type as specified by the Role interface.
      * @throws StorageException if the role type could not be determined.
      */
@@ -341,14 +371,14 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             classes += clazz;
         }
         throw new StorageException("Could not determine role type for objectClasses: '" + classes + "'.");
-        // return Role.ROLE;
     }
 
     /**
      * Creates a Role for the given LDAP entry.
      * 
-     * @param factory The factory to use for creation.
+     * @param factory The factory to use for object creation.
      * @param entry The entry to create a role for.
+     * 
      * @return The created role or null.
      * @throws StorageException if the entry does not map to a role.
      */
@@ -391,10 +421,11 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     /**
      * Returns the entry with the given DN if it exists, null otherwise.
      *  
-     * @param connection
+     * @param connection The LDAP connection to use.
      * @param dn
-     * @return
-     * @throws LDAPException
+
+     * @return The LDAP Entry that represents the given DN - null otherwise.
+     * @throws LDAPException if an error occurs when accessing the LDAP server
      */
     private LDAPEntry getEntry(LDAPConnection connection, String dn) throws LDAPException {
         LDAPEntry entry = null;
@@ -402,9 +433,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             entry = connection.read(dn);
         } catch (LDAPException e) {
             if (e.getResultCode() != LDAPException.NO_SUCH_OBJECT) {
-                // rethrow other errors
+                // re-throw other errors
                 throw e;
-            } // ignore and return null
+            } // else ignore and return null
         }
         return entry;
     }
@@ -414,24 +445,29 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * 
      * @param connection The LDAP connection to use.
      * @param name The name of the entry to search for.
+     * 
      * @return The LDAP entry that matches the given name.
-     * @throws LDAPException if an LDAP error occurs.
+     * @throws LDAPException if an error occurs when accessing the LDAP server
      */
     private LDAPEntry getEntryForName(LDAPConnection connection, String name) throws LDAPException {
+        // first check if a group exists ...
         LDAPEntry entry = getEntry(connection, getGroupDN(name));
         if (null == entry) {
+            // check for a user ...
             entry = getEntry(connection, getUserDN(name));
         }
         return entry;
     }
     
     /**
-     * Creates an entry for a group. Group entries are stored in two sub-entries below the group node: the 'basic' or 'required' group entries.
+     * Creates an sub-group entry for a group. Sub-group entries are stored in two entries below
+     * the group node: the 'basic' or 'required' group entries.
      * 
      * @param connection The LDAP connection to use.
      * @param isBasic True if the initialMember should be added to the 'basic' members - on false it is added to the 'required' members.
      * @param group The group to modify.
      * @param initialMember The initial member to add to this group.
+     * 
      * @return The LDAP entry that was created for this group entry.
      * @throws LDAPException if an LDAP error occurs.
      */
@@ -466,22 +502,35 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return entry;
     }
 
+    /**
+     * Retrieves the members of the specified sub-group.
+     * 
+     * @param connection The LDAP connection to use.
+     * @param factory The factory to use for object creation.
+     * @param group
+     * @param subGroupDN
+     * @return
+     * @throws LDAPException
+     * @throws StorageException
+     */
     @SuppressWarnings(value = "unchecked")
     private Collection<Role> getMembers(LDAPConnection connection,
                                         UserAdminFactory factory,
                                         Group group,
-                                        String groupEntryDN) throws LDAPException, StorageException {
+                                        String ext) throws LDAPException, StorageException {
         Collection<Role> roles = new ArrayList<Role>();
         //
-        // get the group ou-entry
+        // get the group main entry
         //
         LDAPEntry groupEntry = getEntry(connection, getGroupDN(group.getName()));
         if (null == groupEntry) {
             throw new StorageException(  "Internal error: entry for group '" + group.getName()
                                          + "' could not be retrieved.");
         }
-        // if there is a <name>.basic group return its members
-        LDAPEntry subGroupEntry = getEntry(connection, groupEntryDN);
+        //
+        // if there is a <group-name>.<ext> group return its members
+        //
+        LDAPEntry subGroupEntry = getEntry(connection, getGroupDN(group.getName(), ext));
         if (null != subGroupEntry) {
             Iterator<LDAPAttribute> it = subGroupEntry.getAttributeSet().iterator();
             while (it.hasNext()) {
@@ -576,6 +625,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return false;
     }
 
+    // - public <code>StorageProvider</code> interface implementation
+    
     /**
      * @see StorageProvider#createUser(UserAdminFactory, String)
      */
@@ -661,7 +712,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
-            return getMembers(connection, factory, group, getGroupDN(group.getName(), BASIC_EXT));
+            return getMembers(connection, factory, group, BASIC_EXT);
         } catch (LDAPException e) {
             throw new StorageException(  "Error retrieving role with name '" + group.getName() + "': "
                                        + e.getMessage() + " / " + e.getLDAPErrorMessage());
@@ -676,7 +727,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
-            return getMembers(connection, factory, group, getGroupDN(group.getName(), REQUIRED_EXT));
+            return getMembers(connection, factory, group, REQUIRED_EXT);
         } catch (LDAPException e) {
             throw new StorageException(  "Error retrieving role with name '" + group.getName() + "': "
                                        + e.getMessage() + " / " + e.getLDAPErrorMessage());

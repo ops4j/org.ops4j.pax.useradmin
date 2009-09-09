@@ -29,7 +29,7 @@ import org.osgi.service.cm.ManagedService;
 import com.novell.ldap.LDAPConnection;
 
 /**
- * Activator of the Pax UserAdmin bundle.
+ * Activator of the Pax UserAdmin LDAP StorageProvider bundle.
  * 
  * @author Matthias Kuespert
  * @since  08.07.2009
@@ -37,18 +37,30 @@ import com.novell.ldap.LDAPConnection;
 public class Activator implements BundleActivator {
 
     /**
+     * Create and register the <code>StorageProvider</code> service.
+     * 
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        StorageProviderImpl serviceImpl = new StorageProviderImpl(context, new LDAPConnection());
+        //
+        // create LDAP connection access object
+        //
+        LDAPConnection connection = new LDAPConnection();
+        //
+        // set service properties
         //
         Dictionary<String, String> properties = new Hashtable<String, String>();
-        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
+        properties.put(Constants.SERVICE_PID,
+                       ConfigurationConstants.SERVICE_PID);
         properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
                        ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        //
+        // create & register service implementation
+        //
         context.registerService(new String[] { StorageProvider.class.getName(),
                                                ManagedService.class.getName() },
-                                serviceImpl, properties);
+                                new StorageProviderImpl(connection),
+                                properties);
     }
 
     /**
@@ -56,5 +68,4 @@ public class Activator implements BundleActivator {
      */
     public void stop(BundleContext context) throws Exception {
     }
-
 }
