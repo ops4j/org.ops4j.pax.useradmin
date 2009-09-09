@@ -177,8 +177,6 @@ public class FrameworkConfiguration {
                            ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
             properties.put(ConfigurationConstants.PROP_LDAP_ROOT_DN,
                            ConfigurationConstants.DEFAULT_LDAP_ROOT_DN);
-            properties.put(ConfigurationConstants.PROP_GROUP_ALLOW_EMPTY, "no");
-            properties.put(ConfigurationConstants.PROP_GROUP_DEFAULT_MEMBER, Role.USER_ANYONE);
             config.update(properties);
         } catch (IOException e) {
             e.printStackTrace();
