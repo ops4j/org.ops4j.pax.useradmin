@@ -1,0 +1,12 @@
+/* AUTOMATICALLY GENERATED ON Thu Sep 10 10:12:33 CEST 2009*/
+/* DO NOT EDIT */
+
+// keystore "useradmin.keystore";
+
+grant {
+    permission org.osgi.service.useradmin.UserAdminPermission "admin";
+};
+
+//grant {
+//  permission java.security.AllPermission;
+//};
