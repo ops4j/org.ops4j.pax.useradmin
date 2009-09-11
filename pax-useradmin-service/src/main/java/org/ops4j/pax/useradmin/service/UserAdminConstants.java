@@ -18,11 +18,32 @@ package org.ops4j.pax.useradmin.service;
 
 /**
  * @author Matthias Kuespert
- * @since  11.08.2009
+ * @since 11.08.2009
  */
 public interface UserAdminConstants {
 
-    final static String STORAGEPROVIDER_TYPE = "org.ops4j.pax.useradmin.storageprovider.type";
-    
-    
+    /**
+     * The PID used to identify configuration data.
+     */
+    final static String  SERVICE_PID          = "org.ops4j.pax.useradmin";
+
+    /**
+     * The property that must be set by StorageProvider implementations.
+     */
+    final static String  STORAGEPROVIDER_TYPE = "org.ops4j.pax.useradmin.storageprovider.type";
+
+    /**
+     * Property to switch security on/off.
+     */
+    final static String  PROP_SECURITY        = "org.ops4j.pax.useradmin.security";
+
+    /**
+     * The default security setting.
+     */
+    final static boolean DEFAULT_SECURITY     = false;
+
+    /**
+     * The prefix used for events sent by the UserAdmin service.
+     */
+    final static String  EVENT_TOPIC_PREFIX   = "org/osgi/service/useradmin/UserAdmin/";
 }

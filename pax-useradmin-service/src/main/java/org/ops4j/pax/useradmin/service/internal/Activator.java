@@ -27,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.UserAdmin;
@@ -61,9 +62,9 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
             throw new IllegalStateException("Internal error: StorageProvider service implementation not available.");
         }
         if (!m_services.containsKey(type)) {
-            System.out.println(" -- starting new UserAdmin service for provider: " + type);
+            System.err.println(" -- starting new UserAdmin service for provider: " + type);
             Dictionary<String, String> properties = new Hashtable<String, String>();
-            properties.put(Constants.SERVICE_PID, UserAdminImpl.PID + "." + type);
+            properties.put(Constants.SERVICE_PID, UserAdminConstants.SERVICE_PID + "." + type);
             properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
             UserAdminImpl userAdmin = new UserAdminImpl(m_context,
                                                         new ServiceTracker(m_context,
@@ -75,7 +76,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
                                                         new ServiceTracker(m_context,
                                                                            EventAdmin.class.getName(),
                                                                            null));
-            ServiceRegistration userAdminRegistration = m_context.registerService(UserAdmin.class.getName(),
+            ServiceRegistration userAdminRegistration = m_context.registerService(new String[] {
+                                                                                                 UserAdmin.class.getName(),
+                                                                                                 ManagedService.class.getName()
+                                                                                               },
                                                                                   userAdmin, properties);
             m_services.put(type, userAdminRegistration);
         }
@@ -129,16 +133,6 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
      */
     public Object addingService(ServiceReference reference) {
 
-//        System.out.println("adding service: " + reference.getProperty(Constants.SERVICE_ID));
-//        System.out.println("                with interface(s): ");
-//        for (String name : (String[]) reference.getProperty(Constants.OBJECTCLASS)) {
-//            System.out.println("   " + Constants.OBJECTCLASS + " = " + name);
-//        }
-//        
-//        for (String key : reference.getPropertyKeys()) {
-//            System.out.println("  key: " + key);
-//        }
-        
         String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
         if (null == type) {
             // ignore if property not set: it's not a useable provider
@@ -152,8 +146,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
      */
     public void modifiedService(ServiceReference reference, Object service) {
         // TODO Auto-generated method stub
-        System.out.println("modified service: " + reference.getProperty(Constants.BUNDLE_SYMBOLICNAME));
-        System.out.println("modified service: " + reference.getProperty(Constants.SERVICE_PID));
+        System.err.println("modified service: " + reference.getProperty(Constants.BUNDLE_SYMBOLICNAME));
+        System.err.println("modified service: " + reference.getProperty(Constants.SERVICE_PID));
     }
     
     /**

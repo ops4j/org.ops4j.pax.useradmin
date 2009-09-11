@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Test;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
@@ -132,12 +133,12 @@ public class UserAdminImplTest {
             logTracker.open();
             eventTracker.open();
             //
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn(null);
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn("true");
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn("TrUe");
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn("yes");
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn("yEs");
-            EasyMock.expect(properties.get(UserAdminImpl.PROP_SECURITY)).andReturn("false");
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn(null);
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn("true");
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn("TrUe");
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn("yes");
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn("yEs");
+            EasyMock.expect(properties.get(UserAdminConstants.PROP_SECURITY)).andReturn("false");
         } catch (Exception e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -382,7 +383,7 @@ public class UserAdminImplTest {
             EasyMock.expect(context.getServiceReference(UserAdmin.class.getName())).andReturn(ref);
             EasyMock.expect(ref.getProperty(Constants.SERVICE_ID)).andReturn("1");
             EasyMock.expect(ref.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
-            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminImpl.PID);
+            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
             eventAdmin.postEvent(EasyMock.isA(Event.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
@@ -412,7 +413,7 @@ public class UserAdminImplTest {
             EasyMock.expect(context.getServiceReference(UserAdmin.class.getName())).andReturn(ref);
             EasyMock.expect(ref.getProperty(Constants.SERVICE_ID)).andReturn("1");
             EasyMock.expect(ref.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
-            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminImpl.PID);
+            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
             eventAdmin.postEvent(EasyMock.isA(Event.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
@@ -562,7 +563,7 @@ public class UserAdminImplTest {
             EasyMock.expect(context.getServiceReference(UserAdmin.class.getName())).andReturn(ref);
             EasyMock.expect(ref.getProperty(Constants.SERVICE_ID)).andReturn("1");
             EasyMock.expect(ref.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
-            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminImpl.PID);
+            EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
             eventAdmin.postEvent(EasyMock.isA(Event.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected StorageException: " + e.getMessage());

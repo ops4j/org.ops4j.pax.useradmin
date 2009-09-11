@@ -24,7 +24,7 @@ package org.ops4j.pax.useradmin.provider.ldap;
 public class ConfigurationConstants {
 
     /**
-     * The PID of the service used to identify configuration data.
+     * The SERVICE_PID of the service used to identify configuration data.
      */
     public static final String SERVICE_PID                         = "org.ops4j.pax.useradmin.provider.ldap";
 

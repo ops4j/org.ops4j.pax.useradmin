@@ -30,6 +30,8 @@ import org.osgi.service.useradmin.UserAdmin;
  */
 public interface StorageProvider {
 
+    // private enum GroupType { BASIC, REQUIRED };
+
     // role management
 
     /**

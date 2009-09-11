@@ -24,6 +24,9 @@
           <activeByDefault>true</activeByDefault>
         </activation>
       <modules>
+        <!-- TODO:
+        <module>pax-useradmin-provider-rdbms</module>
+        -->
         <module>pax-useradmin-service</module>
         <module>pax-useradmin-provider-preferences</module>
         <module>pax-useradmin-provider-ldap</module>
@@ -44,18 +47,6 @@
     </profile>
   </profiles>
 
-    <!--
-  <modules>
-    <module>pax-useradmin-service</module>
-    <module>pax-useradmin-provider-preferences</module>
-    <module>pax-useradmin-provider-ldap</module>
-    <module>pax-useradmin-command</module>
-    <module>pax-useradmin-itest</module>
-    
-    <module>pax-useradmin-provider-rdbms</module>
-  </modules>
-    -->
-  
   <developers>
     <developer>
       <id>mkuespert</id>
@@ -283,7 +274,6 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
- -->
  
   <repositories>
     <repository>
@@ -295,5 +285,6 @@
       </snapshots>
     </repository>
   </repositories>
-
+-->
+ 
 </project>

@@ -14,9 +14,10 @@
   <name>Pax UserAdmin Integration Tests</name>
   <packaging>jar</packaging>
 
-  <!--
-    <modules> <module>pax-useradmin-itest-ldap</module> </modules>
-  -->
+  <properties>
+    <pax.exam.version>1.1.0</pax.exam.version>
+    <apache.felix.version>1.0.2</apache.felix.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -29,40 +30,44 @@
       <artifactId>org.osgi.compendium</artifactId>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam</artifactId>
-      <version>1.0.0</version>
+      <version>${pax.exam.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.prefs</artifactId>
-      <version>1.0.2</version>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-junit</artifactId>
+      <version>${pax.exam.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-container-default</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.prefs</artifactId>
+      <version>${apache.felix.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.shell</artifactId>
       <version>1.0.0</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-junit</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-container-default</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.ops4j.pax.ldapserver</groupId>
       <artifactId>pax-ldapserver-apacheds</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -101,7 +106,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.2</version>
+<!--        <version>2.2</version>   --> 
         <configuration>
           <argLine>-Xmx1024m</argLine>
           <disableXmlReport>true</disableXmlReport>

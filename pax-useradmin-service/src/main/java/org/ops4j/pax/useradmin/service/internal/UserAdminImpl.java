@@ -15,11 +15,13 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.security.AccessController;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -50,21 +52,11 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
-    public static String        PID                = "org.ops4j.pax.useradmin";
-
-    public static String        PROP_SECURITY      = "org.ops4j.pax.useradmin.security";
-
-    public static boolean       DEFAULT_SECURITY   = false;
-
-    // private implementation details
-
-    private static String       EVENT_TOPIC_PREFIX = "org/osgi/service/useradmin/UserAdmin/";
-
     private BundleContext       m_context          = null;
 
     private UserAdminPermission m_adminPermission  = null;
     
-    private boolean             m_checkSecurity    = DEFAULT_SECURITY;
+    private boolean             m_checkSecurity    = UserAdminConstants.DEFAULT_SECURITY;
 
     /**
      * The ServiceTracker which monitors the service used to store data.
@@ -143,14 +135,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      *         the caller does not have the UserAdminPermission with name admin.
      */
     protected void checkAdminPermission() {
-        if (m_checkSecurity) {
-            SecurityManager securityManager = System.getSecurityManager();
-            if (null != securityManager) {
-                if (null == m_adminPermission) {
-                    m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
-                }
-                securityManager.checkPermission(m_adminPermission);
+        if (m_checkSecurity && null != System.getSecurityManager()) {
+            if (null == m_adminPermission) {
+                m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
             }
+            AccessController.checkPermission(m_adminPermission);
         }
     }
 
@@ -162,10 +151,10 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
-        m_checkSecurity = DEFAULT_SECURITY;
+        m_checkSecurity = UserAdminConstants.DEFAULT_SECURITY;
         //
         if (null !=properties) {
-            String checkSecurity = (String) properties.get(PROP_SECURITY);
+            String checkSecurity = (String) properties.get(UserAdminConstants.PROP_SECURITY);
             if (null != checkSecurity) {
                 m_checkSecurity =    "yes".equalsIgnoreCase(checkSecurity)
                                   || "true".equalsIgnoreCase(checkSecurity);
@@ -355,7 +344,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
             properties.put("service.pid", ref.getProperty(Constants.SERVICE_PID));
             //
-            Event event = new Event(EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
+            Event event = new Event(UserAdminConstants.EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
         } else {
             String message = "No event service available - cannot send event of type '"
@@ -372,11 +361,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#checkPermission(String, String)
      */
     public void checkPermission(String name, String action) {
-        if (m_checkSecurity) {
-            SecurityManager securityManager = System.getSecurityManager();
-            if (null != securityManager) {
-                securityManager.checkPermission(new UserAdminPermission(name, action));
-            }
+        if (m_checkSecurity && null != System.getSecurityManager()) {
+            AccessController.checkPermission(new UserAdminPermission(name, action));
         }
     }
     

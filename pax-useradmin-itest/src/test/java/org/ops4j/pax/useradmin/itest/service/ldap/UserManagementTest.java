@@ -56,12 +56,12 @@ public class UserManagementTest extends UserManagement {
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
-                       FrameworkConfiguration.get());
+                       FrameworkConfiguration.get(doEnableSecurity()));
     }
     
     @Before
     public void setup() {
-        FrameworkConfiguration.setup(getBundleContext());
+        FrameworkConfiguration.setup(getBundleContext(), doEnableSecurity());
     }
 
     @Test

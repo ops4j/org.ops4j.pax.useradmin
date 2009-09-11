@@ -29,14 +29,16 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSConfiguration;
 import org.ops4j.pax.ldapserver.apacheds.ApacheDSServer;
 import org.ops4j.pax.useradmin.Utilities;
+import org.ops4j.pax.useradmin.itest.service.CopyFilesEnvironmentCustomizer;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.log.LogService;
-import org.osgi.service.useradmin.Role;
+import org.osgi.service.useradmin.UserAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -47,13 +49,23 @@ import org.osgi.util.tracker.ServiceTracker;
  * @since 14.07.2009
  */
 public class FrameworkConfiguration {
-
+    
     /**
      * @return The additional configuration needed for testing the Preferences
      *         service based variant of the UserAdmin service
      */
-    protected static Option get() {
+    protected static Option get(boolean enableSecurity) {
         return composite(rawPaxRunnerOption("bootDelegation", "javax.naming.ldap.*"),
+                         when (enableSecurity).useOptions(
+                                                          new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
+                                                                      .sourceFilter(".*.permissions")
+                                                                      .targetDir("/permissions"),
+                                                          systemProperty("-Djava.security.manager"),
+                                                          // systemProperty("-Djava.security.debug").value("access"),
+                                                          systemProperty("-Djava.security.policy").value("/permissions/useradmin-test.permissions")
+                                                          ),
+//                         equinox(), // allEquinoxVersions();
+//                         knopflerfish(),
                          mavenBundle().groupId("org.ops4j.pax.ldapserver")
                                       .artifactId("pax-ldapserver-apacheds")
                                       .version("0.0.1-SNAPSHOT").startLevel(4),
@@ -66,9 +78,10 @@ public class FrameworkConfiguration {
      * Standard initialization for all tests: update configuration for the StorageProvider bundle
      * 
      * @param context The <code>BundleContext</code> of the bundle containing the test.
+     * @param enableSecurity True if security should be enabled.
      */
     @SuppressWarnings(value = "unchecked")
-    protected static void setup(BundleContext context) {
+    protected static void setup(BundleContext context, boolean enableSecurity) {
         
         ServiceReference refConfigAdmin = context.getServiceReference(ConfigurationAdmin.class.getName());
         Assert.assertNotNull("No ConfigurationAdmin service reference found", refConfigAdmin);
@@ -153,7 +166,7 @@ public class FrameworkConfiguration {
         while (!server.isAvailable()) {
             try {
                 Thread.sleep(500);
-                System.out.println("... waiting for ApacheDS ...");
+                System.err.println("... waiting for ApacheDS ...");
             } catch (InterruptedException e) {
                 // ignore
             }
@@ -185,6 +198,24 @@ public class FrameworkConfiguration {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             // ignore
+        }
+        //
+        // configure UserAdmin service
+        //
+        ServiceReference refAdmin = context.getServiceReference(UserAdmin.class.getName());
+        Assert.assertNotNull("No UserAdmin service reference found", refAdmin);
+        //
+        try {
+            Configuration config = configAdmin.getConfiguration(UserAdminConstants.SERVICE_PID + "." + ConfigurationConstants.STORAGEPROVIDER_TYPE,
+                                                                refAdmin.getBundle().getLocation());
+            Dictionary<String, String> properties = config.getProperties();
+            if (null == properties) {
+                properties = new Hashtable<String, String>();
+            }
+            properties.put(UserAdminConstants.PROP_SECURITY, enableSecurity ? "true" : "false");
+            config.update(properties);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     

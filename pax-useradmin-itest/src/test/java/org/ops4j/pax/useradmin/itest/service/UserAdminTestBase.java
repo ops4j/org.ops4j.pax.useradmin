@@ -34,6 +34,11 @@ import org.osgi.service.useradmin.UserAdmin;
 public abstract class UserAdminTestBase {
 
     /**
+     * Change this to false to disable security
+     */
+    private static boolean m_doEnableSecurity = true;
+    
+    /**
      * Abstract method used to retrieve the <code>BundleContext</code>.
      * 
      * @return <code>BundleContext</code> used throughout the tests.
@@ -45,6 +50,15 @@ public abstract class UserAdminTestBase {
      * @return An identifying string value.
      */
     protected abstract String getProviderType();
+    
+    /**
+     * Checks if security should be enabled when running the test.
+     * 
+     * @return True if security should be enabled in tests, false otherwise.
+     */
+    protected static boolean doEnableSecurity() {
+        return m_doEnableSecurity;
+    }
     
     /**
      * @return The basic OSGi framework configuration used to run the tests.
