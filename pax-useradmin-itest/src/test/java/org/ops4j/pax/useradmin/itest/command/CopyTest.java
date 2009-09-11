@@ -28,6 +28,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.Utilities;
+import org.ops4j.pax.useradmin.itest.service.CopyFilesEnvironmentCustomizer;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -37,7 +38,7 @@ import org.osgi.framework.BundleContext;
 @RunWith(JUnit4TestRunner.class)
 public class CopyTest extends CommandTestBase {
 
-    private static final String FILE_INPUT_RESOURCE = "/UserAdminTestData.xml";
+    private static final String FILE_INPUT_RESOURCE = "UserAdminTestData.xml";
     private static final String FILE_INPUT_XML = "./UserAdminTestData.xml";
     private static final String FILE_OUTPUT_XML = "./out.xml";
     private static final String FILE_OUTPUT_CHECK_XML = "./out-check.xml";
@@ -58,13 +59,13 @@ public class CopyTest extends CommandTestBase {
 
     @Configuration
     public static Option[] configure() {
-        return options(getBasicFrameworkConfiguration());
+        return options(new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
+                                                           .sourceFilter(FILE_INPUT_RESOURCE),
+                       getBasicFrameworkConfiguration());
     }
 
     @Test
     public void xml2XmlOk() {
-        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
-        //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);
         File out = new File(FILE_OUTPUT_XML);
@@ -89,8 +90,6 @@ public class CopyTest extends CommandTestBase {
 
     @Test
     public void xml2ServiceOk() {
-        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
-        //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);
         command.execute("userAdmin copyData file://" + FILE_INPUT_XML + " userAdmin://org.ops4j.pax.useradmin.pax-useradmin-service", System.out, System.out);
@@ -111,8 +110,6 @@ public class CopyTest extends CommandTestBase {
 
     @Test
     public void xml2Service2xmlOk() {
-        Utilities.copyResourceToFile(FILE_INPUT_RESOURCE, new File("."));
-        //
         Command command = getCommand("userAdmin");
         Assert.assertNotNull("Command not found", command);
         command.execute("userAdmin copyData file://" + FILE_INPUT_XML + " userAdmin://org.ops4j.pax.useradmin.pax-useradmin-service", System.out, System.out);
