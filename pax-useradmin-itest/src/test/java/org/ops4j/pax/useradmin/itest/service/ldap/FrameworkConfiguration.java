@@ -56,10 +56,13 @@ public class FrameworkConfiguration {
      */
     protected static Option get(boolean enableSecurity) {
         return composite(rawPaxRunnerOption("bootDelegation", "javax.naming.ldap.*"),
+                         new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
+                                                             .sourceFilter(".*.ldif")
+                                                             .targetDir("/server-data"),
                          when (enableSecurity).useOptions(
                                                           new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
-                                                                      .sourceFilter(".*.permissions")
-                                                                      .targetDir("/permissions"),
+                                                                                              .sourceFilter(".*.permissions")
+                                                                                              .targetDir("/permissions"),
                                                           systemProperty("-Djava.security.manager"),
                                                           // systemProperty("-Djava.security.debug").value("access"),
                                                           systemProperty("-Djava.security.policy").value("/permissions/useradmin-test.permissions")
@@ -119,12 +122,12 @@ public class FrameworkConfiguration {
         // clean/initialize data directory
         //
         File dataDir = new File("./server-data");
-        if (dataDir.exists() && dataDir.isDirectory()) {
-            Utilities.delete(dataDir, false);
-        } else {
-            dataDir.mkdir();
-        }
-        Utilities.copyResourceToFile("/ldaptree-test.ldif", dataDir);
+//        if (dataDir.exists() && dataDir.isDirectory()) {
+//            Utilities.delete(dataDir, false);
+//        } else {
+//            dataDir.mkdir();
+//        }
+//        Utilities.copyResourceToFile("/ldaptree-test.ldif", dataDir);
         //
         // configure ApacheDS LDAP server
         //
