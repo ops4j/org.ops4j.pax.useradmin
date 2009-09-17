@@ -15,6 +15,8 @@
  */
 package org.ops4j.pax.useradmin.itest.service;
 
+import java.io.UnsupportedEncodingException;
+
 import org.junit.Assert;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.useradmin.Group;
@@ -31,8 +33,11 @@ import org.osgi.service.useradmin.UserAdmin;
 public abstract class UserManagement extends UserAdminTestBase {
     
     private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_PASSWD = "userPassword";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_PASSWD = "myDomain2";
+    
     private static final String VALUE_DESCRIPTION = "some description";
+    private static final String VALUE_TITLE = "some title";
     private static final String VALUE_CHANGED_DESCRIPTION = "some changed description";
     private static final String VALUE_PASSWD = "secret";
     
@@ -138,38 +143,60 @@ public abstract class UserManagement extends UserAdminTestBase {
     }
 
     @SuppressWarnings(value = "unchecked")
-    protected void setAndGetAttributesOk() {
+    protected void setAndGetStringAttributesOk() {
         UserAdmin userAdmin = getUserAdmin();
         User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
         Assert.assertNotNull("Could not create user", user);
         Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
         //
         Assert.assertNull("Value 1 not set", user.getProperties().put(KEY_DESCRIPTION, VALUE_DESCRIPTION));
-        Assert.assertNull("Value 2 not set", user.getProperties().put(KEY_PASSWD, VALUE_PASSWD.getBytes()));
         //
+        user = (User) userAdmin.getRole(USER_NAME);
+        Assert.assertNotNull("Could not retrieve user: " + USER_NAME, user);
         String stringValue;
-        byte[] byteValue;
         stringValue = (String) user.getProperties().get(KEY_DESCRIPTION);
         Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
         Assert.assertEquals(VALUE_DESCRIPTION, stringValue);
-        byteValue = (byte[]) user.getProperties().get(KEY_PASSWD);
-        Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
-        Assert.assertArrayEquals(VALUE_PASSWD.getBytes(), byteValue);
         //
         Assert.assertNotNull(user.getProperties().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
         Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getProperties().get(KEY_DESCRIPTION));
     }
 
     @SuppressWarnings(value = "unchecked")
-    protected void setAndGetCredentialsOk() {
+    protected void setAndGetByteAttributesOk() {
         UserAdmin userAdmin = getUserAdmin();
         User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
         Assert.assertNotNull("Could not create user", user);
         Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
         //
-        Assert.assertNull("Value 1 not set", user.getCredentials().put(KEY_DESCRIPTION, VALUE_DESCRIPTION));
-        Assert.assertNull("Value 2 not set", user.getCredentials().put(KEY_PASSWD, VALUE_PASSWD.getBytes()));
+        Assert.assertNull("Value 2 not set", user.getProperties().put(KEY_TITLE, VALUE_TITLE.getBytes()));
         //
+        user = (User) userAdmin.getRole(USER_NAME);
+        Assert.assertNotNull("Could not retrieve user: " + USER_NAME, user);
+        byte[] byteValue;
+        byteValue = (byte[]) user.getProperties().get(KEY_TITLE);
+        Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
+        Assert.assertArrayEquals(VALUE_TITLE.getBytes(), byteValue);
+        //
+        // TODO: new changeAttribute test?
+        // Assert.assertNotNull(user.getProperties().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
+        // Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getProperties().get(KEY_DESCRIPTION));
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    private void setCredentials(User user) {
+        Assert.assertNull("String value was set", user.getCredentials().put(KEY_DESCRIPTION, VALUE_DESCRIPTION));
+        Assert.assertNull("Byte value was set", user.getCredentials().put(KEY_PASSWD, VALUE_PASSWD.getBytes()));
+//        try {
+//            Assert.assertNull("Byte value was set", user.getCredentials().put(KEY_PASSWD, VALUE_PASSWD.getBytes("base64")));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//            Assert.fail();
+//        }
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    private void getCredentials(User user) {
         String stringValue;
         byte[] byteValue;
         stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
@@ -182,4 +209,59 @@ public abstract class UserManagement extends UserAdminTestBase {
         Assert.assertNotNull(user.getCredentials().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
         Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
     }
+    private void removeCredentials(User user) {
+        String stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
+        Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
+        Assert.assertNotNull("Value 1 not set", user.getCredentials().get(KEY_DESCRIPTION));
+        Assert.assertNotNull("Could not remove credential", user.getCredentials().remove(KEY_DESCRIPTION));
+        Assert.assertNull("Value 1 still set", user.getCredentials().get(KEY_DESCRIPTION));
+        Assert.assertNotNull("Could not remove credential", user.getCredentials().remove(KEY_PASSWD));
+        Assert.assertNull("Value 2 still set", user.getCredentials().get(KEY_PASSWD));
+        Assert.assertEquals("Credential size mismatch", 0, user.getCredentials().size());
+    }
+
+    protected void setAndGetUserCredentialsOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
+        Assert.assertNotNull("Could not create user", user);
+        Assert.assertEquals("Mismatching user name", USER_NAME, user.getName());
+        setCredentials(user);
+        //
+        user = (User) userAdmin.getRole(USER_NAME);
+        Assert.assertNotNull("Could not get user " + USER_NAME, user);
+        Assert.assertEquals("Role type mismatch", Role.USER, user.getType());
+        getCredentials(user);
+    }
+    
+    protected void setAndRemoveUserCredentialsOk() {
+        setAndGetUserCredentialsOk();
+        //
+        UserAdmin userAdmin = getUserAdmin();
+        User user = (User) userAdmin.getRole(USER_NAME);
+        Assert.assertNotNull("Could not retrieve user", user);
+        removeCredentials(user);
+    }
+    
+    protected void setAndGetGroupCredentialsOk() {
+        UserAdmin userAdmin = getUserAdmin();
+        Group group = (Group) userAdmin.createRole(GROUP_NAME, Role.GROUP);
+        Assert.assertNotNull("Could not create group", group);
+        Assert.assertEquals("Mismatching group name", GROUP_NAME, group.getName());
+        setCredentials(group);
+        //
+        group = (Group) userAdmin.getRole(GROUP_NAME);
+        Assert.assertNotNull("Could not get group " + GROUP_NAME, group);
+        Assert.assertEquals("Role type mismatch", Role.GROUP, group.getType());
+        getCredentials(group);
+    }
+
+    protected void setAndRemoveGroupCredentialsOk() {
+        setAndGetGroupCredentialsOk();
+       //
+       UserAdmin userAdmin = getUserAdmin();
+       Group group = (Group) userAdmin.getRole(GROUP_NAME);
+       Assert.assertNotNull("Could not retrieve group", group);
+       removeCredentials(group);
+   }
 }

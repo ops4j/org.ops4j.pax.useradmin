@@ -33,10 +33,33 @@ public class FrameworkConfiguration {
      *         service based variant of the UserAdmin service
      */
     protected static Option get() {
-        return composite(mavenBundle().groupId("org.apache.felix")
+        return composite(
+// using the Equinox PreferencesService:
+//
+//                         equinox(), // TODO: doesn't run with Felix missing depency: UrlConverter
+//                         mavenBundle().groupId("org.eclipse.equinox")
+//                                      .artifactId("preferences")
+//                                      .version("3.2.100-v20070522")
+//                                      .startLevel(1),
+//                         mavenBundle().groupId("org.eclipse.equinox")
+//                                      .artifactId("common")
+//                                      .version("3.3.0-v20070426")
+//                                      .startLevel(1),
+
+
+// using the Felix PreferencesService:
+                         mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
-                                      .version("1.0.2")
+                                      .version("1.0.3-SNAPSHOT")
                                       .startLevel(1),
+
+// TODO: using the Knopflerfish PreferencesService:
+//                         knopflerfish(),
+//                         mavenBundle().groupId("org.apache.felix")
+//                                      .artifactId("org.apache.felix.prefs")
+//                                      .version("1.0.2")
+//                                      .startLevel(1),
+
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-provider-preferences")
                                       .version("0.0.1-SNAPSHOT")

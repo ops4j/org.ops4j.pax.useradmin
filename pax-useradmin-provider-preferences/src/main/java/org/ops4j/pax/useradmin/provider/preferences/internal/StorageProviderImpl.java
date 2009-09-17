@@ -85,10 +85,10 @@ public class StorageProviderImpl implements StorageProvider {
         Preferences propertyTypes = node.node(TYPES_NODE);
         Map<String, Object> properties = new HashMap<String, Object>();
         for (String key : node.keys()) {
-            if (propertyTypes.getBoolean(key, false)) {
+            if (propertyTypes.getBoolean(key, true)) {
                 properties.put(key, node.get(key, ""));
             } else {
-                properties.put(key, node.getByteArray(key, "".getBytes()).toString());
+                properties.put(key, node.getByteArray(key, "".getBytes()));
             }
         }
         return properties;
@@ -108,8 +108,7 @@ public class StorageProviderImpl implements StorageProvider {
         node.flush();
     }
 
-    private Role loadRole(UserAdminFactory factory, String name, Filter filter) 
-         throws BackingStoreException, StorageException {
+    private Role loadRole(UserAdminFactory factory, String name, Filter filter) throws BackingStoreException, StorageException {
         if (!getRootNode().nodeExists(name)) {
             return null;
         }

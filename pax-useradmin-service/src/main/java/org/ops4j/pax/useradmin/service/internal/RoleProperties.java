@@ -45,19 +45,27 @@ public class RoleProperties extends AbstractProperties {
      * @see AbstractProperties#store(StorageProvider, String, String)
      */
     @Override
-    protected void store(StorageProvider storageProvider, String key, String value) throws StorageException {
+    protected void store(StorageProvider storageProvider, String key, Object value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
-        storageProvider.setRoleAttribute(getRole(), key, value);
+//        storageProvider.setRoleAttribute(getRole(), key, value);
+        // TODO: make SPI use Object as well?
+        if (value instanceof String) {
+            storageProvider.setRoleAttribute(getRole(), key, (String) value);
+        } else if (value instanceof byte[]) {
+            storageProvider.setRoleAttribute(getRole(), key, (byte[]) value);
+        } else {
+            throw new StorageException("Illegal value type: " + value.getClass().getName());
+        }
     }
 
     /**
      * @see AbstractProperties#store(StorageProvider, String, byte[])
      */
-    @Override
-    protected void store(StorageProvider storageProvider, String key, byte[] value) throws StorageException {
-        getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
-        storageProvider.setRoleAttribute(getRole(), key, value);
-    }
+//    @Override
+//    protected void store(StorageProvider storageProvider, String key, byte[] value) throws StorageException {
+//        getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
+//        storageProvider.setRoleAttribute(getRole(), key, value);
+//    }
 
     /**
      * @see AbstractProperties#remove(StorageProvider, String)

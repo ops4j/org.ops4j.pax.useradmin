@@ -49,37 +49,40 @@ import com.novell.ldap.LDAPSearchResults;
  */
 public class StorageProviderImpl implements StorageProvider, ManagedService {
 
-    private static final String BASIC_EXT                  = ".basic";
-    private static final String REQUIRED_EXT               = ".required";
+    private static final String DEFAULT_CREDENTIAL_NAME     = "default";
+    private static final int    CREDENTIAL_VALUE_ARRAY_SIZE = 3;
     
-    private static final String PATTERN_SPLIT_LIST_VALUE   = ", *";
+    private static final String BASIC_EXT                   = ".basic";
+    private static final String REQUIRED_EXT                = ".required";
+
+    private static final String PATTERN_SPLIT_LIST_VALUE    = "[;,] *";
 
     // configuration
-    
-    private String              m_accessUser               = "";
-    private String              m_accessPassword           = "";
-    private String              m_host                     = ConfigurationConstants.DEFAULT_LDAP_SERVER_URL;
-    private String              m_port                     = ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT;
 
-    private String              m_rootDN                   = ConfigurationConstants.DEFAULT_LDAP_ROOT_DN;
-    private String              m_rootUsersDN              = ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS
-                                                                                    + "," + m_rootDN;
-    private String              m_rootGroupsDN             = ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS
-                                                                                    + "," + m_rootDN;
+    private String              m_accessUser                = "";
+    private String              m_accessPassword            = "";
+    private String              m_host                      = ConfigurationConstants.DEFAULT_LDAP_SERVER_URL;
+    private String              m_port                      = ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT;
 
-    private String              m_userObjectclass          = ConfigurationConstants.DEFAULT_USER_OBJECTCLASS;
-    private String              m_userIdAttr               = ConfigurationConstants.DEFAULT_USER_ATTR_ID;
-    private String              m_userMandatoryAttr        = ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY;
-    private String              m_userCredentialAttr       = ConfigurationConstants.DEFAULT_USER_ATTR_CREDENTIAL;
+    private String              m_rootDN                    = ConfigurationConstants.DEFAULT_LDAP_ROOT_DN;
+    private String              m_rootUsersDN               = ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS
+                                                                            + "," + m_rootDN;
+    private String              m_rootGroupsDN              = ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS
+                                                                            + "," + m_rootDN;
 
-    private String              m_groupObjectclass         = ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS;
-    private String              m_groupIdAttr              = ConfigurationConstants.DEFAULT_GROUP_ATTR_ID;
+    private String              m_userObjectclass           = ConfigurationConstants.DEFAULT_USER_OBJECTCLASS;
+    private String              m_userIdAttr                = ConfigurationConstants.DEFAULT_USER_ATTR_ID;
+    private String              m_userMandatoryAttr         = ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY;
+    private String              m_userCredentialAttr        = ConfigurationConstants.DEFAULT_USER_ATTR_CREDENTIAL;
 
-    private String              m_groupEntryObjectclass    = ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS;
-    private String              m_groupEntryIdAttr         = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID;
-    private String              m_groupEntryMandatoryAttr  = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MANDATORY;
-    private String              m_groupEntryMemberAttr     = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER;
-    private String              m_groupEntryCredentialAttr = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_CREDENTIAL;
+    private String              m_groupObjectclass          = ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS;
+    private String              m_groupIdAttr               = ConfigurationConstants.DEFAULT_GROUP_ATTR_ID;
+    private String              m_groupMandatoryAttr        = ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY;
+    private String              m_groupCredentialAttr       = ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL;
+
+    private String              m_groupEntryObjectclass     = ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS;
+    private String              m_groupEntryIdAttr          = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID;
+    private String              m_groupEntryMemberAttr      = ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER;
 
     /**
      * The connection which is used for access.
@@ -192,6 +195,12 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         m_groupIdAttr = getOptionalProperty(properties,
                                             ConfigurationConstants.PROP_GROUP_ATTR_ID,
                                             ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
+        m_groupMandatoryAttr = getOptionalProperty(properties,
+                                                   ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY,
+                                                   ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
+        m_groupCredentialAttr = getOptionalProperty(properties,
+                                                   ConfigurationConstants.PROP_GROUP_ATTR_CREDENTIAL,
+                                                   ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL);
 
         m_groupEntryObjectclass = getOptionalProperty(properties,
                                                       ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS,
@@ -199,9 +208,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         m_groupEntryIdAttr = getOptionalProperty(properties,
                                                  ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID,
                                                  ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
-        m_groupEntryMandatoryAttr = getOptionalProperty(properties,
-                                                        ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MANDATORY,
-                                                        ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MANDATORY);
         m_groupEntryMemberAttr = getOptionalProperty(properties,
                                                      ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER,
                                                      ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
@@ -323,7 +329,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
      * 
      * @return True if all classes are found in the list.
      */
-    private boolean configuredClassedContainedInObjectClasses(String configuredClasslist, String[] objectClasses) {
+    private boolean configuredClassedContainedInObjectClasses(String configuredClasslist,
+                                                              String[] objectClasses) {
         for (String typeName : configuredClasslist.split(PATTERN_SPLIT_LIST_VALUE)) {
             boolean contained = false;
             for (String objectClass : objectClasses) {
@@ -350,7 +357,8 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     private int getRoleType(LDAPEntry entry) throws StorageException {
         LDAPAttribute typeAttr = entry.getAttribute(ConfigurationConstants.ATTR_OBJECTCLASS);
         if (null == typeAttr) {
-            throw new StorageException("No type attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS + "' found for entry: " + entry);
+            throw new StorageException(  "No type attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
+                                       + "' found for entry: " + entry);
         }
         String[] objectClasses = typeAttr.getStringValueArray();
         //
@@ -394,24 +402,35 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             LDAPAttribute attribute = it.next();
             if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(attribute.getName())) {
                 // ignore: we've read that already
-            } else if (   (type == Role.GROUP && m_groupEntryCredentialAttr.equals(attribute.getName()))
+                // System.err.println("------------- ignore: " + attribute.getName());
+            } else if (   (type == Role.GROUP && m_groupCredentialAttr.equals(attribute.getName()))
                        || (type == Role.USER && m_userCredentialAttr.equals(attribute.getName()))) {
                 for (String value : attribute.getStringValueArray()) {
-                    String[] data = value.split("; *");
-                    if (2 != data.length) {
+                    String[] data = value.split(PATTERN_SPLIT_LIST_VALUE);
+                    if (CREDENTIAL_VALUE_ARRAY_SIZE != data.length) {
                         throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
                     }
-                    credentials.put(data[0], data[1]);
+                    // ignore default credential for groups
+                    if (type != Role.GROUP || !DEFAULT_CREDENTIAL_NAME.equals(data[1])) {
+                        credentials.put(data[1], ("char".equals(data[0]) ? data[2] : data[2].getBytes()));
+                    }
                 }
             } else {
-                properties.put(attribute.getName(), attribute.getStringValue());
+                // TODO: how to get the attribute type (String or byte[])?
+                //
+                // For now we always read string values ... see Jira issue PAXUSERADMIN-XXX
+                //
+                boolean isByteArray = false;
+                properties.put(attribute.getName(), isByteArray ? attribute.getByteValue() : attribute.getStringValue());
             }
         }
         switch (type) {
             case Role.USER:
-                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(), properties, credentials);
+                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(),
+                                          properties, credentials);
             case Role.GROUP:
-                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(), properties, credentials);
+                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(),
+                                           properties, credentials);
             default:
                 // should never happen: getRoleType() throws on this
                 throw new StorageException("Unexpected role type '" + type + "' (0==Role) detected.");
@@ -458,13 +477,15 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         }
         return entry;
     }
-    
+
     /**
-     * Creates an sub-group entry for a group. Sub-group entries are stored in two entries below
-     * the group node: the 'basic' or 'required' group entries.
+     * Creates an sub-group entry for a group. Sub-group entries are stored in
+     * two entries below the group node: the 'basic' or 'required' group
+     * entries.
      * 
      * @param connection The LDAP connection to use.
-     * @param isBasic True if the initialMember should be added to the 'basic' members - on false it is added to the 'required' members.
+     * @param isBasic True if the initialMember should be added to the 'basic'
+     *                     members - on false it is added to the 'required' members.
      * @param group The group to modify.
      * @param initialMember The initial member to add to this group.
      * 
@@ -491,13 +512,14 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         //
         // set all mandatory attributes to name
         //
-        if (!"".equals(m_groupEntryMandatoryAttr)) {
-            for (String attr : m_groupEntryMandatoryAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
-                attributes.add(new LDAPAttribute(attr.trim(), entryName));
-            }
-        }
+        //        if (!"".equals(m_groupEntryMandatoryAttr)) {
+        //            for (String attr : m_groupEntryMandatoryAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
+        //                attributes.add(new LDAPAttribute(attr.trim(), entryName));
+        //            }
+        //        }
         // create and add entry
-        LDAPEntry entry = new LDAPEntry(m_groupEntryIdAttr + "=" + entryName + "," + getGroupDN(group.getName()), attributes);
+        LDAPEntry entry = new LDAPEntry(  m_groupEntryIdAttr + "=" + entryName + ","
+                                        + getGroupDN(group.getName()), attributes);
         connection.add(entry);
         return entry;
     }
@@ -614,7 +636,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                     for (String userDN : attribute.getStringValueArray()) {
                         if (userDN.equals(memberDN)) {
                             // found: let's remove this member from the group ...
-                            LDAPModification modification = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(m_groupEntryMemberAttr, memberDN));
+                            LDAPModification modification = new LDAPModification(LDAPModification.DELETE,
+                                                                                 new LDAPAttribute(m_groupEntryMemberAttr,
+                                                                                                   memberDN));
                             connection.modify(groupEntry.getDN(), modification);
                             return true;
                         }
@@ -625,6 +649,19 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         return false;
     }
 
+    private String createCredentialValueString(String key, Object value) throws StorageException {
+        if (!(value instanceof String || value instanceof byte[])) {
+            throw new StorageException("Invalid type for credential value: " + value.getClass().getName());
+        }
+        boolean isString = value instanceof String;
+        String result =   (isString ? "char" : "byte") + ";"
+                        + key + ";"
+                        + (isString ? value : new String((byte[]) value));
+        // System.err.println("------------ create credential: " + result);
+        return result;
+
+    }
+    
     // - public <code>StorageProvider</code> interface implementation
     
     /**
@@ -669,8 +706,21 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         //
         LDAPAttributeSet attributes = new LDAPAttributeSet();
         attributes.add(new LDAPAttribute(ConfigurationConstants.ATTR_OBJECTCLASS,
-                                         m_groupObjectclass.split(PATTERN_SPLIT_LIST_VALUE))); // new String[] { "organizationalUnit", "top" }));
+                                         m_groupObjectclass.split(PATTERN_SPLIT_LIST_VALUE)));
         attributes.add(new LDAPAttribute(m_groupIdAttr, name));
+        //
+        // set all mandatory attributes to name
+        //
+        if (!"".equals(m_groupMandatoryAttr)) {
+            for (String attr : m_groupMandatoryAttr.split(PATTERN_SPLIT_LIST_VALUE)) {
+                if (attr.equals(m_groupCredentialAttr)) {
+                    // note: the default credential is not visible for the calling UserAdmin!
+                    attributes.add(new LDAPAttribute(attr.trim(), createCredentialValueString(DEFAULT_CREDENTIAL_NAME, name)));
+                } else {
+                    attributes.add(new LDAPAttribute(attr.trim(), name));
+                }
+            }
+        }
         //
         LDAPEntry entry = new LDAPEntry(getGroupDN(name), attributes);
         //
@@ -855,7 +905,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             closeConnection();
         }
     }
-    
+
     /**
      * @see StorageProvider#removeRoleAttribute(Role, String)
      */
@@ -874,10 +924,10 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             }
         }
         if (Role.GROUP == role.getType()) {
-            if (m_groupEntryIdAttr.equals(key)) {
-                throw new StorageException(  "Cannot remove mandatory ID attribute '" + m_groupEntryIdAttr
+            if (m_groupIdAttr.equals(key)) {
+                throw new StorageException(  "Cannot remove mandatory ID attribute '" + m_groupIdAttr
                                              + "'.");
-            } else if (m_userMandatoryAttr.contains(key)) {
+            } else if (m_groupMandatoryAttr.contains(key)) {
                 throw new StorageException(  "Cannot remove mandatory attribute '" + key
                                              + "'.");
             }
@@ -904,33 +954,34 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public void setUserCredential(User user, String key, String value) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
-            LDAPEntry entry = getEntryForName(connection, user.getName());
+            String dn = getRoleDN(user);
+            LDAPEntry entry = getEntry(connection, dn);
             if (null == entry) {
                 throw new StorageException("Could not find user '" + user.getName() + "'");
             }
-            String dn = getRoleDN(user);
-            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupEntryCredentialAttr; 
+            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
             LDAPAttribute attribute = entry.getAttribute(attrName);
             if (null != attribute) {
                 for (String attrValue : attribute.getStringValueArray()) {
-                    String[] data = attrValue.split("; *");
-                    if (2 != data.length) {
-                        throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
+                    String[] data = attrValue.split(PATTERN_SPLIT_LIST_VALUE);
+                    if (CREDENTIAL_VALUE_ARRAY_SIZE != data.length) {
+                        throw new StorageException(  "Wrong credential format: could not split into " + CREDENTIAL_VALUE_ARRAY_SIZE
+                                                   + " chunks: '" + value + "' - entry: " + entry);
                     }
-                    if (data[0].equals(key)) {
+                    if (data[1].equals(key)) {
                         // modify existing entry
                         attribute.removeValue(attrValue);
-                        attribute.addValue(key + ";" + value);
-                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
-                        connection.modify(dn, modification);
-                        return;
                     }
                 }
+                // TODO: if we get here the value does not yet exist or was removed above - now add it
+                attribute.addValue(createCredentialValueString(key, value));
+                LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
+                connection.modify(dn, modification);
             } else {
                 LDAPModification modification = new LDAPModification(LDAPModification.ADD,
-                                                                     new LDAPAttribute(attrName, key + ";" + value));
+                                                                     new LDAPAttribute(attrName,
+                                                                                       createCredentialValueString(key, value)));
                 connection.modify(dn, modification);
-                return;
             }
         } catch (LDAPException e) {
             throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
@@ -943,33 +994,35 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     public void setUserCredential(User user, String key, byte[] value) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
-            LDAPEntry entry = getEntry(connection, getRoleDN(user)); // readEntry(connection, user.getName());
+            String dn = getRoleDN(user);
+            LDAPEntry entry = getEntry(connection, dn);
             if (null == entry) {
                 throw new StorageException("Could not find user '" + user.getName() + "'");
             }
-            String dn = getRoleDN(user);
-            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupEntryCredentialAttr; 
+            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
             LDAPAttribute attribute = entry.getAttribute(attrName);
             if (null != attribute) {
                 for (String attrValue : attribute.getStringValueArray()) {
-                    String[] data = attrValue.split("; *");
-                    if (2 != data.length) {
-                        throw new StorageException("Wrong credential format '" + value + "' found for entry: " + entry);
+                    String[] data = attrValue.split(PATTERN_SPLIT_LIST_VALUE);
+                    if (CREDENTIAL_VALUE_ARRAY_SIZE != data.length) {
+                        throw new StorageException(  "Wrong credential format: could not split into " + CREDENTIAL_VALUE_ARRAY_SIZE
+                                                   + " chunks: '" + value + "' - entry: " + entry);
                     }
-                    if (data[0].equals(key)) {
+                    if (data[1].equals(key)) {
                         // modify existing entry
                         attribute.removeValue(attrValue);
-                        attribute.addValue(key + ";" + value);
-                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
-                        connection.modify(dn, modification);
-                        return;
                     }
                 }
-            } else {
-                LDAPModification modification = new LDAPModification(LDAPModification.ADD,
-                                                                     new LDAPAttribute(attrName, key + ";" + value));
+                // if we get here the value does not yet exist or was removed above - now add it
+                attribute.addValue(createCredentialValueString(key, value));
+                LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
                 connection.modify(dn, modification);
-                return;
+            } else {
+
+                LDAPModification modification = new LDAPModification(LDAPModification.ADD,
+                                                                     new LDAPAttribute(attrName,
+                                                                                       createCredentialValueString(key, value)));
+                connection.modify(dn, modification);
             }
         } catch (LDAPException e) {
             throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
@@ -980,7 +1033,37 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     public void removeUserCredential(User user, String key) throws StorageException {
-        throw new IllegalStateException("credential handling is not yet implemented");
+        LDAPConnection connection = openConnection();
+        try {
+            String dn = getRoleDN(user);
+            LDAPEntry entry = getEntry(connection, dn);
+            if (null == entry) {
+                throw new StorageException("Could not find user '" + user.getName() + "'");
+            }
+            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
+            LDAPAttribute attribute = entry.getAttribute(attrName);
+            if (null != attribute) {
+                for (String attrValue : attribute.getStringValueArray()) {
+                    String[] data = attrValue.split("; *");
+                    if (CREDENTIAL_VALUE_ARRAY_SIZE != data.length) {
+                        throw new StorageException("Wrong credential format '" + attrValue + "' found for entry: " + entry);
+                    }
+                    if (data[1].equals(key)) {
+                        // modify existing entry
+                        // Note: depending on the configured scheme a LDAPException is thrown if the last value is removed
+                        attribute.removeValue(attrValue);
+                        LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
+                        connection.modify(dn, modification);
+                        return;
+                    }
+                }
+            }
+        } catch (LDAPException e) {
+            throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
+                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
+        } finally {
+            closeConnection();
+        }
     }
     
     public void clearUserCredentials(User user) throws StorageException {

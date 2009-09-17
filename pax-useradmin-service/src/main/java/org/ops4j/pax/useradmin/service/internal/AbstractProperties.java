@@ -70,8 +70,7 @@ public abstract class AbstractProperties extends Hashtable {
      * @param value The <code>String</code> value.
      * @throws StorageException
      */
-    protected abstract void store(StorageProvider storageProvider, String key, String value)
-    throws StorageException;
+    protected abstract void store(StorageProvider storageProvider, String key, Object value) throws StorageException;
 
     /**
      * Stores a byte[] value.
@@ -81,8 +80,8 @@ public abstract class AbstractProperties extends Hashtable {
      * @param value The <code>byte[]</code> value.
      * @throws StorageException
      */
-    protected abstract void store(StorageProvider storageProvider, String key, byte[] value)
-    throws StorageException;
+//    protected abstract void store(StorageProvider storageProvider, String key, byte[] value)
+//    throws StorageException;
 
     /**
      * Removes an entry.
@@ -121,13 +120,12 @@ public abstract class AbstractProperties extends Hashtable {
     }
     
     /**
-     * To be overridden by implementations that need security checks on the get
+     * Optionally overridden by implementations that need security checks on the get
      * method(s), e.g. for access to credentials.
      * 
      * @param key The key for permission checks.
      */
-    protected void checkGetPermission(String key) {
-    }
+    protected void checkGetPermission(String key) {}
 
     /**
      * @see Hashtable#get(Object)
@@ -169,11 +167,12 @@ public abstract class AbstractProperties extends Hashtable {
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
-            if (value instanceof String) {
-                store(storageProvider, (String) key, (String) value);
-            } else {
-                store(storageProvider, (String) key, (byte[]) value);
-            }
+            store(storageProvider, (String) key, value);
+//            if (value instanceof String) {
+//                store(storageProvider, (String) key, (String) value);
+//            } else {
+//                store(storageProvider, (String) key, (byte[]) value);
+//            }
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
             return super.put(key, value);
         } catch (StorageException e) {

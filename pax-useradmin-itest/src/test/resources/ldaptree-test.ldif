@@ -36,6 +36,6 @@ sn: user.anyone
 # note: userPassword contains credential tuples consisting of an ID and a password. The ID may be the wildcard char '*' which matches all IDs.
 #       Therefor the second credential is superfluous - it's just used for testing
 #
-userPassword: *,notNeededForThisUser
-userPassword: some authority;testPwd
+userPassword: char;*;notNeededForThisUser
+userPassword: char;some authority;testPwd
 

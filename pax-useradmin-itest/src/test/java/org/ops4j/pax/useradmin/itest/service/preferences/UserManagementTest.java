@@ -17,6 +17,7 @@ package org.ops4j.pax.useradmin.itest.service.preferences;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
@@ -26,6 +27,9 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.itest.service.UserManagement;
 import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.prefs.Preferences;
+import org.osgi.service.prefs.PreferencesService;
 
 /**
  * Testing the user-management parts of the preferences service based
@@ -56,6 +60,23 @@ public class UserManagementTest extends UserManagement {
     }
 
     @Test
+    public void setAndGetBytePreference() {
+    
+        ServiceReference refPref = m_context.getServiceReference(PreferencesService.class.getName());
+        Assert.assertNotNull("No preferences service available", refPref);
+        
+        PreferencesService preferencesService = (PreferencesService) m_context.getService(refPref);
+        Preferences preferences = preferencesService.getUserPreferences("Test");
+        String key = "test";
+        byte[] value = "testValue".getBytes();
+
+        preferences.putByteArray(key, value);
+        byte[] result = preferences.getByteArray(key, null);
+        Assert.assertNotNull("No value returned", result);
+    }
+    
+    
+    @Test
     public void createAndFindUserOk() {
         super.createAndFindUserOk();
     }
@@ -76,12 +97,17 @@ public class UserManagementTest extends UserManagement {
     }
 
     @Test
-    public void setAndGetAttributesOk() {
-        super.setAndGetAttributesOk();
+    public void setAndGetStringAttributesOk() {
+        super.setAndGetStringAttributesOk();
     }
 
     @Test
-    public void setAndGetCredentialsOk() {
-        super.setAndGetCredentialsOk();
+    public void setAndGetByteAttributesOk() {
+        super.setAndGetByteAttributesOk();
+    }
+
+    @Test
+    public void setAndGetUserCredentialsOk() {
+        super.setAndGetUserCredentialsOk();
     }
 }

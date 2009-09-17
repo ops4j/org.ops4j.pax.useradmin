@@ -42,7 +42,7 @@ User identification options
 *----------*-----------*-----------*
   org.ops4j.pax.useradmin.ldap.user.attr.mandatory | cn, sn | List of mandatory attributes for a user entry.
 *----------*-----------*-----------*
-  org.ops4j.pax.useradmin.ldap.user.attr.credential | userPassword | The attribute used to store credentials.
+  org.ops4j.pax.useradmin.ldap.user.attr.credential | userPassword | The attribute used to store credentials for a user.
 *----------*-----------*-----------*
 
 Group identification options
@@ -54,6 +54,10 @@ Group identification options
 *----------*-----------*-----------*
   org.ops4j.pax.useradmin.ldap.group.attr.id | ou | The ID attribute that is used by the group entry.
 *----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.attr.mandatory | userPassword | List of mandatory attributes for a group entry.
+*----------*-----------*-----------*
+  org.ops4j.pax.useradmin.ldap.group.attr.credential | userPassword | The attribute used to store credentials for a group.
+*----------*-----------*-----------*
 
 Sub-Group identification options
 
@@ -63,11 +67,5 @@ Sub-Group identification options
   org.ops4j.pax.useradmin.ldap.group.entry.objectclass | groupOfNames, simpleSecurityObject, top | The objectclass attribute values that identify a sub-group.
 *----------*-----------*-----------*
   org.ops4j.pax.useradmin.ldap.group.entry.attr.id | cn | The ID attribute that is used for the sub-group entry.
-*----------*-----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.mandatory | userPassword | List of mandatory attributes for a sub-group entry.
-*----------*-----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.member | member | The attribute used to store members.
-*----------*-----------*-----------*
-  org.ops4j.pax.useradmin.ldap.group.entry.attr.credential | userPassword | The attribute used to store credentials.
 *----------*-----------*-----------*
   

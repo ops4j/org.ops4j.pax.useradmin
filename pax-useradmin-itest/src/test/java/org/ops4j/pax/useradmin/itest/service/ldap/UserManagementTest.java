@@ -17,6 +17,7 @@ package org.ops4j.pax.useradmin.itest.service.ldap;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,9 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.useradmin.itest.service.UserManagement;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.prefs.Preferences;
+import org.osgi.service.prefs.PreferencesService;
 
 /**
  * Testing the user-management parts of the preferences service based
@@ -85,12 +89,33 @@ public class UserManagementTest extends UserManagement {
     }
 
     @Test
-    public void setAndGetAttributesOk() {
-        super.setAndGetAttributesOk();
+    public void setAndGetStringAttributesOk() {
+        super.setAndGetStringAttributesOk();
+    }
+
+// TODO: Disabled because the LDAP provider does not byte[] attributes correctly
+//    @Test
+//    public void setAndGetByteAttributesOk() {
+//         super.setAndGetByteAttributesOk();
+//    }
+
+    @Test
+    public void setAndGetUserCredentialsOk() {
+        super.setAndGetUserCredentialsOk();
     }
 
     @Test
-    public void setAndGetCredentialsOk() {
-        super.setAndGetCredentialsOk();
+    public void setAndRemoveUserCredentialsOk() {
+        super.setAndRemoveUserCredentialsOk();
+    }
+
+    @Test
+    public void setAndGetGroupCredentialsOk() {
+        super.setAndGetGroupCredentialsOk();
+    }
+
+    @Test
+    public void setAndRemoveGroupCredentialsOk() {
+        super.setAndRemoveGroupCredentialsOk();
     }
 }

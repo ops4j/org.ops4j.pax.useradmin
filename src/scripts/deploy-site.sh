@@ -10,4 +10,8 @@ while getopts ":M:P:D:" o ; do
      esac
 done
 #
+if [ -z $PROFILE ]; then
+   PROFILE="-P"
+fi
+#
 ${MAVEN_DIR}mvn ${PROFILE},repos.ops4j deploy && ${MAVEN_DIR}mvn ${PROFILE} dashboard:dashboard && ${MAVEN_DIR}mvn ${PROFILE} ${DEPLOY_DIR} site:deploy

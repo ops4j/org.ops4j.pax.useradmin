@@ -28,14 +28,16 @@ import org.osgi.service.useradmin.Role;
 public interface UserAdminUtil {
 
     /**
-     * Checks if the caller has the specified permission.
+     * Checks if the caller has the specified permission when security is
+     * enabled. If security is not enabled nothing happens here.
      * 
      * @param permission The name of the permission, e.g. the name of a property
      *            to change.
      * @param credential The <code>UserAdminPermission</code> code.
      * 
-     * @throws <code>SecurityException</code> If a security manager exists and
-     *         the caller does not have the UserAdminPermission with name admin.
+     * @throws <code>SecurityException</code> If security is enabled, a security
+     *         manager exists and the caller does not have the specified
+     *         permission.
      */
     void checkPermission(String permission, String credential);
 

@@ -127,12 +127,14 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     protected boolean doCheckSecurity() {
         return m_checkSecurity;
     }
-    
+
     /**
-     * Checks if the caller has admin permissions.
+     * Checks if the caller has admin permissions when security is enabled. If
+     * security is not enabled nothing happens here.
      * 
-     * @throws <code>SecurityException</code> If a security manager exists and
-     *         the caller does not have the UserAdminPermission with name admin.
+     * @throws <code>SecurityException</code> If security is enabled, a security
+     *         manager exists and the caller does not have the
+     *         UserAdminPermission with name admin.
      */
     protected void checkAdminPermission() {
         if (m_checkSecurity && null != System.getSecurityManager()) {
