@@ -34,7 +34,23 @@
         <module>pax-useradmin-webservice-api</module>
         <module>pax-useradmin-itest</module>
       </modules>
+      <!-- TODO:
+           remove this repository as soon as Felix PreferencesService 1.0.3 is released 
+        -->
+      <repositories>
+        <repository>
+          <id>m2apache.snapshots</id>
+          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
+    
     <profile>
       <id>no-itest</id>
       <modules>
@@ -259,32 +275,5 @@
     </resources>
 
   </build>
-  <modules>
-  	<module>pax-useradmin-webservice-api</module>
-  </modules>
 
-<!-- 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>codehaus.snapshots</id>
-      <name>Codehaus Maven Snapshot Repository</name>
-      <url>http://snapshots.repository.codehaus.org/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
- 
-  <repositories>
-    <repository>
-      <id>ops4j.releases</id>
-      <name>The OPS4J Release Repository</name>
-      <url>http://repository.ops4j.org/mvn-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
--->
- 
 </project>
