@@ -5,7 +5,8 @@
 
 // codeBase "file:/private/tmp/paxexam_runner_Matthias/bundles/org.apache.felix.main_1.8.1.jar" 
 
-grant codeBase "file:/private/tmp/paxexam_runner_Matthias/bundles/org.apache.felix.main_1.8.1.jar" {
+// grant codeBase "file:/tmp/paxexam_runner_tomcat/bundles/org.apache.felix.main_1.8.1.jar" {
+grant {
   permission java.security.AllPermission;
 };
 
