@@ -3,10 +3,13 @@
 
 // keystore "useradmin.keystore";
 
-grant {
-    permission org.osgi.service.useradmin.UserAdminPermission "admin";
+// codeBase "file:/private/tmp/paxexam_runner_Matthias/bundles/org.apache.felix.main_1.8.1.jar" 
+
+grant codeBase "file:/private/tmp/paxexam_runner_Matthias/bundles/org.apache.felix.main_1.8.1.jar" {
+  permission java.security.AllPermission;
 };
 
-//grant {
-//  permission java.security.AllPermission;
-//};
+// grant {
+//    permission org.osgi.service.useradmin.UserAdminPermission "admin";
+// };
+

@@ -49,9 +49,14 @@ import org.osgi.util.tracker.ServiceTracker;
  * @since 14.07.2009
  */
 public class FrameworkConfiguration {
-    
+    /*
+     * Note:
+     *   Only basic security is tested. The different permissions can only be tested 
+     *   with CondPermAdmin installed, since Felix autmatically gives AllPermission to its bundles.
+     *   see http://www.mail-archive.com/users@felix.apache.org/msg02636.html
+     */
     /**
-     * @return The additional configuration needed for testing the Preferences
+     * @return The additional configuration needed for testing the LDAP
      *         service based variant of the UserAdmin service
      */
     protected static Option get(boolean enableSecurity) {
@@ -63,9 +68,9 @@ public class FrameworkConfiguration {
                                                           new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
                                                                                               .sourceFilter(".*.permissions")
                                                                                               .targetDir("/permissions"),
-                                                          systemProperty("-Djava.security.manager"),
-                                                          // systemProperty("-Djava.security.debug").value("access"),
-                                                          systemProperty("-Djava.security.policy").value("/permissions/useradmin-test.permissions")
+                                                           systemProperty("java.security.manager"),
+//                                                          systemProperty("java.security.debug").value("access,failure"),
+                                                          systemProperty("java.security.policy").value("permissions/useradmin-test.permissions")
                                                           ),
 //                         equinox(), // allEquinoxVersions();
 //                         knopflerfish(),
@@ -107,6 +112,7 @@ public class FrameworkConfiguration {
             properties.put("log4j.appender.A1",                          "org.apache.log4j.ConsoleAppender");
             properties.put("log4j.appender.A1.layout",                   "org.apache.log4j.PatternLayout");
             properties.put("log4j.appender.A1.layout.ConversionPattern", "%d [%t] %-5p %c - %m%n");
+            properties.put("log4j.logger.org.ops4j",                     "DEBUG");
             config.update(properties);
         } catch (IOException e) {
             e.printStackTrace();
