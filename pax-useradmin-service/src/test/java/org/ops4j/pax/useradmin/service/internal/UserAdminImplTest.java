@@ -119,7 +119,8 @@ public class UserAdminImplTest {
         //
         Assert.assertNotNull(createUserAdmin(spTracker, logTracker, eventTracker));
     }
-    
+
+    /* No configuration properties so far ... but that may change
     @Test
     @SuppressWarnings(value = "unchecked")
     public void updatedOk() {
@@ -165,6 +166,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(properties, spTracker, logTracker, eventTracker);
     }
+    */
     
     @Test
     public void fireEventNoService() {

@@ -15,7 +15,6 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.security.AccessController;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -56,8 +55,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     private UserAdminPermission m_adminPermission  = null;
     
-    private boolean             m_checkSecurity    = UserAdminConstants.DEFAULT_SECURITY;
-
     /**
      * The ServiceTracker which monitors the service used to store data.
      */
@@ -124,10 +121,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         return typeName;
     }
 
-    protected boolean doCheckSecurity() {
-        return m_checkSecurity;
-    }
-
     /**
      * Checks if the caller has admin permissions when security is enabled. If
      * security is not enabled nothing happens here.
@@ -137,11 +130,12 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      *         UserAdminPermission with name admin.
      */
     protected void checkAdminPermission() {
-        if (m_checkSecurity && null != System.getSecurityManager()) {
+        SecurityManager sm = System.getSecurityManager();
+        if (null != sm) {
             if (null == m_adminPermission) {
                 m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
             }
-            AccessController.checkPermission(m_adminPermission);
+            sm.checkPermission(m_adminPermission);
         }
     }
 
@@ -153,14 +147,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
         // defaults
-        m_checkSecurity = UserAdminConstants.DEFAULT_SECURITY;
         //
         if (null !=properties) {
-            String checkSecurity = (String) properties.get(UserAdminConstants.PROP_SECURITY);
-            if (null != checkSecurity) {
-                m_checkSecurity =    "yes".equalsIgnoreCase(checkSecurity)
-                                  || "true".equalsIgnoreCase(checkSecurity);
-            }
         }
     }
 
@@ -363,8 +351,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#checkPermission(String, String)
      */
     public void checkPermission(String name, String action) {
-        if (m_checkSecurity && null != System.getSecurityManager()) {
-            AccessController.checkPermission(new UserAdminPermission(name, action));
+        SecurityManager sm = System.getSecurityManager();
+        if (null != sm) {
+            sm.checkPermission(new UserAdminPermission(name, action));
         }
     }
     

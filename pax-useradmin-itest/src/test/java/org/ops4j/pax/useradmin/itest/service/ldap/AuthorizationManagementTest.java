@@ -51,7 +51,7 @@ public class AuthorizationManagementTest extends AuthorizationManagement {
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
-                       FrameworkConfiguration.get(doEnableSecurity()));
+                       FrameworkConfiguration.get());
     }
 
     @Before

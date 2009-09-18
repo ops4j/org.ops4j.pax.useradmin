@@ -60,7 +60,7 @@ public class UserManagementTest extends UserManagement {
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
-                       FrameworkConfiguration.get(doEnableSecurity()));
+                       FrameworkConfiguration.get());
     }
     
     @Before

@@ -35,12 +35,12 @@ public interface UserAdminConstants {
     /**
      * Property to switch security on/off.
      */
-    final static String  PROP_SECURITY        = "org.ops4j.pax.useradmin.security";
+    // final static String  PROP_SECURITY        = "org.ops4j.pax.useradmin.security";
 
     /**
      * The default security setting.
      */
-    final static boolean DEFAULT_SECURITY     = false;
+    // final static boolean DEFAULT_SECURITY     = false;
 
     /**
      * The prefix used for events sent by the UserAdmin service.

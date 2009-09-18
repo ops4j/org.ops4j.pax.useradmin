@@ -31,14 +31,12 @@ import org.ops4j.pax.ldapserver.apacheds.ApacheDSServer;
 import org.ops4j.pax.useradmin.Utilities;
 import org.ops4j.pax.useradmin.itest.service.CopyFilesEnvironmentCustomizer;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.log.LogService;
-import org.osgi.service.useradmin.UserAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -49,31 +47,16 @@ import org.osgi.util.tracker.ServiceTracker;
  * @since 14.07.2009
  */
 public class FrameworkConfiguration {
-    /*
-     * Note:
-     *   Only basic security is tested. The different permissions can only be tested 
-     *   with CondPermAdmin installed, since Felix autmatically gives AllPermission to its bundles.
-     *   see http://www.mail-archive.com/users@felix.apache.org/msg02636.html
-     */
+    
     /**
      * @return The additional configuration needed for testing the LDAP
      *         service based variant of the UserAdmin service
      */
-    protected static Option get(boolean enableSecurity) {
+    protected static Option get() {
         return composite(rawPaxRunnerOption("bootDelegation", "javax.naming.ldap.*"),
                          new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
                                                              .sourceFilter(".*.ldif")
                                                              .targetDir("/server-data"),
-                         when (enableSecurity).useOptions(
-                                                          new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
-                                                                                              .sourceFilter(".*.permissions")
-                                                                                              .targetDir("/permissions"),
-                                                           systemProperty("java.security.manager"),
-//                                                          systemProperty("java.security.debug").value("access,failure"),
-                                                          systemProperty("java.security.policy").value("permissions/useradmin-test.permissions")
-                                                          ),
-//                         equinox(), // allEquinoxVersions();
-//                         knopflerfish(),
                          mavenBundle().groupId("org.ops4j.pax.ldapserver")
                                       .artifactId("pax-ldapserver-apacheds")
                                       .version("0.0.1-SNAPSHOT").startLevel(4),
@@ -127,7 +110,7 @@ public class FrameworkConfiguration {
         //
         // clean/initialize data directory
         //
-        File dataDir = new File("./server-data");
+//        File dataDir = new File("./server-data");
 //        if (dataDir.exists() && dataDir.isDirectory()) {
 //            Utilities.delete(dataDir, false);
 //        } else {
@@ -148,7 +131,7 @@ public class FrameworkConfiguration {
                 properties = new Hashtable<String, String>();
             }
             properties.put(ApacheDSConfiguration.PROP_DATA_DIR,
-                           dataDir.getPath());
+                           "server-data"); // dataDir.getPath());
             properties.put(ApacheDSConfiguration.PROP_LDAP_SERVER_PORT,
                            ApacheDSConfiguration.DEFAULT_PORT_LDAP);
             properties.put(ApacheDSConfiguration.PROP_PARTITIONS,
@@ -157,7 +140,7 @@ public class FrameworkConfiguration {
                            "dc=ops4j,dc=org");
             config.update(properties);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
         //
         // wait for ApacheDS to be ready ...
@@ -172,12 +155,20 @@ public class FrameworkConfiguration {
             // ignore
         }
         ApacheDSServer server = (ApacheDSServer) apacheDSTracker.getService();
+        long waitTime = 50000;
+        long interval = 500;
         while (!server.isAvailable()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(interval);
+                waitTime -= interval;
                 System.err.println("... waiting for ApacheDS ...");
+                if (waitTime < 0) {
+                    Assert.fail("... timeout: ApacheDS still not ready.");
+                    break;
+                }
             } catch (InterruptedException e) {
-                // ignore
+                e.printStackTrace(System.err);
+                break;
             }
         }
         //
@@ -201,16 +192,17 @@ public class FrameworkConfiguration {
                            ConfigurationConstants.DEFAULT_LDAP_ROOT_DN);
             config.update(properties);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
-            // ignore
+            e.printStackTrace(System.err);
         }
         //
         // configure UserAdmin service
         //
+        /*
         ServiceReference refAdmin = context.getServiceReference(UserAdmin.class.getName());
         Assert.assertNotNull("No UserAdmin service reference found", refAdmin);
         //
@@ -226,6 +218,7 @@ public class FrameworkConfiguration {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
     }
     
     protected static void cleanup() {

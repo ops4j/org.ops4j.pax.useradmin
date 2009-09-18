@@ -34,7 +34,7 @@ import org.osgi.service.useradmin.UserAdmin;
 public abstract class UserAdminTestBase {
 
     /**
-     * Change this to false to disable security
+     * Change this to false to disable security during tests.
      */
     private static boolean m_doEnableSecurity = true;
     
@@ -59,12 +59,26 @@ public abstract class UserAdminTestBase {
     protected static boolean doEnableSecurity() {
         return m_doEnableSecurity;
     }
-    
+
+    // Note:
+    //   Only basic security is tested: if AllPermissions is set or not.
+    //   
+    //   The various permissions can only be tested seperately with (Conditional)PermissionAdmin installed,
+    //   since Felix autmatically gives AllPermission to its bundles.
+    //   
+    //   see: http://www.mail-archive.com/users@felix.apache.org/msg02636.html
+
     /**
      * @return The basic OSGi framework configuration used to run the tests.
      */
     protected static Option getBasicFrameworkConfiguration() {
-        return composite(mavenBundle().groupId("org.ops4j.pax.logging")
+        return composite(when(doEnableSecurity()).useOptions(new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
+                                                                                                 .sourceFilter(".*.permissions")
+                                                                                                 .targetDir("/permissions"),
+                                                             systemProperty("java.security.manager"),
+//                                                           systemProperty("java.security.debug").value("access,failure"),
+                                                             systemProperty("java.security.policy").value("permissions/useradmin-test.permissions")),
+                         mavenBundle().groupId("org.ops4j.pax.logging")
                                       .artifactId("pax-logging-api")
                                       .version("1.3.0").startLevel(1),
                          mavenBundle().groupId("org.ops4j.pax.logging")
