@@ -50,7 +50,7 @@ public class FrameworkConfiguration {
 // using the Felix PreferencesService:
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
-                                      .version("1.0.3-SNAPSHOT")
+                                      .version("1.0.4")
                                       .startLevel(1),
 
 // TODO: using the Knopflerfish PreferencesService:

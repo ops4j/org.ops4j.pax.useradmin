@@ -18,7 +18,7 @@
     <pax.exam.version>1.1.0</pax.exam.version>
     <apache.felix.version>1.0.2</apache.felix.version>
     <apache.felix.shell.version>1.0.0</apache.felix.shell.version>
-    <apache.felix.prefs.version>1.0.3-SNAPSHOT</apache.felix.prefs.version>
+    <apache.felix.prefs.version>1.0.4</apache.felix.prefs.version>
   </properties>
 
   <dependencies>
