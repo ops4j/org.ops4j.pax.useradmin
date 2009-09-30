@@ -12,7 +12,7 @@ while getopts "dm:P:s:" o ; do
 done
 #
 if [ ! -z ${MAVEN_DIR} ] ; then
-  MAVEN_OPT=-m ${MAVEN_DIR}
+  MAVEN_OPT="-m ${MAVEN_DIR}"
   MAVEN_BIN_DIR=${MAVEN_DIR}/bin/
 fi
 #
@@ -36,6 +36,7 @@ if [ 0 != $? ]; then
   exit -1
 fi
 if [ ! -z ${DO_DEPLOY} ]; then
+  echo "running: ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT}"
   ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT}
 fi
 if [ 0 != $? ]; then
@@ -43,6 +44,7 @@ if [ 0 != $? ]; then
   exit -1
 fi
 #
+echo "runnin: ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}"
 ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}
 if [ 0 != $? ]; then
   echo "error deploying site"
