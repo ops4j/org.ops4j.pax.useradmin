@@ -259,7 +259,7 @@
 
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>src/resources</directory>
       </resource>
       <!--
        | additional resource entries, useful when building Eclipse RCP applications

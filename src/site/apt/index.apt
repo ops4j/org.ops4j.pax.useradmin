@@ -88,7 +88,8 @@ Standard StorageProvider Types
   
 Distribution
 
-  The Pax UserAdmin project is distributed as a set of OSGi bundles:
+  The Pax UserAdmin project is distributed as a set of OSGi bundles available in 
+  the {{{http://repository.ops4j.org/mvn-snapshots/org/ops4j/pax/useradmin/}OPS4J snapshot repository}}:
   
   * the {{{bundles/service.html}pax-useradmin-service}} bundle containing the extender logic and core service implementation
 
@@ -104,3 +105,4 @@ Distribution
   * the {{{bundles/command.html}pax-useradmin-command}} bundle which provides a command to transfer data between files and/or service instances.
     
 ~~  * a {{{ui-eclipse/index.html}pax-useradmin-ui-eclipse}} bundle (optional)
+

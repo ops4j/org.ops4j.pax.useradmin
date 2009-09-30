@@ -2,16 +2,13 @@
 #
 # Builds the dashboard and deploys the generated site
 #
-while getopts ":M:P:D:" o ; do
+while getopts ":m:P:s:" o ; do
    case $o in
-     M ) MAVEN_DIR="$OPTARG/bin/" ;;
-     P ) PROFILE="-P $OPTARG" ;;
-     D ) DEPLOY_DIR="-Dsite.deploy.dir=$OPTARG" ;;
+     m ) MAVEN_BIN_DIR="$OPTARG/bin/" ;;
+     P ) PROFILE_OPT="-P $OPTARG" ;;
+     s ) SITE_DIR_OPT="-Dsite.deploy.dir=$OPTARG" ;;
      esac
 done
 #
-if [ -z $PROFILE ]; then
-   PROFILE="-P"
-fi
-#
-${MAVEN_DIR}mvn ${PROFILE},repos.ops4j deploy && ${MAVEN_DIR}mvn ${PROFILE} dashboard:dashboard && ${MAVEN_DIR}mvn ${PROFILE} ${DEPLOY_DIR} site:deploy
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} dashboard:dashboard && \
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${SITE_DIR_OPT} site:deploy
