@@ -39,15 +39,19 @@ import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
 import org.osgi.service.useradmin.UserAdminEvent;
+import org.osgi.service.useradmin.UserAdminListener;
 import org.osgi.service.useradmin.UserAdminPermission;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
- * A service to administer user and group/role data using a pluggable storage
- * implementation.
+ * An implementation of the OSGi UserAdmin service. Allows to administer user
+ * and group/role data using pluggable storage providers that connect to an
+ * underlying datastore.
+ * 
+ * @see UserAdmin
  * 
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
@@ -69,6 +73,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * The ServiceTracker which monitors the service used for firing events.
      */
     private ServiceTracker      m_eventService     = null;
+
+    /**
+     * The ServiceTracker which tracks the registered UserAdminListeners.
+     */
+    private ServiceTracker      m_eventListeners   = null;
 
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
@@ -98,6 +107,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         m_eventService = eventService;
         m_eventService.open();
         m_context = context;
+        //
+        m_eventListeners = new ServiceTracker(context, UserAdminListener.class.getName(), null);
+        m_eventListeners.open();
     }
 
     /**
@@ -117,6 +129,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                 break;
             case UserAdminEvent.ROLE_REMOVED:
                 typeName = "ROLE_REMOVED";
+            default:
+                typeName = "Event" + type;
         }
         return typeName;
     }
@@ -307,11 +321,13 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * @see UserAdminUtil#logMessage(Object, String, int)
+     * 
+     * TODO: do we need a check for valid levels? What to do then: exception or ignore?
      */
     public void logMessage(Object source, String message, int level) {
         LogService log = (LogService) m_logService.getService();
         if (null != log) {
-            log.log(level, "[" + source.getClass().getName() + "] " + message);
+            log.log(level, "[" + (source != null ? source.getClass().getName() : "none") + "] " + message);
         }
     }
 
@@ -319,16 +335,37 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#fireEvent(int, Role)
      */
     public void fireEvent(int type, Role role) {
+        if (null == role) {
+            throw new IllegalArgumentException("parameter role must not be null");
+        }
+        ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
+        final UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);
+        //
+        // send event to all listeners, asynchronously - in a separate thread!!
+        // 
+        Object[] eventListeners = m_eventListeners.getServices();
+        if (null != eventListeners) {
+            for (Object listenerObject : eventListeners) {
+                final UserAdminListener listener = (UserAdminListener) listenerObject;
+                Thread notifyThread = new Thread() {
+                    @Override
+                    public void run() {
+                        listener.roleChanged(uaEvent);
+                    }
+                };
+                notifyThread.start();
+            }
+        }
+        //
+        // send event to EventAdmin if present
+        //
         EventAdmin eventAdmin = (EventAdmin) m_eventService.getService();
         if (null != eventAdmin) {
-            ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
-            UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);
-            //
             Dictionary<String, Object> properties = new Hashtable<String, Object>();
             properties.put("event", uaEvent);
             properties.put("role", role);
-            properties.put("role.name", null != role ? role.getName() : "n/a");
-            properties.put("role.type", null != role ? role.getType() : "n/a");
+            properties.put("role.name", role.getName());
+            properties.put("role.type", role.getType());
             properties.put("service", ref);
             properties.put("service.id", ref.getProperty(Constants.SERVICE_ID));
             properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
@@ -337,11 +374,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             Event event = new Event(UserAdminConstants.EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
         } else {
-            String message = "No event service available - cannot send event of type '"
-                + getEventTypeName(type) + "'";
-            if (null != role) {
-                message += " for role '" + role.getName() + "'";
-            }
+            String message =   "No event service available - cannot send event of type '"
+                             + getEventTypeName(type) + "' for role '" + role.getName() + "'";
             logMessage(this, message,
                        LogService.LOG_ERROR);
         }
