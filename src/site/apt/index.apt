@@ -10,7 +10,7 @@
 Overview
 
   The Pax UserAdmin project aims to leverage the standard OSGi UserAdmin specification as specified in chapter 107
-  of the latest {{{http://www.osgi.org/Specifications/Drafts}OSGi Service Platform Release 4 Compendium Specification Version 4.2 Public Draft}}.
+  of the latest {{{http://www.osgi.org/Download/File?url=/download/r4v42/r4.cmpn.pdf}OSGi Service Platform Release 4 Compendium Specification Version 4.2}}.
   
   Main goal is to provide 'enterprise value' - all the tools and handles needed to manage large amounts of user
   data, often having to deal with one or even more legacy systems.
@@ -36,6 +36,8 @@ Architecture & Design
   The Pax UserAdmin architecture is based on the {{{http://www.osgi.org/blog/2007/02/osgi-extender-model.html}Extender Pattern}}: a
   ServiceTracker tracks all services that implement the {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider SPI}}
   and manages OSGi {{{xref/org/ops4j/pax/useradmin/service/internal/UserAdminImpl.html}UserAdmin service instances}} for each provider it detects.
+  
+[images/UserAdminOverview.png] Overview
   
 ~~  Thus the complexity of user data management is broken down into 3 layers:
   

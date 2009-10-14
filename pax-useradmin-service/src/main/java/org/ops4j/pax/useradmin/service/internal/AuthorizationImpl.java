@@ -66,13 +66,16 @@ public class AuthorizationImpl implements Authorization {
     public String[] getRoles() {
         Collection<String> roleNames = new ArrayList<String>();
         try {
-            for (Role role : m_userAdmin.getRoles(null)) {
-                if (!Role.USER_ANYONE.equals(role.getName())) {
-                    ImplicationResult result = ((RoleImpl) role).isImpliedBy(m_user,
-                                                                             new ArrayList<String>());
-                    if (ImplicationResult.IMPLIEDBY_YES == result) {
-                        String name = role.getName();
-                        roleNames.add(name);
+            Role[] roles = m_userAdmin.getRoles(null);
+            if (null != roles) {
+                for (Role role : roles) {
+                    if (!Role.USER_ANYONE.equals(role.getName())) {
+                        ImplicationResult result = ((RoleImpl) role).isImpliedBy(m_user,
+                                                                                 new ArrayList<String>());
+                        if (ImplicationResult.IMPLIEDBY_YES == result) {
+                            String name = role.getName();
+                            roleNames.add(name);
+                        }
                     }
                 }
             }
