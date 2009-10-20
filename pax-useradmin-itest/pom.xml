@@ -14,12 +14,20 @@
   <name>Pax UserAdmin Integration Tests</name>
   <packaging>jar</packaging>
 
+  <!-- Versions of dependencies used for integration testing 
+    -->
   <properties>
+    <pax.ldapserver.apacheds.version>0.2.0</pax.ldapserver.apacheds.version>
     <pax.exam.version>1.1.0</pax.exam.version>
-    <apache.felix.version>1.0.2</apache.felix.version>
-    <!-- <apache.felix.version>2.0.0</apache.felix.version>   -->
+    <pax.logging.version>1.3.0</pax.logging.version>
     <apache.felix.shell.version>1.0.0</apache.felix.shell.version>
     <apache.felix.prefs.version>1.0.4</apache.felix.prefs.version>
+    <apache.felix.eventadmin.version>1.0.0</apache.felix.eventadmin.version>
+    <apache.felix.configadmin.version>1.0.4</apache.felix.configadmin.version>
+    <!-- TODO: check if we need these too
+    <apache.felix.version>1.0.2</apache.felix.version>
+    <apache.felix.version>2.0.0</apache.felix.version>
+      -->
   </properties>
 
   <dependencies>
@@ -34,6 +42,8 @@
       <scope>provided</scope>
     </dependency>
     
+    <!-- We're using Pax Exam/JUnit as framework: 
+      -->
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam</artifactId>
@@ -53,26 +63,53 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 3rd party services we use while testing:
+      -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.prefs</artifactId>
       <version>${apache.felix.prefs.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.eventadmin</artifactId>
+      <version>${apache.felix.eventadmin.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.configadmin</artifactId>
+      <version>${apache.felix.configadmin.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.shell</artifactId>
       <version>${apache.felix.shell.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <artifactId>pax-logging-api</artifactId>
+      <version>${pax.logging.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <artifactId>pax-logging-service</artifactId>
+      <version>${pax.logging.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.ops4j.pax.ldapserver</groupId>
       <artifactId>pax-ldapserver-apacheds</artifactId>
-      <version>${project.version}</version>
+      <version>${pax.ldapserver.apacheds.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- Our own stuff:
+      -->    
     <dependency>
       <groupId>org.ops4j.pax.useradmin</groupId>
       <artifactId>pax-useradmin-service</artifactId>
@@ -91,10 +128,15 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.useradmin</groupId>
+      <artifactId>pax-useradmin-command</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
-
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -106,15 +148,31 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
       </plugin>
+      <!-- Configure memory space for surefire 
+        -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-<!--        <version>2.2</version>   --> 
         <configuration>
           <argLine>-Xmx1024m</argLine>
           <disableXmlReport>true</disableXmlReport>
         </configuration>
       </plugin>
+      <!-- Use Pax Exam plugin to generate a dependency file which is used
+           to configure the test run (instead of specifying versions twice). 
+        -->
+      <plugin>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>maven-paxexam-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-config</id>
+            <goals>
+              <goal>generate-depends-file</goal>
+            </goals>
+          </execution>
+        </executions>
+     </plugin>
     </plugins>
   </build>
 

@@ -57,13 +57,12 @@ public class FrameworkConfiguration {
                          new CopyFilesEnvironmentCustomizer().sourceDir("src/test/resources")
                                                              .sourceFilter(".*.ldif")
                                                              .targetDir("/server-data"),
-                         // TODO: check if we can get rid of the versions specified here ...
                          mavenBundle().groupId("org.ops4j.pax.ldapserver")
-                                      .artifactId("pax-ldapserver-apacheds") // .startLevel(4),
-                                      .version("0.0.1-SNAPSHOT").startLevel(4),
+                                      .artifactId("pax-ldapserver-apacheds")
+                                      .versionAsInProject().startLevel(4),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
-                                      .artifactId("pax-useradmin-provider-ldap") // .startLevel(5));
-                                      .version("0.0.1-SNAPSHOT").startLevel(5));
+                                      .artifactId("pax-useradmin-provider-ldap")
+                                      .versionAsInProject().startLevel(5));
     }
     
     /**

@@ -49,10 +49,10 @@ public abstract class CommandTestBase {
         return composite(dsProfile(),
                          mavenBundle().groupId("org.ops4j.pax.logging")
                                       .artifactId("pax-logging-api")
-                                      .version("1.3.0").startLevel(1),
+                                      .versionAsInProject().startLevel(1),
                          mavenBundle().groupId("org.ops4j.pax.logging")
                                       .artifactId("pax-logging-service")
-                                      .version("1.3.0").startLevel(1),
+                                      .versionAsInProject().startLevel(1),
 //                         mavenBundle().groupId("org.ops4j.pax.shell")
 //                                      .artifactId("pax-shell-connector-http")
 //                                      .version("0.1.0-SNAPSHOT").startLevel(1),
@@ -61,24 +61,19 @@ public abstract class CommandTestBase {
                                       .version("0.1.0-SNAPSHOT").startLevel(1),
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
-                                      .version("1.0.2")
-                                      .startLevel(1),
+                                      .versionAsInProject().startLevel(1),
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.shell")
-                                      .version("1.0.0")
-                                      .startLevel(1),
+                                      .versionAsInProject().startLevel(1),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-service")
-                                      .version("0.0.1-SNAPSHOT")
-                                      .startLevel(6),
+                                      .versionAsInProject().startLevel(6),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-provider-preferences")
-                                      .version("0.0.1-SNAPSHOT")
-                                      .startLevel(6),
+                                      .versionAsInProject().startLevel(6),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-command")
-                                      .version("0.0.1-SNAPSHOT")
-                                      .startLevel(6));
+                                      .versionAsInProject().startLevel(6));
     }
 
     /**

@@ -50,8 +50,7 @@ public class FrameworkConfiguration {
 // using the Felix PreferencesService:
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
-                                      .version("1.0.4")
-                                      .startLevel(1),
+                                      .versionAsInProject().startLevel(1),
 
 // TODO: using the Knopflerfish PreferencesService:
 //                         knopflerfish(),
@@ -62,7 +61,6 @@ public class FrameworkConfiguration {
 
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-provider-preferences")
-                                      .version("0.0.1-SNAPSHOT")
-                                      .startLevel(4));
+                                      .versionAsInProject().startLevel(4));
     }
 }
