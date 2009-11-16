@@ -73,17 +73,6 @@ public abstract class AbstractProperties extends Hashtable {
     protected abstract void store(StorageProvider storageProvider, String key, Object value) throws StorageException;
 
     /**
-     * Stores a byte[] value.
-     * 
-     * @param storageProvider The StorageProvider to use.
-     * @param key The key.
-     * @param value The <code>byte[]</code> value.
-     * @throws StorageException
-     */
-//    protected abstract void store(StorageProvider storageProvider, String key, byte[] value)
-//    throws StorageException;
-
-    /**
      * Removes an entry.
      * 
      * @param storageProvider The StorageProvider to use.
@@ -168,11 +157,6 @@ public abstract class AbstractProperties extends Hashtable {
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
             store(storageProvider, (String) key, value);
-//            if (value instanceof String) {
-//                store(storageProvider, (String) key, (String) value);
-//            } else {
-//                store(storageProvider, (String) key, (byte[]) value);
-//            }
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
             return super.put(key, value);
         } catch (StorageException e) {
