@@ -36,7 +36,9 @@ Architecture & Design
   The Pax UserAdmin architecture is based on the {{{http://www.osgi.org/blog/2007/02/osgi-extender-model.html}Extender Pattern}}: a
   ServiceTracker tracks all services that implement the {{{xref/org/ops4j/pax/useradmin/service/spi/StorageProvider.html}StorageProvider SPI}}
   and manages OSGi {{{xref/org/ops4j/pax/useradmin/service/internal/UserAdminImpl.html}UserAdmin service instances}} for each provider it detects.
-  
+
+  The Pax UserAdmin service implementation provides all the necessary glue code to enable independent development of storage providers and service consumers.
+    
 [images/UserAdminOverview.png] Overview
   
 ~~  Thus the complexity of user data management is broken down into 3 layers:

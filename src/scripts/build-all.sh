@@ -68,15 +68,15 @@ fi
 if [ ! -z ${DO_DEPLOY} ]; then
   echo "running: ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT}"
   ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT}
-fi
-if [ 0 != $? ]; then
-  echo "error deploying artifacts"
-  exit -1
-fi
-#
-echo "running: ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}"
-${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}
-if [ 0 != $? ]; then
-  echo "error deploying site"
-  exit -1
+  if [ 0 != $? ]; then
+    echo "error deploying artifacts"
+    exit -1
+  fi
+  #
+  echo "running: ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}"
+  ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}
+  if [ 0 != $? ]; then
+    echo "error deploying site"
+    exit -1
+  fi
 fi

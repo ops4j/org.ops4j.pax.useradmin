@@ -26,21 +26,35 @@
       <modules>
         <!-- TODO:
         <module>pax-useradmin-provider-rdbms</module>
+        <module>pax-useradmin-webservice-api</module>
+        <module>pax-useradmin-provider-file</module>
         -->
         <module>pax-useradmin-service</module>
         <module>pax-useradmin-provider-preferences</module>
         <module>pax-useradmin-provider-ldap</module>
         <module>pax-useradmin-command</module>
-        <module>pax-useradmin-webservice-api</module>
         <module>pax-useradmin-itest</module>
       </modules>
       <!-- TODO:
            remove this repository as soon as Felix PreferencesService 1.0.3 is released 
-        -->
       <repositories>
         <repository>
           <id>m2apache.snapshots</id>
           <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+        -->
+      <repositories>
+        <!-- needed for Pax shell -->
+        <repository>
+          <id>ops4j.snapshots</id>
+          <url>http://repository.ops4j.org/mvn-snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>

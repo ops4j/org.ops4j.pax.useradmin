@@ -10,7 +10,7 @@ Quickstart
 ---
   svn co https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin
   cd useradmin
-  ./src/scripts/build-all.sh -Dfile://`pwd`/target/deploy [ -Pno-itest ]
+  ./src/scripts/build-all.sh -s file://`pwd`/target/deploy [ -Pno-itest ]
 ---
   
   The <no-itest> profile may be used to shorten compile time.
@@ -70,9 +70,9 @@ scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
-scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
 #
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
 ------------
 
@@ -87,6 +87,7 @@ scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+#
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
@@ -103,6 +104,7 @@ scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+#
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
 ------------
@@ -133,6 +135,7 @@ scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
+#
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
