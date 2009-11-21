@@ -62,6 +62,16 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
+        <repository>
+          <id>ops4j.releases</id>
+          <url>http://repository.ops4j.org/mvn-releases</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
       </repositories>
     </profile>
     
