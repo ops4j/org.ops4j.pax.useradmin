@@ -66,10 +66,10 @@
           <id>ops4j.releases</id>
           <url>http://repository.ops4j.org/mvn-releases</url>
           <releases>
-            <enabled>false</enabled>
+            <enabled>true</enabled>
           </releases>
           <snapshots>
-            <enabled>true</enabled>
+            <enabled>false</enabled>
           </snapshots>
         </repository>
       </repositories>
