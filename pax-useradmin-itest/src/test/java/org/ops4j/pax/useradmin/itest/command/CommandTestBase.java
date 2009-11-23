@@ -56,9 +56,9 @@ public abstract class CommandTestBase {
 //                         mavenBundle().groupId("org.ops4j.pax.shell")
 //                                      .artifactId("pax-shell-connector-http")
 //                                      .version("0.1.0-SNAPSHOT").startLevel(1),
-                         mavenBundle().groupId("org.ops4j.pax.shell")
-                                      .artifactId("osgi-service-command")
-                                      .version("0.1.0-SNAPSHOT").startLevel(1),
+//                         mavenBundle().groupId("org.ops4j.pax.shell")
+//                                      .artifactId("osgi-service-command")
+//                                      .version("0.1.0-SNAPSHOT").startLevel(1),
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
                                       .versionAsInProject().startLevel(1),
