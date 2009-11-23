@@ -16,7 +16,8 @@
   <version>0.0.1-SNAPSHOT</version>
   
   <description>Pax UserAdmin - OPS4J implementation of the OSGi UserAdmin service and more ...</description>
-  
+  <inceptionYear>2009</inceptionYear>
+
   <profiles>
     <profile>
       <id>all</id>
@@ -35,12 +36,12 @@
         <module>pax-useradmin-command</module>
         <module>pax-useradmin-itest</module>
       </modules>
-      <!-- TODO:
-           remove this repository as soon as Felix PreferencesService 1.0.3 is released 
       <repositories>
+        <!-- TODO:
+           remove this repository as soon as Felix Gogo release is available 
         <repository>
           <id>m2apache.snapshots</id>
-          <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+          <url>http://repository.apache.org/snapshots</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -48,10 +49,7 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
-      </repositories>
-        -->
-      <repositories>
-        <!-- needed for Pax shell -->
+        - needed for Pax shell -
         <repository>
           <id>ops4j.snapshots</id>
           <url>http://repository.ops4j.org/mvn-snapshots</url>
@@ -72,6 +70,7 @@
             <enabled>false</enabled>
           </snapshots>
         </repository>
+        -->
       </repositories>
     </profile>
     
@@ -125,13 +124,13 @@
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
-        <version>4.1.0</version>
+        <version>4.2.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.compendium</artifactId>
-        <version>4.1.0</version>
+        <version>4.2.0</version>
         <scope>provided</scope>
       </dependency>
 
@@ -254,6 +253,11 @@
      -->
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <!--  version>2.3</version -->
+        </plugin>
         <!--
         | Felix bundle plugin / Bnd version and configuration
           -->
@@ -265,11 +269,11 @@
           <configuration>
             <instructions>
               <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
-              <Bundle-Version>${pom.version}</Bundle-Version>
+              <Bundle-Version>${project.version}</Bundle-Version>
               <!--
                | assume public classes are in the top package, and private classes are under ".internal"
               -->
-              <Export-Package>!${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${pom.version}"</Export-Package>
+              <Export-Package>!${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${project.version}"</Export-Package>
               <Private-Package>${bundle.namespace}.internal.*</Private-Package>
               <!--
                | each module can override these defaults in their osgi.bnd file

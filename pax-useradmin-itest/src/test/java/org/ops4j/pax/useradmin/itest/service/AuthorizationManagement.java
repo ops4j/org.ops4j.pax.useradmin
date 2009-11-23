@@ -18,6 +18,7 @@ package org.ops4j.pax.useradmin.itest.service;
 
 import junit.framework.Assert;
 
+import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
 import org.osgi.service.useradmin.Authorization;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
@@ -28,7 +29,7 @@ import org.osgi.service.useradmin.UserAdmin;
  * @author Matthias Kuespert
  * @since  12.07.2009
  */
-public abstract class AuthorizationManagement extends UserAdminTestBase {
+public abstract class AuthorizationManagement extends ServiceTestBase {
 
     private static final String USER_NAME1 = "tboss";
     private static final String USER_NAME2 = "jdeveloper";

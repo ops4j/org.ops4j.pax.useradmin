@@ -23,6 +23,7 @@ import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.dsProfile;
 import org.apache.felix.shell.Command;
 import org.junit.Assert;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -33,7 +34,7 @@ import org.osgi.framework.ServiceReference;
  * @author Matthias Kuespert
  * @since  06.08.2009
  */
-public abstract class CommandTestBase {
+public abstract class CommandTestBase extends UserAdminTestBase {
 
     /**
      * Abstract method used to retrieve the <code>BundleContext</code>.
@@ -46,7 +47,8 @@ public abstract class CommandTestBase {
      * @return The basic OSGi framework configuration used to run the tests.
      */
     protected static Option getBasicFrameworkConfiguration() {
-        return composite(dsProfile(),
+        return composite(UserAdminTestBase.getBasicFrameworkConfiguration(),
+                         dsProfile(),
                          mavenBundle().groupId("org.ops4j.pax.logging")
                                       .artifactId("pax-logging-api")
                                       .versionAsInProject().startLevel(1),
@@ -62,12 +64,15 @@ public abstract class CommandTestBase {
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.prefs")
                                       .versionAsInProject().startLevel(1),
+//                         mavenBundle().groupId("org.apache.felix")
+//                                      .artifactId("org.apache.felix.gogo")
+//                                      .versionAsInProject().startLevel(1),
                          mavenBundle().groupId("org.apache.felix")
                                       .artifactId("org.apache.felix.shell")
                                       .versionAsInProject().startLevel(1),
-                         mavenBundle().groupId("org.ops4j.pax.useradmin")
-                                      .artifactId("pax-useradmin-service")
-                                      .versionAsInProject().startLevel(6),
+//                         mavenBundle().groupId("org.ops4j.pax.useradmin")
+//                                      .artifactId("pax-useradmin-service")
+//                                      .versionAsInProject().startLevel(6),
                          mavenBundle().groupId("org.ops4j.pax.useradmin")
                                       .artifactId("pax-useradmin-provider-preferences")
                                       .versionAsInProject().startLevel(6),

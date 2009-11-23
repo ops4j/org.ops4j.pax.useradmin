@@ -27,7 +27,6 @@ import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.useradmin.Utilities;
 import org.ops4j.pax.useradmin.itest.service.CopyFilesEnvironmentCustomizer;
 import org.osgi.framework.BundleContext;
 

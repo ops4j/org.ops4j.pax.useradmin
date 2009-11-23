@@ -13,6 +13,11 @@ while getopts "dm:P:s:" o ; do
    esac
 done
 #
+# - shift to end and collect additional parameters
+#
+#shift $OPTIND-1
+#RAW_MAVEN_OPTS="$@"
+#
 # - provide recognized options as variables/subtask-parameters
 #
 if [ ! -z ${MAVEN_DIR} ] ; then
@@ -37,28 +42,28 @@ DEPLOY_SITE_SCRIPT=`dirname $0`/deploy-site.sh
 #
 ## TODO: if actual version is not a snapshot ... exit(code) / TODO: code = 0 or error needs to be defined 
 #
-echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} clean"
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} clean
+echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} clean"
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} clean
 if [ 0 != $? ]; then
   echo "error building project"
   exit -1
 fi
 #
-echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} install"
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} install
+echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} install"
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} install
 if [ 0 != $? ]; then
   echo "error building project"
   exit -1
 fi
 #
-echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} site"
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} site
+echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} site"
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} site
 if [ 0 != $? ]; then
   echo "error building project"
   exit -1
 fi
 #
-#echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} clean install site"
+#echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} clean install site"
 #${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} clean install site
 #if [ 0 != $? ]; then
 #  echo "error building project"

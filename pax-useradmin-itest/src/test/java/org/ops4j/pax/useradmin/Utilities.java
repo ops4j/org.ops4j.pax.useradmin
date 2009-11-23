@@ -15,17 +15,7 @@
  */
 package org.ops4j.pax.useradmin;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import junit.framework.Assert;
-
-import org.ops4j.pax.useradmin.itest.service.ldap.FrameworkConfiguration;
 
 /**
  * Static utility methods.
@@ -47,28 +37,4 @@ public class Utilities {
             root.delete();
         }
     }
-
-// TODO: check if to move to a CopyResourceEnvironmentCustomizer for Pax Exam
-//
-//    public static void copyResourceToFile(String resourcePath, File directory) {
-//        InputStream is = FrameworkConfiguration.class.getResourceAsStream(resourcePath);
-//        Assert.assertNotNull("Could not load file: " + resourcePath, is);
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-//        try {
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(directory.getPath()
-//                                                                      + resourcePath));
-//            while (true) {
-//                String line = reader.readLine();
-//                if (null == line)
-//                    break;
-//                writer.append(line);
-//                writer.newLine();
-//            }
-//            writer.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Assert.fail(  "Error copying resource " + resourcePath + " to "
-//                        + directory.getPath() + " - " + e.getMessage());
-//        }
-//    }
 }

@@ -57,13 +57,12 @@ public class UserCredentials extends AbstractProperties {
     }
 
     /**
-     * @see AbstractProperties#store(StorageProvider, String, String)
+     * @see AbstractProperties#store(StorageProvider, String, Object)
      */
     @Override
     protected void store(StorageProvider storageProvider, String key, Object value)
         throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-//        storageProvider.setUserCredential(getUser(), key, value);
         if (value instanceof String) {
             storageProvider.setUserCredential(getUser(), key, (String) value);
         } else if (value instanceof byte[]) {
@@ -72,16 +71,6 @@ public class UserCredentials extends AbstractProperties {
             throw new StorageException("Illegal value type: " + value.getClass().getName());
         }
     }
-
-    /**
-     * @see AbstractProperties#store(StorageProvider, String, byte[])
-     */
-//    @Override
-//    protected void store(StorageProvider storageProvider, String key, byte[] value)
-//        throws StorageException {
-//        getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-//        storageProvider.setUserCredential(getUser(), key, value);
-//    }
 
     /**
      * @see AbstractProperties#remove(StorageProvider, String)

@@ -18,6 +18,7 @@ package org.ops4j.pax.useradmin.itest.service;
 import java.io.UnsupportedEncodingException;
 
 import org.junit.Assert;
+import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
@@ -30,7 +31,7 @@ import org.osgi.service.useradmin.UserAdmin;
  * @author Matthias Kuespert
  * @since  09.07.2009
  */
-public abstract class UserManagement extends UserAdminTestBase {
+public abstract class UserManagement extends ServiceTestBase {
     
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_TITLE = "title";

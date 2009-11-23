@@ -24,13 +24,14 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-import org.ops4j.pax.exam.options.ExecutionCustomizer;
+import org.ops4j.pax.exam.Customizer;
+//import org.ops4j.pax.exam.options.ExecutionCustomizer;
 
 /**
  * @author Matthias Kuespert
  * @since 10.09.2009
  */
-public class CopyFilesEnvironmentCustomizer extends ExecutionCustomizer {
+public class CopyFilesEnvironmentCustomizer extends Customizer {
 
     private String m_sourceFilter = "";
     
