@@ -54,7 +54,7 @@ public abstract class AbstractProperties extends Hashtable {
     }
 
     /**
-     * @return The UserAdminUtil implementation used here.
+     * @return The UserAdminTools implementation used here.
      */
     protected UserAdminUtil getUtil() {
         return m_util;
@@ -70,7 +70,7 @@ public abstract class AbstractProperties extends Hashtable {
      * @param value The <code>String</code> value.
      * @throws StorageException
      */
-    protected abstract void store(StorageProvider storageProvider, String key, Object value) throws StorageException;
+    protected abstract Object store(StorageProvider storageProvider, String key, Object value) throws StorageException;
 
     /**
      * Removes an entry.
@@ -156,11 +156,11 @@ public abstract class AbstractProperties extends Hashtable {
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
-            store(storageProvider, (String) key, value);
+            Object storedValue = store(storageProvider, (String) key, value);
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
-            return super.put(key, value);
+            return super.put(key, storedValue);
         } catch (StorageException e) {
-            m_util.logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            m_util.logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }
@@ -185,7 +185,7 @@ public abstract class AbstractProperties extends Hashtable {
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
             return super.remove(key);
         } catch (StorageException e) {
-            m_util.logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            m_util.logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }

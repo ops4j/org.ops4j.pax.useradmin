@@ -35,7 +35,7 @@ public class RoleProperties extends AbstractProperties {
     /**
      * Initializing constructor.
      * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminTools, Map)
      */
     protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         super(role, util, properties);
@@ -45,7 +45,7 @@ public class RoleProperties extends AbstractProperties {
      * @see AbstractProperties#store(StorageProvider, String, String)
      */
     @Override
-    protected void store(StorageProvider storageProvider, String key, Object value) throws StorageException {
+    protected Object store(StorageProvider storageProvider, String key, Object value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
 //        storageProvider.setRoleAttribute(getRole(), key, value);
         // TODO: make SPI use Object as well?
@@ -56,6 +56,7 @@ public class RoleProperties extends AbstractProperties {
         } else {
             throw new StorageException("Illegal value type: " + value.getClass().getName());
         }
+        return value;
     }
 
     /**

@@ -149,4 +149,9 @@ public class AuthorizationImplTest {
         //
         EasyMock.verify(userAdmin, sp);
     }
+    
+    @Test
+    public void hasRoleOk() {
+        // TODO: implement test
+    }
 }

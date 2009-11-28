@@ -25,25 +25,60 @@ public interface UserAdminConstants {
     /**
      * The PID used to identify configuration data.
      */
-    final static String  SERVICE_PID          = "org.ops4j.pax.useradmin";
+    final static String SERVICE_PID                          = "org.ops4j.pax.useradmin";
 
     /**
      * The property that must be set by StorageProvider implementations.
      */
-    final static String  STORAGEPROVIDER_TYPE = "org.ops4j.pax.useradmin.storageprovider.type";
-
-    /**
-     * Property to switch security on/off.
-     */
-    // final static String  PROP_SECURITY        = "org.ops4j.pax.useradmin.security";
-
-    /**
-     * The default security setting.
-     */
-    // final static boolean DEFAULT_SECURITY     = false;
+    final static String STORAGEPROVIDER_TYPE                 = "org.ops4j.pax.useradmin.storageprovider.type";
 
     /**
      * The prefix used for events sent by the UserAdmin service.
      */
-    final static String  EVENT_TOPIC_PREFIX   = "org/osgi/service/useradmin/UserAdmin/";
+    final static String EVENT_TOPIC_PREFIX                   = "org/osgi/service/useradmin/UserAdmin/";
+
+    // property names
+
+    /**
+     * Property that controls which encryption algorithm is used. Defaults to ENCRYPTION_ALGORITHM_NONE.
+     */
+    final static String PROP_ENCRYPTION_ALGORITHM            = "org.ops4j.pax.useradmin.encryption.algorithm";
+
+    /**
+     * Property that controls which random number algorithm is used for encryption. Defaults to DEFAULT_ENCRYPTION_RANDOM_ALGORITHM.
+     */
+    final static String PROP_ENCRYPTION_RANDOM_ALGORITHM     = "org.ops4j.pax.useradmin.encryption.random.algorithm";
+    
+    
+    /**
+     * Property that controls which salt-length is used by the random number algorithm. Defaults to DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH.
+     */
+    final static String PROP_ENCRYPTION_RANDOM_SALTLENGTH    = "org.ops4j.pax.useradmin.encryption.random.saltlength";
+
+    // property defaults
+
+    /**
+     * The default algorithm to use for random number generation.
+     */
+    final static String DEFAULT_ENCRYPTION_RANDOM_ALGORITHM  = "SHA1PRNG";
+
+    /**
+     * The default salt length to use by the random number algorithm.
+     */
+    final static String DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH = "32";
+
+    // special values
+    
+    final static String ENCRYPTION_ALGORITHM_NONE            = "none";
+
+    /**
+     * Property to switch security on/off.
+     */
+    // final static String PROP_SECURITY = "org.ops4j.pax.useradmin.security";
+
+    /**
+     * The default security setting.
+     */
+    // final static boolean DEFAULT_SECURITY = false;
+
 }

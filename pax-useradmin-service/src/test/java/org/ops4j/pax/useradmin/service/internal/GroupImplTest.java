@@ -77,8 +77,8 @@ public class GroupImplTest {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.removeMember(group, role2)).andThrow(exception);
             userAdmin.logMessage(EasyMock.eq(group),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -117,8 +117,8 @@ public class GroupImplTest {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.addMember(group, role)).andThrow(exception);
             userAdmin.logMessage(EasyMock.eq(group),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -192,8 +192,8 @@ public class GroupImplTest {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.getMembers(userAdmin, group)).andThrow(exception);
             userAdmin.logMessage(EasyMock.eq(group),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -233,8 +233,8 @@ public class GroupImplTest {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.addRequiredMember(group, role)).andThrow(exception);
             userAdmin.logMessage(EasyMock.eq(group),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -308,8 +308,8 @@ public class GroupImplTest {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             EasyMock.expect(sp.getRequiredMembers(userAdmin, group)).andThrow(exception);
             userAdmin.logMessage(EasyMock.eq(group),
-                                 EasyMock.isA(String.class),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }

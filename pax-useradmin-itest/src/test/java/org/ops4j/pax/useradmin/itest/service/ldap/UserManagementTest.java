@@ -93,7 +93,7 @@ public class UserManagementTest extends UserManagement {
         super.setAndGetStringAttributesOk();
     }
 
-// TODO: Disabled because the LDAP provider does not byte[] attributes correctly
+// TODO: Disabled because the LDAP provider does not handle byte[] attributes correctly
 //    @Test
 //    public void setAndGetByteAttributesOk() {
 //         super.setAndGetByteAttributesOk();

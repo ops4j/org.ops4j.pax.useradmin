@@ -25,6 +25,7 @@ Import-Package: javax.servlet.http.*;resolution:=optional,\
                 org.apache.soap.transport.*;resolution:=optional,\
                 org.apache.soap.util.*;resolution:=optional,\
                 org.apache.soap.util.net.*;resolution:=optional,\
+                org.ops4j.pax.useradmin.service.*,\
                 org.ops4j.pax.useradmin.service.spi.*,\
                 org.osgi.framework.*,\
                 org.osgi.service.cm.*,\

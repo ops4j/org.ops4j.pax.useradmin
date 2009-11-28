@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
+import org.ops4j.pax.useradmin.service.UserAdminTools;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -92,7 +93,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     /**
      * Constructor.
      * 
-     * @param connection Unit tests can provide a mock via this parameter.
+     * @param connection The LDAP connection to be used by this provider.
      */
     protected StorageProviderImpl(LDAPConnection connection) {
         if (null == connection) {
@@ -104,52 +105,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     // ManagedService interface implementation
     
     /**
-     * Retrieves a property and throws an exception if not found.
-     * 
-     * @param properties The properties used for lookup.
-     * @param name The name of the property to retrieve.
-     * @return The value of the property.
-     * @throws ConfigurationException If the property is not found in the given properties.
-     * @throws IllegalArgumentException If the properties argument is null.
-     */
-    private static String getMandatoryProperty(Dictionary<String, String> properties,
-                                               String name) throws ConfigurationException {
-        if (null == properties) {
-            throw new IllegalArgumentException("getMandatoryProperty() argument 'properties' must not be null");
-        }
-        String value = properties.get(name);
-        if (null == value) {
-            throw new ConfigurationException(name,
-                                               "no value found for property '"
-                                             + name
-                                             + "' - please check the configuration");
-        }
-        return value;
-    }
-
-    /**
-     * Retrieves a property and returns a default value if not found.
-     * 
-     * @param properties The properties used for lookup.
-     * @param name The name of the property to retrieve.
-     * @param defaultValue The default value to return if the property is not found.
-     * @return The value of the property or the given default value.
-     * @throws IllegalArgumentException If the properties argument is null.
-     */
-    private static String getOptionalProperty(Dictionary<String, String> properties,
-                                              String name,
-                                              String defaultValue) {
-        if (null == properties) {
-            throw new IllegalArgumentException("getMandatoryProperty() argument 'properties' must not be null");
-        }
-        String value = properties.get(name);
-        if (null == value) {
-            value = defaultValue;
-        }
-        return value;
-    }
-
-    /**
      * @see ManagedService#updated(Dictionary)
      */
     @SuppressWarnings(value = "unchecked")
@@ -159,58 +114,58 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
             return;
         }
         //
-        m_accessUser = getOptionalProperty(properties,
-                                           ConfigurationConstants.PROP_LDAP_ACCESS_USER, "");
-        m_accessPassword = getOptionalProperty(properties,
-                                               ConfigurationConstants.PROP_LDAP_ACCESS_PWD, "");
+        m_accessUser = UserAdminTools.getOptionalProperty(properties,
+                                                          ConfigurationConstants.PROP_LDAP_ACCESS_USER, "");
+        m_accessPassword = UserAdminTools.getOptionalProperty(properties,
+                                                              ConfigurationConstants.PROP_LDAP_ACCESS_PWD, "");
         //
-        m_host = getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_URL,
-                                     ConfigurationConstants.DEFAULT_LDAP_SERVER_URL);
-        m_port = getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_PORT,
-                                     ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
+        m_host = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_URL,
+                                                    ConfigurationConstants.DEFAULT_LDAP_SERVER_URL);
+        m_port = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_PORT,
+                                                    ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
         //
-        m_rootDN = getMandatoryProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_DN);
-        m_rootUsersDN = getOptionalProperty(properties,
-                                            ConfigurationConstants.PROP_LDAP_ROOT_USERS,
-                                            ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS)
+        m_rootDN = UserAdminTools.getMandatoryProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_DN);
+        m_rootUsersDN = UserAdminTools.getOptionalProperty(properties,
+                                                           ConfigurationConstants.PROP_LDAP_ROOT_USERS,
+                                                           ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS)
                         + "," + m_rootDN;
-        m_rootGroupsDN = getOptionalProperty(properties,
-                                             ConfigurationConstants.PROP_LDAP_ROOT_GROUPS,
-                                             ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS)
+        m_rootGroupsDN = UserAdminTools.getOptionalProperty(properties,
+                                                            ConfigurationConstants.PROP_LDAP_ROOT_GROUPS,
+                                                            ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS)
                          + "," + m_rootDN;
 
-        m_userObjectclass = getOptionalProperty(properties,
-                                                ConfigurationConstants.PROP_USER_OBJECTCLASS,
-                                                ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
-        m_userIdAttr = getOptionalProperty(properties,
-                                           ConfigurationConstants.PROP_USER_ATTR_ID,
-                                           ConfigurationConstants.DEFAULT_USER_ATTR_ID);
-        m_userMandatoryAttr = getOptionalProperty(properties,
-                                                  ConfigurationConstants.PROP_USER_ATTR_MANDATORY,
-                                                  ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY);
+        m_userObjectclass = UserAdminTools.getOptionalProperty(properties,
+                                                               ConfigurationConstants.PROP_USER_OBJECTCLASS,
+                                                               ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
+        m_userIdAttr = UserAdminTools.getOptionalProperty(properties,
+                                                          ConfigurationConstants.PROP_USER_ATTR_ID,
+                                                          ConfigurationConstants.DEFAULT_USER_ATTR_ID);
+        m_userMandatoryAttr = UserAdminTools.getOptionalProperty(properties,
+                                                                 ConfigurationConstants.PROP_USER_ATTR_MANDATORY,
+                                                                 ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY);
 
-        m_groupObjectclass = getOptionalProperty(properties,
-                                                 ConfigurationConstants.PROP_GROUP_OBJECTCLASS,
-                                                 ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
-        m_groupIdAttr = getOptionalProperty(properties,
-                                            ConfigurationConstants.PROP_GROUP_ATTR_ID,
-                                            ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
-        m_groupMandatoryAttr = getOptionalProperty(properties,
-                                                   ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY,
-                                                   ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
-        m_groupCredentialAttr = getOptionalProperty(properties,
-                                                   ConfigurationConstants.PROP_GROUP_ATTR_CREDENTIAL,
-                                                   ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL);
+        m_groupObjectclass = UserAdminTools.getOptionalProperty(properties,
+                                                                ConfigurationConstants.PROP_GROUP_OBJECTCLASS,
+                                                                ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
+        m_groupIdAttr = UserAdminTools.getOptionalProperty(properties,
+                                                           ConfigurationConstants.PROP_GROUP_ATTR_ID,
+                                                           ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
+        m_groupMandatoryAttr = UserAdminTools.getOptionalProperty(properties,
+                                                                  ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY,
+                                                                  ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
+        m_groupCredentialAttr = UserAdminTools.getOptionalProperty(properties,
+                                                                   ConfigurationConstants.PROP_GROUP_ATTR_CREDENTIAL,
+                                                                   ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL);
 
-        m_groupEntryObjectclass = getOptionalProperty(properties,
-                                                      ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS,
-                                                      ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS);
-        m_groupEntryIdAttr = getOptionalProperty(properties,
-                                                 ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID,
-                                                 ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
-        m_groupEntryMemberAttr = getOptionalProperty(properties,
-                                                     ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER,
-                                                     ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
+        m_groupEntryObjectclass = UserAdminTools.getOptionalProperty(properties,
+                                                                     ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS,
+                                                                     ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS);
+        m_groupEntryIdAttr = UserAdminTools.getOptionalProperty(properties,
+                                                                ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID,
+                                                                ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
+        m_groupEntryMemberAttr = UserAdminTools.getOptionalProperty(properties,
+                                                                    ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER,
+                                                                    ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
     }
 
     // StorageProvider interface implementation

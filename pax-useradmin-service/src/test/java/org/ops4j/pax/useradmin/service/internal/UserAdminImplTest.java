@@ -218,13 +218,13 @@ public class UserAdminImplTest {
         }
         EasyMock.replay(context, spTracker, logTracker, eventTracker, role, logService);
         //
-        userAdmin.logMessage(null, null,             0);
-        userAdmin.logMessage(this, null,             0);
-        userAdmin.logMessage(this, "test - NOTHING", 0);
-        userAdmin.logMessage(this, "test - DEBUG",   LogService.LOG_DEBUG);
-        userAdmin.logMessage(this, "test - ERROR",   LogService.LOG_ERROR);
-        userAdmin.logMessage(this, "test - INFO",    LogService.LOG_INFO);
-        userAdmin.logMessage(this, "test - WARNING", LogService.LOG_WARNING);
+        userAdmin.logMessage(null, 0,             null);
+        userAdmin.logMessage(this, 0,             null);
+        userAdmin.logMessage(this, 0, "test - NOTHING");
+        userAdmin.logMessage(this, LogService.LOG_DEBUG,   "test - DEBUG");
+        userAdmin.logMessage(this, LogService.LOG_ERROR,   "test - ERROR");
+        userAdmin.logMessage(this, LogService.LOG_INFO,    "test - INFO");
+        userAdmin.logMessage(this, LogService.LOG_WARNING, "test - WARNING");
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker, role, logService);
     }
@@ -246,7 +246,7 @@ public class UserAdminImplTest {
         }
         EasyMock.replay(context, spTracker, logTracker, eventTracker);
         //
-        userAdmin.logMessage(this, "test - DEBUG", LogService.LOG_DEBUG);
+        userAdmin.logMessage(this, LogService.LOG_DEBUG, "test - DEBUG");
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }

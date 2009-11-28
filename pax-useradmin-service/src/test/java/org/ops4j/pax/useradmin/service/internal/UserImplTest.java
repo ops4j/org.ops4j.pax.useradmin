@@ -17,6 +17,7 @@
 package org.ops4j.pax.useradmin.service.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class UserImplTest {
     
     private Map<String, Object> getCredentials() {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(KEY1, VALUE1);
+        properties.put(KEY1, VALUE1.getBytes());
         properties.put(KEY2, VALUE2);
         return properties;
     }
@@ -98,7 +99,7 @@ public class UserImplTest {
         Dictionary credentials = user.getCredentials(); 
         Assert.assertNotNull(credentials);
         Assert.assertEquals("Mismatching property count", 2, credentials.size());
-        Assert.assertEquals("Mismatching property", VALUE1, credentials.get(KEY1));
+        Assert.assertTrue("Mismatching property", Arrays.equals(VALUE1.getBytes(), (byte[])credentials.get(KEY1)));
     }
 
     @Test
@@ -110,8 +111,8 @@ public class UserImplTest {
 
         EasyMock.replay(userAdmin);
         //
-        Assert.assertEquals("Mismatching value", VALUE1, user.getCredentials().get(KEY1));
-        Assert.assertEquals("Mismatching value", VALUE2, user.getCredentials().get(KEY2));
+        Assert.assertTrue("Mismatching value", Arrays.equals(VALUE1.getBytes(), (byte[])user.getCredentials().get(KEY1)));
+        Assert.assertTrue("Mismatching value", Arrays.equals(VALUE2, (byte[])user.getCredentials().get(KEY2)));
         //
         EasyMock.verify(userAdmin);
     }
@@ -127,19 +128,24 @@ public class UserImplTest {
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_CREDENTIAL);
-            sp.setUserCredential(user, KEY1, VALUE1);
+            EasyMock.expect(userAdmin.encrypt(VALUE1)).andReturn(VALUE1.getBytes());
+            // System.out.println("enc 2 - " + VALUE1 + " -- " + VALUE1.getBytes());
+            // doesn't work: sp.setUserCredential(user, KEY1, VALUE1.getBytes());
+            sp.setUserCredential(EasyMock.eq(user), EasyMock.eq(KEY1), EasyMock.isA(byte[].class));
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_CREDENTIAL);
-            sp.setUserCredential(user, KEY2, VALUE2);
+            EasyMock.expect(userAdmin.encrypt(VALUE2)).andReturn(VALUE2);
+            // doesn't work:  sp.setUserCredential(user, KEY2, VALUE2);
+            sp.setUserCredential(EasyMock.eq(user), EasyMock.eq(KEY2), EasyMock.isA(byte[].class));
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -161,12 +167,16 @@ public class UserImplTest {
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY1, UserAdminPermission.CHANGE_CREDENTIAL);
-            sp.setUserCredential(user, KEY1, VALUE1);
+            EasyMock.expect(userAdmin.encrypt(VALUE1)).andReturn(VALUE1.getBytes());
+            // sp.setUserCredential(user, KEY1, VALUE1);
+            sp.setUserCredential(EasyMock.eq(user), EasyMock.eq(KEY1), EasyMock.isA(byte[].class));
             userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, user);
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_CREDENTIAL);
-            sp.setUserCredential(user, KEY2, VALUE2);
+            EasyMock.expect(userAdmin.encrypt(VALUE2)).andReturn(VALUE2);
+            // sp.setUserCredential(user, KEY2, VALUE2);
+            sp.setUserCredential(EasyMock.eq(user), EasyMock.eq(KEY2), EasyMock.isA(byte[].class));
             userAdmin.fireEvent(UserAdminEvent.ROLE_CHANGED, user);
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
@@ -192,16 +202,16 @@ public class UserImplTest {
             sp.removeUserCredential(user, KEY1);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_CREDENTIAL);
             sp.removeUserCredential(user, KEY2);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -245,7 +255,7 @@ public class UserImplTest {
     // Note: a test for the clear() method is not needed since the Dictionary
     // class does not provide a clear method
     
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void hasCredentialNullKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, getCredentials());
@@ -260,7 +270,7 @@ public class UserImplTest {
         EasyMock.verify(userAdmin, sp);
     }
 
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void hasCredentialNullValue() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, getCredentials());
@@ -275,7 +285,7 @@ public class UserImplTest {
         EasyMock.verify(userAdmin, sp);
     }
 
-    @Test
+    @Test (expected = IllegalArgumentException.class)
     public void hasCredentialWrongValueType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, getCredentials());
@@ -298,12 +308,18 @@ public class UserImplTest {
         //
         userAdmin.checkAdminPermission();
         userAdmin.checkPermission(KEY1, UserAdminPermission.GET_CREDENTIAL);
+        EasyMock.expect(userAdmin.compareToEncryptedValue(EasyMock.isA(byte[].class),
+                                                          EasyMock.isA(byte[].class)))
+                .andReturn(true);
         userAdmin.checkAdminPermission();
         userAdmin.checkPermission(KEY2, UserAdminPermission.GET_CREDENTIAL);
+        EasyMock.expect(userAdmin.compareToEncryptedValue(EasyMock.isA(byte[].class),
+                                                          EasyMock.isA(byte[].class)))
+                .andReturn(true);
         //
         EasyMock.replay(userAdmin, sp);
         //
-        Assert.assertTrue(user.hasCredential(KEY1, VALUE1));
+        Assert.assertTrue(user.hasCredential(KEY1, VALUE1.getBytes()));
         Assert.assertTrue(user.hasCredential(KEY2, VALUE2));
         //
         EasyMock.verify(userAdmin, sp);

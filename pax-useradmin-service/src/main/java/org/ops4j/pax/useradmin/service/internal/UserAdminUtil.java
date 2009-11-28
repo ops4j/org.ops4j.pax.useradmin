@@ -55,10 +55,10 @@ public interface UserAdminUtil {
      * available the call is silently ignored.
      * 
      * @param source The object which sends the message.
-     * @param message The message text.
      * @param level The log level.
+     * @param message The message text.
      */
-    void logMessage(Object source, String message, int level);
+    void logMessage(Object source, int level, String message);
 
     /**
      * Publish an event of the given type related to the role specified.
@@ -67,4 +67,23 @@ public interface UserAdminUtil {
      * @param role The role which is related to the event.
      */
     void fireEvent(int type, Role role);
+    
+    /**
+     * Encrypts the given value.
+     * 
+     * @param value The value to encrypt. May be either a <code>String</code> or
+     *            a <code>byte[]</code> - otherwise an
+     *            <code>IllegalArgumentException</code> is thrown.
+     * @return A <code>byte[]</code> containing the encrypted value.
+     */
+    byte[] encrypt(Object value);
+    
+    /**
+     * Checks if the given (plain) input value equals the (encrypted) stored value.
+     * 
+     * @param inputValue The plain input value.
+     * @param storedValue The encrypted stored value.
+     * @return True if the encrypted input value equals the stored value.
+     */
+    boolean compareToEncryptedValue(Object inputValue, byte[] storedValue);
 }

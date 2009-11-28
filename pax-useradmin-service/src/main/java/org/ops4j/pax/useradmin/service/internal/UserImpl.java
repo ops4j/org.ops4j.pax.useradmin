@@ -63,14 +63,28 @@ public class UserImpl extends RoleImpl implements User {
      * @see User#hasCredential(String, Object)
      */
     public boolean hasCredential(String key, Object value) {
+        if (null == key) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
+        }
+        if (!(key instanceof String)) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
+        }
+        if ("".equals(key)) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
+        }
+        if (null == value) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
+        }
+        if (!(value instanceof String || value instanceof byte[])) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE_TYPE);
+        }
+        //
         getAdmin().checkAdminPermission();
-        if (null != key && null != value && (value instanceof String || value instanceof byte[])) {
-            for (Object credential : m_credentials.keySet()) {
-                if (((String) credential).equals(key)) {
-                    // check this credential
-                    Object credentialValue = m_credentials.get(key);
-                    return null != credentialValue && credentialValue.equals(value);
-                }
+        for (Object credentialKey : m_credentials.keySet()) {
+            if (((String) credentialKey).equals(key)) {
+                // check this credential
+                byte[] credentialValue = (byte[]) m_credentials.get(key);
+                return null != credentialValue && getAdmin().compareToEncryptedValue(value, credentialValue);
             }
         }
         return false;

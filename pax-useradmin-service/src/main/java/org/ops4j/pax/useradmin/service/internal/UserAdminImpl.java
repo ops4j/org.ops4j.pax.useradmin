@@ -15,12 +15,15 @@
  */
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.UserAdminTools;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -79,6 +82,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      */
     private ServiceTracker      m_eventListeners   = null;
 
+    private EncryptorImpl           m_encryptor       = null;
+
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
      * 
@@ -110,6 +115,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         //
         m_eventListeners = new ServiceTracker(context, UserAdminListener.class.getName(), null);
         m_eventListeners.open();
+        //
+        m_encryptor = null;
     }
 
     /**
@@ -156,16 +163,43 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     // ManagedService interface
     
     /**
+     * Copies all properties to an internal Map.
+     * 
      * @see ManagedService#updated(Dictionary)
      */
     @SuppressWarnings(value = "unchecked")
     public void updated(Dictionary properties) throws ConfigurationException {
-        // defaults
-        //
-        if (null !=properties) {
+        if (null == properties) {
+            // ignore empty properties
+            return;
+        }
+        String encryptionAlgorithm = UserAdminTools.getOptionalProperty(properties,
+                                                                        UserAdminConstants.PROP_ENCRYPTION_ALGORITHM,
+                                                                        UserAdminConstants.ENCRYPTION_ALGORITHM_NONE);
+        if (UserAdminConstants.ENCRYPTION_ALGORITHM_NONE.equals(encryptionAlgorithm)) {
+            // set no encryption
+            m_encryptor = null;
+        }
+        else {
+            // create encryptor ...
+            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties,
+                                                                                  UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
+                                                                                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
+            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties,
+                                                                                            UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH,
+                                                                                            UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+            try {
+                m_encryptor = new EncryptorImpl(encryptionAlgorithm,
+                                                encryptionRandomAlgorithm,
+                                                encryptionRandomAlgorithmSaltLength);
+            } catch (NoSuchAlgorithmException e) {
+                throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM
+                                                   + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
+                                                 "Encryption algorithm not supported: " + e.getMessage(), e);
+            }
         }
     }
-
+    
     // UserAdmin interface
 
     /**
@@ -180,7 +214,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_ROLE_TYPE);
         }
         if (null != getRole(name)) {
-            logMessage(this, "role already exists: " + name, LogService.LOG_WARNING);
+            logMessage(this, LogService.LOG_WARNING, "role already exists: " + name);
             return null;
         }
         checkAdminPermission();
@@ -203,7 +237,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             }
             fireEvent(UserAdminEvent.ROLE_CREATED, role);
         } catch (StorageException e) {
-            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return role;
     }
@@ -234,7 +268,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             StorageProvider storage = getStorageProvider();
             return storage.getRole(this, name);
         } catch (StorageException e) {
-            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }
@@ -250,7 +284,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                 return roles.toArray(new Role[0]);
             }
         } catch (StorageException e) {
-            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }
@@ -270,7 +304,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             User user = storage.getUser(this, key, value);
             return user;
         } catch (StorageException e) {
-            logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }
@@ -292,16 +326,16 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                         fireEvent(UserAdminEvent.ROLE_REMOVED, role);
                         return true;
                     } else {
-                        logMessage(this, "Role '" + name + "' could not be deleted", LogService.LOG_ERROR);
+                        logMessage(this, LogService.LOG_ERROR, "Role '" + name + "' could not be deleted");
                     }
                 } catch (StorageException e) {
-                    logMessage(this, e.getMessage(), LogService.LOG_ERROR);
+                    logMessage(this, LogService.LOG_ERROR, e.getMessage());
                 }
             } else {
-                logMessage(this, "Role '" + name + "' does not exist.", LogService.LOG_ERROR);
+                logMessage(this, LogService.LOG_ERROR, "Role '" + name + "' does not exist.");
             }
         } else {
-            logMessage(this, "Standard user '" + Role.USER_ANYONE + "' cannot be removed.", LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR, "Standard user '" + Role.USER_ANYONE + "' cannot be removed.");
         }
         return false;
     }
@@ -320,11 +354,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     /**
-     * @see UserAdminUtil#logMessage(Object, String, int)
+     * @see UserAdminUtil#logMessage(Object, int, String)
      * 
      * TODO: do we need a check for valid levels? What to do then: exception or ignore?
      */
-    public void logMessage(Object source, String message, int level) {
+    public void logMessage(Object source, int level, String message) {
         LogService log = (LogService) m_logService.getService();
         if (null != log) {
             log.log(level, "[" + (source != null ? source.getClass().getName() : "none") + "] " + message);
@@ -376,8 +410,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         } else {
             String message =   "No event service available - cannot send event of type '"
                              + getEventTypeName(type) + "' for role '" + role.getName() + "'";
-            logMessage(this, message,
-                       LogService.LOG_ERROR);
+            logMessage(this, LogService.LOG_ERROR,
+                       message);
         }
     }
 
@@ -389,6 +423,45 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null != sm) {
             sm.checkPermission(new UserAdminPermission(name, action));
         }
+    }
+    
+    /**
+     * @see UserAdminUtil#encrypt(Object)
+     */
+    public byte[] encrypt(Object value) {
+        byte[] valueBytes = null;
+        if (value instanceof String) {
+            valueBytes = ((String)value).getBytes();
+        } else if (value instanceof byte[]) {
+            valueBytes = (byte[]) value;
+        } else {
+            throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
+        }
+        //
+        if (null != m_encryptor) {
+            valueBytes = m_encryptor.encrypt(valueBytes);
+        }
+        return valueBytes;
+    }
+    
+    /**
+     * @see UserAdminUtil#verifyEncryptedValue(Object, byte[])
+     */
+    public boolean compareToEncryptedValue(Object inputValue,
+                                        byte[] storedValue) {
+        byte[] valueBytes = null;
+        if (inputValue instanceof String) {
+            valueBytes = ((String)inputValue).getBytes();
+        } else if (inputValue instanceof byte[]) {
+            valueBytes = (byte[]) inputValue;
+        } else {
+            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
+        }
+        //
+        if (null != m_encryptor) {
+            return m_encryptor.compare(valueBytes, storedValue);
+        }
+        return Arrays.equals(valueBytes, storedValue);
     }
     
     // UserAdminFactory interface

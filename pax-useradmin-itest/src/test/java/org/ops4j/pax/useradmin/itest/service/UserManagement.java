@@ -16,6 +16,7 @@
 package org.ops4j.pax.useradmin.itest.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
@@ -200,20 +201,23 @@ public abstract class UserManagement extends ServiceTestBase {
     private void getCredentials(User user) {
         String stringValue;
         byte[] byteValue;
-        stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
-        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
-        Assert.assertEquals(VALUE_DESCRIPTION, stringValue);
+        byteValue = (byte[]) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertNotNull("Retrieving string value for key returned null", byteValue);
+        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_DESCRIPTION.getBytes(), byteValue));
         byteValue = (byte[]) user.getCredentials().get(KEY_PASSWD);
         Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
-        Assert.assertArrayEquals(VALUE_PASSWD.getBytes(), byteValue);
+        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_PASSWD.getBytes(), byteValue));
         //
         Assert.assertNotNull(user.getCredentials().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
-        Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
+        byteValue = (byte[])user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_CHANGED_DESCRIPTION.getBytes(), byteValue));
     }
     private void removeCredentials(User user) {
-        String stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
-        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
-        Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
+        byte[] byteValue = (byte[]) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertNotNull("Retrieving string value for key returned null", byteValue);
+        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_CHANGED_DESCRIPTION.getBytes(), byteValue));
+        // Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
+        
         Assert.assertNotNull("Value 1 not set", user.getCredentials().get(KEY_DESCRIPTION));
         Assert.assertNotNull("Could not remove credential", user.getCredentials().remove(KEY_DESCRIPTION));
         Assert.assertNull("Value 1 still set", user.getCredentials().get(KEY_DESCRIPTION));

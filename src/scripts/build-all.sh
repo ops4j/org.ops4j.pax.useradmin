@@ -43,14 +43,14 @@ DEPLOY_SITE_SCRIPT=`dirname $0`/deploy-site.sh
 ## TODO: if actual version is not a snapshot ... exit(code) / TODO: code = 0 or error needs to be defined 
 #
 echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} clean"
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} clean
+${MAVEN_BIN_DIR}mvn ${RAW_MAVEN_OPTS} clean
 if [ 0 != $? ]; then
   echo "error building project"
   exit -1
 fi
 #
-echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} install"
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} install
+echo "running: ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} -Dmaven.test.skip=true install"
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${RAW_MAVEN_OPTS} -Dmaven.test.skip=true install
 if [ 0 != $? ]; then
   echo "error building project"
   exit -1
@@ -77,11 +77,11 @@ if [ ! -z ${DO_DEPLOY} ]; then
     echo "error deploying artifacts"
     exit -1
   fi
-  #
-  echo "running: ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}"
-  ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}
-  if [ 0 != $? ]; then
-    echo "error deploying site"
-    exit -1
-  fi
+fi
+#
+echo "running: ${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}"
+${DEPLOY_SITE_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} ${SITE_DIR_OPT}
+if [ 0 != $? ]; then
+  echo "error deploying site"
+  exit -1
 fi

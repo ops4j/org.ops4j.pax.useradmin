@@ -35,7 +35,7 @@ public class UserCredentials extends AbstractProperties {
     /**
      * Initializing constructor.
      * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminTools, Map)
      */
     protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
         super(user, util, properties);
@@ -60,16 +60,13 @@ public class UserCredentials extends AbstractProperties {
      * @see AbstractProperties#store(StorageProvider, String, Object)
      */
     @Override
-    protected void store(StorageProvider storageProvider, String key, Object value)
+    protected Object store(StorageProvider storageProvider, String key, Object plainValue)
         throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-        if (value instanceof String) {
-            storageProvider.setUserCredential(getUser(), key, (String) value);
-        } else if (value instanceof byte[]) {
-            storageProvider.setUserCredential(getUser(), key, (byte[]) value);
-        } else {
-            throw new StorageException("Illegal value type: " + value.getClass().getName());
-        }
+        byte[] encryptedValue = getUtil().encrypt(plainValue);
+//        System.out.println("enc = " + plainValue + "  - " + encryptedValue);
+        storageProvider.setUserCredential(getUser(), key, encryptedValue);
+        return encryptedValue;
     }
 
     /**

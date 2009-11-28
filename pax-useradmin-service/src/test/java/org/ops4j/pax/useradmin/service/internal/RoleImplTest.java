@@ -281,16 +281,16 @@ public class RoleImplTest {
             sp.setRoleAttribute(role, KEY1, VALUE1);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
             sp.setRoleAttribute(role, KEY2, VALUE2);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -397,16 +397,16 @@ public class RoleImplTest {
             sp.removeRoleAttribute(role, KEY1);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
             //
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
             userAdmin.checkPermission(KEY2, UserAdminPermission.CHANGE_PROPERTY);
             sp.removeRoleAttribute(role, KEY2);
             EasyMock.expectLastCall().andThrow(exception);
             userAdmin.logMessage(EasyMock.isA(AbstractProperties.class),
-                                 EasyMock.matches(exception.getMessage()),
-                                 EasyMock.eq(LogService.LOG_ERROR));
+                                 EasyMock.eq(LogService.LOG_ERROR),
+                                 EasyMock.matches(exception.getMessage()));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }

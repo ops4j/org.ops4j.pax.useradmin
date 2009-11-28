@@ -4,14 +4,16 @@ Quickstart
 
   <<Build from source>>
   
-  Prior to running the examples the latest sources must be checked out and built. This done by issuing
+  Prior to running the examples the latest sources must be checked out and built. This is done by issuing
   the following commands:
   
 ---
   svn co https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin
   cd useradmin
-  ./src/scripts/build-all.sh -s file://`pwd`/target/deploy [ -Pno-itest ]
+  ./src/scripts/build-all.sh -s file://`pwd`/target/website [ -Pno-itest ]
 ---
+
+  The -s option specifies where the generated site is stored.
   
   The <no-itest> profile may be used to shorten compile time.
   
@@ -37,13 +39,13 @@ Quickstart
 *-------------------+-----------------------------+--------+
  Service            | Tested Implementation(s)    | Purpose
 *-------------------+-----------------------------+--------+
- - OSGi LogService  | {{{http://wiki.ops4j.org/display/paxlogging/Pax+Logging}Pax Logging}} | Service used to log messages for later analysis. 
+ - {{{http://www.osgi.org/javadoc/r4v42/org/osgi/service/log/package-summary.html}OSGi LogService}}  | {{{http://wiki.ops4j.org/display/paxlogging/Pax+Logging}Pax Logging}} | Log messages for later analysis. 
 *-------------------+-----------------------------+--------+
- - OSGi EventAdmin  | {{{http://felix.apache.org/site/apache-felix-event-admin.html}Felix Event Admin}} | Delivers events.
+ - {{{http://www.osgi.org/javadoc/r4v42/org/osgi/service/event/package-summary.html}OSGi EventAdmin}}  | {{{http://felix.apache.org/site/apache-felix-event-admin.html}Felix Event Admin}} | Deliver events.
 *-------------------+-----------------------------+--------+
- - OSGi ConfigAdmin | {{{http://felix.apache.org/site/apache-felix-configuration-admin-service.html}Felix Configuration Admin}} | Delivers configuration data to services.
+ - {{{http://www.osgi.org/javadoc/r4v42/org/osgi/service/cm/package-summary.html}OSGi ConfigAdmin}} | {{{http://felix.apache.org/site/apache-felix-configuration-admin-service.html}Felix Configuration Admin}} | Deliver configuration data to services.
 *-------------------+-----------------------------+--------+
- - OSGi Preferences | {{{http://felix.apache.org/site/apache-felix-preferences-service.html}Felix Preferences Service}} | Manages persistent storage of preferences.
+ - {{{http://www.osgi.org/javadoc/r4v42/org/osgi/service/prefs/package-summary.html}OSGi Preferences}} | {{{http://felix.apache.org/site/apache-felix-preferences-service.html}Felix Preferences Service}} | Manage persistent storage of preferences.
 *-------------------+-----------------------------+--------+
 
 

@@ -109,14 +109,22 @@ public class EncryptorImpl {
     }
 
     /**
-     * Checks if the plain input value equals the given encrypted value.
+     * Checks if the plain input value equals the given encrypted value. Uses
+     * the salt stored in the encrypted value to encrypt the input value and
+     * compares the result to the data part of the encrypted value.
      * 
      * @param inputValue The plain-text input value.
-     * @param encryptedValue The encrypted stored value.
+     * @param encryptedValue The encrypted value.
      * @return True if the encrypted input value equals the stored value.
      */
     public boolean compare(byte[] inputValue,
                            byte[] encryptedValue) {
+        if (null == inputValue) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
+        }
+        if (null == encryptedValue) {
+            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
+        }
         // copy salt from stored value
         byte[] salt = new byte[m_saltLength];
         System.arraycopy(encryptedValue, 0, salt, 0, m_saltLength);

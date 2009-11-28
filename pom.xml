@@ -253,10 +253,15 @@
      -->
     <pluginManagement>
       <plugins>
+        <!--  plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.5.0</version>
+        </plugin -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <!--  version>2.3</version -->
+          <version>2.3</version>
         </plugin>
         <!--
         | Felix bundle plugin / Bnd version and configuration
@@ -302,6 +307,19 @@
       </resource>
     </resources>
 
+    <plugins>
+     <!-- 
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <header>${basedir}/src/etc/header.txt</header>
+          <quiet>false</quiet>
+
+        </configuration>
+      </plugin>
+      -->
+    </plugins>
   </build>
 
 </project>
