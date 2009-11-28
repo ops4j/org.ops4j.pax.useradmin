@@ -21,7 +21,7 @@ package org.ops4j.pax.useradmin.provider.ldap;
  * @author Matthias Kuespert
  * @since 18.07.2009
  */
-public class ConfigurationConstants {
+public interface ConfigurationConstants {
 
     /**
      * The SERVICE_PID of the service used to identify configuration data.

@@ -35,6 +35,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
+import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
@@ -358,7 +359,9 @@ public class UserAdminImplTest {
         //
         EasyMock.replay(context, spTracker, logTracker, eventTracker);
         //
-        Assert.assertNotNull("No user created", userAdmin.createUser("some name", null, null));
+        User user = userAdmin.createUser("some name", null, null);
+        Assert.assertNotNull("No user created", user);
+        Assert.assertEquals("Type mismatch", user.getType(), Role.USER);
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }
@@ -375,7 +378,9 @@ public class UserAdminImplTest {
         //
         EasyMock.replay(context, spTracker, logTracker, eventTracker);
         //
-        Assert.assertNotNull("No user created", userAdmin.createGroup("some name", null, null));
+        Group group = userAdmin.createGroup("some name", null, null);
+        Assert.assertNotNull("No user created", group);
+        Assert.assertEquals("Type mismatch", group.getType(), Role.GROUP);
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }

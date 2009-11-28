@@ -48,8 +48,6 @@ public class UserImplTest {
 
     private static final String USER_NAME1 = "someUser";
     private static final String USER_NAME2 = "someOtherUser";
-//    private static final String GROUP_NAME1 = "someGroup";
-//    private static final String GROUP_NAME2 = "someOtherGroup";
     
     private static final String KEY1       = "testCredential1";
     private static final String VALUE1     = "someCredentialValue1";

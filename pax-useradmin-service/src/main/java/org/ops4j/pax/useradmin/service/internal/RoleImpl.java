@@ -95,9 +95,7 @@ public abstract class RoleImpl implements Role {
     /**
      * @see Role#getType()
      */
-    public int getType() {
-        return Role.ROLE;
-    }
+    public abstract int getType();
 
     /**
      * @return The <code>UserAdminImpl</code> object that created this role.

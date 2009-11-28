@@ -58,31 +58,34 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
-    private BundleContext       m_context          = null;
+    private BundleContext       m_context         = null;
 
-    private UserAdminPermission m_adminPermission  = null;
-    
+    private UserAdminPermission m_adminPermission = null;
+
     /**
      * The ServiceTracker which monitors the service used to store data.
      */
-    private ServiceTracker      m_storageService   = null;
+    private ServiceTracker      m_storageService  = null;
 
     /**
      * The ServiceTracker which monitors the service used for logging.
      */
-    private ServiceTracker      m_logService       = null;
+    private ServiceTracker      m_logService      = null;
 
     /**
      * The ServiceTracker which monitors the service used for firing events.
      */
-    private ServiceTracker      m_eventService     = null;
+    private ServiceTracker      m_eventService    = null;
 
     /**
      * The ServiceTracker which tracks the registered UserAdminListeners.
      */
-    private ServiceTracker      m_eventListeners   = null;
+    private ServiceTracker      m_eventListeners  = null;
 
-    private EncryptorImpl           m_encryptor       = null;
+    /**
+     * The encryptor that is used for encrypting sensible data (e.g. user credentials).
+     */
+    private EncryptorImpl       m_encryptor       = null;
 
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
@@ -159,6 +162,32 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             sm.checkPermission(m_adminPermission);
         }
     }
+    
+    /**
+     * Creates an appropriate encryptor.
+     * 
+     * @param encryptionAlgorithm The encryption algorithm to use.
+     * @param encryptionRandomAlgorithm The random number algorithm to use.
+     * @param encryptionRandomAlgorithmSaltLength The klength of the salt to use for random number generation.
+     * @return An implementation of the encryptor.
+     * 
+     * @throws ConfigurationException
+     */
+    private EncryptorImpl createEncryptor(String encryptionAlgorithm,
+                                          String encryptionRandomAlgorithm,
+                                          String encryptionRandomAlgorithmSaltLength) throws ConfigurationException {
+        EncryptorImpl encryptor = null;
+        try {
+            encryptor = new EncryptorImpl(encryptionAlgorithm,
+                                            encryptionRandomAlgorithm,
+                                            encryptionRandomAlgorithmSaltLength);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM
+                                               + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
+                                             "Encryption algorithm not supported: " + e.getMessage(), e);
+        }
+        return encryptor;
+    }
 
     // ManagedService interface
     
@@ -188,15 +217,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties,
                                                                                             UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH,
                                                                                             UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-            try {
-                m_encryptor = new EncryptorImpl(encryptionAlgorithm,
-                                                encryptionRandomAlgorithm,
-                                                encryptionRandomAlgorithmSaltLength);
-            } catch (NoSuchAlgorithmException e) {
-                throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM
-                                                   + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
-                                                 "Encryption algorithm not supported: " + e.getMessage(), e);
-            }
+            m_encryptor = createEncryptor(encryptionAlgorithm,
+                                          encryptionRandomAlgorithm,
+                                          encryptionRandomAlgorithmSaltLength);
         }
     }
     

@@ -16,7 +16,10 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.junit.Test;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 
 /**
  * @author Matthias Kuespert
@@ -24,6 +27,41 @@ import org.junit.Test;
  */
 public class EncryptorImplTest {
 
+    @Test (expected = NoSuchAlgorithmException.class)
+    public void createEncryptorNoSuchEncryptorAlgorithm() {
+        try {
+            new EncryptorImpl(UserAdminConstants.ENCRYPTION_ALGORITHM_NONE,
+                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+        } catch (NoSuchAlgorithmException e) {
+        }
+    }
+    
+    @Test (expected = NoSuchAlgorithmException.class)
+    public void createEncryptorNoSuchRandomAlgorithm() {
+        try {
+            new EncryptorImpl("MD5",
+                              "noSuchAlgorithm",
+                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+        } catch (NoSuchAlgorithmException e) {
+        }
+    }
+    
+    @Test
+    public void createEncryptorMD5Ok() {
+        try {
+            new EncryptorImpl("MD5",
+                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Must not happen here.");
+        }
+    }
+    
+    @Test
+    public void createEncryptorNoSuchEncrytionAlgorithm() {
+    }
+        
     @Test
     public void encryptParameterNullTest() {
         // TODO: implement test

@@ -28,6 +28,12 @@ import org.osgi.service.cm.ConfigurationException;
 public final class UserAdminTools {
 
     /**
+     * Protected constructor - this class must not be instanciated outside of tests!
+     */
+    protected UserAdminTools() {
+    }
+
+    /**
      * Retrieves a property and throws an exception if not found.
      * 
      * @param properties The properties used for lookup.
@@ -37,8 +43,7 @@ public final class UserAdminTools {
      *             properties.
      * @throws IllegalArgumentException If the properties argument is null.
      */
-    public static String getMandatoryProperty(Dictionary<String,
-                                              String> properties,
+    public static String getMandatoryProperty(Dictionary<String, String> properties,
                                               String name) throws ConfigurationException {
         if (null == properties) {
             throw new IllegalArgumentException("getMandatoryProperty() argument 'properties' must not be null");
@@ -73,5 +78,4 @@ public final class UserAdminTools {
         }
         return value;
     }
-
 }
