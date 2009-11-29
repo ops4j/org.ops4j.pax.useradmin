@@ -86,6 +86,7 @@ public class GroupImplTest {
         //
         Assert.assertTrue("Member not added", group.addMember(role1));
         Assert.assertTrue("Member not added", group.addMember(role2));
+        Assert.assertFalse("Null member removed", group.removeMember(null));
         Assert.assertTrue("Member not removed", group.removeMember(role1));
         Assert.assertFalse("Member removed when exception was thrown", group.removeMember(role2));
         //

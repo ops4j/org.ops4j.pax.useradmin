@@ -46,6 +46,15 @@ public class EncryptorImpl {
     protected EncryptorImpl(String algorithm,
                             String rngAlgorithm,
                             String saltLength) throws NoSuchAlgorithmException {
+        if (null == algorithm || "".equals(algorithm)) {
+            throw new IllegalArgumentException("Error: parameter algorithm must no be null or empty.");
+        }
+        if (null == rngAlgorithm || "".equals(rngAlgorithm)) {
+            throw new IllegalArgumentException("Error: parameter rngAlgorithm must no be null or empty.");
+        }
+        if (null == saltLength || "".equals(saltLength)) {
+            throw new IllegalArgumentException("Error: parameter saltLength must no be null or empty.");
+        }
         m_messageDigest = MessageDigest.getInstance(algorithm);
         m_saltLength = new Integer(saltLength);
         m_secureRandom = SecureRandom.getInstance(rngAlgorithm);
