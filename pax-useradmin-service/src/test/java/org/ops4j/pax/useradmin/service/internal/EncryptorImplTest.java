@@ -18,6 +18,8 @@ package org.ops4j.pax.useradmin.service.internal;
 
 import java.security.NoSuchAlgorithmException;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
 
@@ -28,23 +30,17 @@ import org.ops4j.pax.useradmin.service.UserAdminConstants;
 public class EncryptorImplTest {
 
     @Test (expected = NoSuchAlgorithmException.class)
-    public void createEncryptorNoSuchEncryptorAlgorithm() {
-        try {
-            new EncryptorImpl(UserAdminConstants.ENCRYPTION_ALGORITHM_NONE,
-                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        } catch (NoSuchAlgorithmException e) {
-        }
+    public void createEncryptorNoSuchEncryptionAlgorithm() throws Exception {
+        new EncryptorImpl(UserAdminConstants.ENCRYPTION_ALGORITHM_NONE,
+                          UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                          UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
     }
     
     @Test (expected = NoSuchAlgorithmException.class)
-    public void createEncryptorNoSuchRandomAlgorithm() {
-        try {
-            new EncryptorImpl("MD5",
-                              "noSuchAlgorithm",
-                              UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        } catch (NoSuchAlgorithmException e) {
-        }
+    public void createEncryptorNoSuchRandomAlgorithm() throws Exception {
+        new EncryptorImpl("MD5",
+                          "noSuchAlgorithm",
+                          UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
     }
     
     @Test
@@ -54,14 +50,10 @@ public class EncryptorImplTest {
                               UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                               UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Must not happen here.");
+            Assert.fail("Unexpected exception: " + e.getMessage());
         }
     }
     
-    @Test
-    public void createEncryptorNoSuchEncrytionAlgorithm() {
-    }
-        
     @Test
     public void encryptParameterNullTest() {
         // TODO: implement test
