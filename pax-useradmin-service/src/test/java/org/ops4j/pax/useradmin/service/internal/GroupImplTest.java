@@ -19,9 +19,8 @@ package org.ops4j.pax.useradmin.service.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.easymock.classextension.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.ops4j.pax.useradmin.service.internal.RoleImpl.ImplicationResult;
 import org.ops4j.pax.useradmin.service.spi.StorageException;

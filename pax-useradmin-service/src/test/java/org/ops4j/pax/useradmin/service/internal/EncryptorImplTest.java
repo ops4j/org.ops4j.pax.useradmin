@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ops4j.pax.useradmin.service.internal;
 
 import java.security.NoSuchAlgorithmException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
 
@@ -29,8 +27,17 @@ import org.ops4j.pax.useradmin.service.UserAdminConstants;
  */
 public class EncryptorImplTest {
 
+    // tested algorithms
+    //
+    private static final String ENCRYPTION_ALGORITHM_SHA = "SHA";
+    private static final String ENCRYPTION_ALGORITHM_MD5 = "MD5";
+    
+    // the value used for testing encryption
+    //
     private static String VALUE = "someValue";
     
+    // testing Encryptor creation
+
     @Test (expected = NoSuchAlgorithmException.class)
     public void createEncryptorNoSuchEncryptionAlgorithm() throws Exception {
         new EncryptorImpl(UserAdminConstants.ENCRYPTION_ALGORITHM_NONE,
@@ -40,7 +47,7 @@ public class EncryptorImplTest {
     
     @Test (expected = NoSuchAlgorithmException.class)
     public void createEncryptorNoSuchRandomAlgorithm() throws Exception {
-        new EncryptorImpl("MD5",
+        new EncryptorImpl(ENCRYPTION_ALGORITHM_MD5,
                           "noSuchAlgorithm",
                           UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
     }
@@ -88,16 +95,16 @@ public class EncryptorImplTest {
     }
 
     @Test (expected = NumberFormatException.class)
-    public void createEncryptorNoIntSaltLength() throws Exception {
-        new EncryptorImpl("MD5",
+    public void createEncryptorMD5DefaultRngNoIntSaltLength() throws Exception {
+        new EncryptorImpl(ENCRYPTION_ALGORITHM_MD5,
                           UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                           "abc");
     }
 
     @Test
-    public void createEncryptorMD5Ok() {
+    public void createEncryptorOkMD5DefaultRngDefaultSaltLength() {
         try {
-            EncryptorImpl encryptor = new EncryptorImpl("MD5",
+            EncryptorImpl encryptor = new EncryptorImpl(ENCRYPTION_ALGORITHM_MD5,
                                                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                                                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
             Assert.assertNotNull("No encryptor created.", encryptor);
@@ -106,54 +113,97 @@ public class EncryptorImplTest {
         }
     }
     
+    @Test
+    public void createEncryptorOkSHADefaultRngDefaultSaltLength() {
+        try {
+            EncryptorImpl encryptor = new EncryptorImpl(ENCRYPTION_ALGORITHM_SHA,
+                                                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                                                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+            Assert.assertNotNull("No encryptor created.", encryptor);
+        } catch (NoSuchAlgorithmException e) {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    // testing Encryptor.encrypt()
+
     @Test (expected = IllegalArgumentException.class)
-    public void encryptValueNullTest() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl("MD5",
+    public void encryptNullValue() throws Exception {
+        EncryptorImpl encryptor = new EncryptorImpl(ENCRYPTION_ALGORITHM_MD5,
                                                     UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                                                     UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
         encryptor.encrypt(null);
     }
 
-    @Test
-    public void encryptOkTest() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl("MD5",
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+    private byte[] encrypt(String algorithm,
+                           String rngAlgorithm,
+                           String saltLength) throws Exception {
+        EncryptorImpl encryptor = new EncryptorImpl(algorithm,
+                                                    rngAlgorithm,
+                                                    saltLength);
         byte[] encryptedValue = encryptor.encrypt(VALUE.getBytes());
-        Assert.assertNotNull("Enrypted value is null", encryptedValue);
+        Assert.assertNotNull("Encrypted value is null", encryptedValue);
+        Assert.assertTrue("Encrypted value is too short", encryptedValue.length > 0);
+        return encryptedValue;
+    }
+
+    @Test
+    public void encryptOk() throws Exception {
+        encrypt(ENCRYPTION_ALGORITHM_MD5,
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+        encrypt(ENCRYPTION_ALGORITHM_MD5,
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+    }
+
+    // testing Encryptor.compare()
+    
+    @Test (expected = IllegalArgumentException.class)
+    public void compareInvalidInput() throws Exception {
+        compare(ENCRYPTION_ALGORITHM_MD5,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                null,
+                null);
     }
 
     @Test (expected = IllegalArgumentException.class)
-    public void compareInvalidInputTest() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl("MD5",
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        byte[] encryptedValue = encryptor.encrypt(VALUE.getBytes());
-        Assert.assertNotNull("Enrypted value is null", encryptedValue);
-        encryptor.compare(null, encryptedValue);
+    public void compareInvalidStored() throws Exception {
+        compare(ENCRYPTION_ALGORITHM_MD5,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                VALUE,
+                null);
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void compareInvalidStoredTest() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl("MD5",
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        encryptor.compare(VALUE.getBytes(), null);
-    }
-
-    @Test
-    public void compareFailedTest() {
-        // TODO: implement test
-    }
-
-    @Test
-    public void compareOkTest() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl("MD5",
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        byte[] encryptedValue = encryptor.encrypt(VALUE.getBytes());
-        Assert.assertNotNull("Enrypted value is null", encryptedValue);
-        boolean result = encryptor.compare(VALUE.getBytes(), encryptedValue);
+    private void compare(String algorithm,
+                         String rngAlgorithm,
+                         String saltLength,
+                         String value,
+                         byte[] encryptedValue) throws Exception {
+        EncryptorImpl encryptor = new EncryptorImpl(algorithm,
+                                                    rngAlgorithm,
+                                                    saltLength);
+        boolean result = encryptor.compare(value == null ? null : value.getBytes(), encryptedValue);
         Assert.assertTrue("Comparison failed", result);
+    }
+    
+    @Test
+    public void compareOk() throws Exception {
+        compare(ENCRYPTION_ALGORITHM_MD5,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                VALUE,
+                encrypt(ENCRYPTION_ALGORITHM_MD5,
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH));
+        compare(ENCRYPTION_ALGORITHM_SHA,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                VALUE,
+                encrypt(ENCRYPTION_ALGORITHM_SHA,
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH));
     }
 }
