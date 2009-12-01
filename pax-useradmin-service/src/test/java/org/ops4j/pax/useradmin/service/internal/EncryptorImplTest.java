@@ -22,6 +22,8 @@ import org.junit.Test;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
 
 /**
+ * Encryptor unit tests.
+ * 
  * @author Matthias Kuespert
  * @since  28.11.2009
  */
@@ -127,37 +129,52 @@ public class EncryptorImplTest {
 
     // testing Encryptor.encrypt()
 
-    @Test (expected = IllegalArgumentException.class)
-    public void encryptNullValue() throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl(ENCRYPTION_ALGORITHM_MD5,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                                                    UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        encryptor.encrypt(null);
-    }
-
     private byte[] encrypt(String algorithm,
                            String rngAlgorithm,
-                           String saltLength) throws Exception {
+                           String saltLength,
+                           String value) throws Exception {
         EncryptorImpl encryptor = new EncryptorImpl(algorithm,
                                                     rngAlgorithm,
                                                     saltLength);
-        byte[] encryptedValue = encryptor.encrypt(VALUE.getBytes());
+        byte[] encryptedValue = encryptor.encrypt(value.getBytes());
         Assert.assertNotNull("Encrypted value is null", encryptedValue);
         Assert.assertTrue("Encrypted value is too short", encryptedValue.length > 0);
         return encryptedValue;
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void encryptNullValue() throws Exception {
+        encrypt(ENCRYPTION_ALGORITHM_MD5,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
+                UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                null);
     }
 
     @Test
     public void encryptOk() throws Exception {
         encrypt(ENCRYPTION_ALGORITHM_MD5,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-        encrypt(ENCRYPTION_ALGORITHM_MD5,
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                  VALUE);
+        encrypt(ENCRYPTION_ALGORITHM_SHA,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                  VALUE);
     }
 
     // testing Encryptor.compare()
+    
+    private void compare(String algorithm,
+                         String rngAlgorithm,
+                         String saltLength,
+                         String value,
+                         byte[] encryptedValue) throws Exception {
+        EncryptorImpl encryptor = new EncryptorImpl(algorithm,
+                                                    rngAlgorithm,
+                                                    saltLength);
+        boolean result = encryptor.compare(value == null ? null : value.getBytes(), encryptedValue);
+        Assert.assertTrue("Comparison failed", result);
+    }
     
     @Test (expected = IllegalArgumentException.class)
     public void compareInvalidInput() throws Exception {
@@ -177,18 +194,6 @@ public class EncryptorImplTest {
                 null);
     }
 
-    private void compare(String algorithm,
-                         String rngAlgorithm,
-                         String saltLength,
-                         String value,
-                         byte[] encryptedValue) throws Exception {
-        EncryptorImpl encryptor = new EncryptorImpl(algorithm,
-                                                    rngAlgorithm,
-                                                    saltLength);
-        boolean result = encryptor.compare(value == null ? null : value.getBytes(), encryptedValue);
-        Assert.assertTrue("Comparison failed", result);
-    }
-    
     @Test
     public void compareOk() throws Exception {
         compare(ENCRYPTION_ALGORITHM_MD5,
@@ -197,13 +202,15 @@ public class EncryptorImplTest {
                 VALUE,
                 encrypt(ENCRYPTION_ALGORITHM_MD5,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH));
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                        VALUE));
         compare(ENCRYPTION_ALGORITHM_SHA,
                 UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                 UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
                 VALUE,
                 encrypt(ENCRYPTION_ALGORITHM_SHA,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
-                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH));
+                        UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
+                        VALUE));
     }
 }
