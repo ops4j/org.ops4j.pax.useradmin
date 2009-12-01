@@ -8,7 +8,7 @@ Quickstart
   the following commands:
   
 ---
-  svn co https://scm.ops4j.org/repos/ops4j/laboratory/users/mkuespert/useradmin
+  svn co https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin useradmin
   cd useradmin
   ./src/scripts/build-all.sh -s file://`pwd`/target/website [ -Pno-itest ]
 ---
