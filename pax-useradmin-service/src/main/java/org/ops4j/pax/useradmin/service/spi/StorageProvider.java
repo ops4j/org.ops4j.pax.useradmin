@@ -154,17 +154,7 @@ public interface StorageProvider {
      * @param value The value of the attribute.
      * @throws StorageException
      */
-    void setRoleAttribute(Role role, String key, String value) throws StorageException;
-
-    /**
-     * Sets a <code>byte[]</code> attribute to a role.
-     * 
-     * @param role The <code>Role</code> to set the attribute to.
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
-     * @throws StorageException
-     */
-    void setRoleAttribute(Role role, String key, byte[] value) throws StorageException;
+    void setRoleAttribute(Role role, String key, Object value) throws StorageException;
 
     /**
      * Removes an attribute from a role.
@@ -193,17 +183,7 @@ public interface StorageProvider {
      * @param value The value of the credential.
      * @throws StorageException
      */
-    void setUserCredential(User user, String key, String value) throws StorageException;
-
-    /**
-     * Sets a <code>byte[]</code> credential to a role.
-     * 
-     * @param user The <code>User</code> to set the credential to.
-     * @param key The key of the credential.
-     * @param value The value of the credential.
-     * @throws StorageException
-     */
-    void setUserCredential(User user, String key, byte[] value) throws StorageException;
+    void setUserCredential(User user, String key, Object value) throws StorageException;
 
     /**
      * Removes a credential from a role.

@@ -67,7 +67,7 @@ public abstract class AbstractProperties extends Hashtable {
      * 
      * @param storageProvider The StorageProvider to use.
      * @param key The key.
-     * @param value The <code>String</code> value.
+     * @param value The value.
      * @throws StorageException
      */
     protected abstract Object store(StorageProvider storageProvider, String key, Object value) throws StorageException;

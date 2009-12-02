@@ -338,25 +338,23 @@ public class StorageProviderImpl implements StorageProvider {
         return true;
     }
 
-    public void setRoleAttribute(Role role, String key, String value) throws StorageException {
+    public void setRoleAttribute(Role role, String key, Object value) throws StorageException {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
-            storeAttribute(node, key, value);
+            if (value instanceof String) {
+                storeAttribute(node, key, (String) value);
+            }
+            else if (value instanceof byte[]) {
+                storeAttribute(node, key, (byte[]) value);
+            }
+            else {
+                throw new StorageException(  "Invalid value type '" + value.getClass().getName()
+                                             + "' - only String or byte[] are allowed.");
+            }
             node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing attribute '" + key + "' = '" + value
                                        + "' for role '" + role.getName()
-                                       + "': " + e.getMessage());
-        }
-    }
-
-    public void setRoleAttribute(Role role, String key, byte[] value) throws StorageException {
-        try {
-            Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
-            storeAttribute(node, key, value);
-            node.flush();
-        } catch (BackingStoreException e) {
-            throw new StorageException(  "Error storing attribute for role '" + role.getName()
                                        + "': " + e.getMessage());
         }
     }
@@ -388,21 +386,19 @@ public class StorageProviderImpl implements StorageProvider {
         }
     }
 
-    public void setUserCredential(User user, String key, String value) throws StorageException {
+    public void setUserCredential(User user, String key, Object value) throws StorageException {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
-            storeAttribute(node, key, value);
-            node.flush();
-        } catch (BackingStoreException e) {
-            throw new StorageException(  "Error storing credential for user '" + user.getName()
-                                       + "': " + e.getMessage());
-        }
-    }
-
-    public void setUserCredential(User user, String key, byte[] value) throws StorageException {
-        try {
-            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
-            storeAttribute(node, key, value);
+            if (value instanceof String) {
+                storeAttribute(node, key, (String) value);
+            }
+            else if (value instanceof byte[]) {
+                storeAttribute(node, key, (byte[]) value);
+            }
+            else {
+                throw new StorageException(  "Invalid value type '" + value.getClass().getName()
+                                             + "' - only String or byte[] are allowed.");
+            }
             node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException(  "Error storing credential for user '" + user.getName()

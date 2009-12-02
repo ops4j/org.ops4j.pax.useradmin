@@ -355,10 +355,11 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         Iterator<LDAPAttribute> it = entry.getAttributeSet().iterator();
         while (it.hasNext()) {
             LDAPAttribute attribute = it.next();
-            if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(attribute.getName())) {
+            /* if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(attribute.getName())) {
                 // ignore: we've read that already
                 // System.err.println("------------- ignore: " + attribute.getName());
-            } else if (   (type == Role.GROUP && m_groupCredentialAttr.equals(attribute.getName()))
+            } else */
+            if (   (type == Role.GROUP && m_groupCredentialAttr.equals(attribute.getName()))
                        || (type == Role.USER && m_userCredentialAttr.equals(attribute.getName()))) {
                 for (String value : attribute.getStringValueArray()) {
                     String[] data = value.split(PATTERN_SPLIT_LIST_VALUE);
@@ -802,9 +803,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
     }
     
     /**
-     * @see StorageProvider#setRoleAttribute(Role, String, String)
+     * @see StorageProvider#setRoleAttribute(Role, String, Object)
      */
-    public void setRoleAttribute(Role role, String key, String value) throws StorageException {
+    public void setRoleAttribute(Role role, String key, Object value) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
             throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
                                        + "' - change the configuration instead.");
@@ -820,38 +821,18 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         LDAPConnection connection = openConnection();
         try {
             String dn = getRoleDN(role);
-            LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(key, value));
-            connection.modify(dn, modification);
-        } catch (LDAPException e) {
-            throw new StorageException(  "Error setting attribute '" + key + "' = '" + value
-                                       + "' for role '" + role.getName() + "': "
-                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
-        } finally {
-            closeConnection();
-        }
-    }
-
-    /**
-     * @see StorageProvider#setRoleAttribute(Role, String, byte[])
-     */
-    public void setRoleAttribute(Role role, String key, byte[] value) throws StorageException {
-        if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
-            throw new StorageException(  "Cannot modify attribute '" + ConfigurationConstants.ATTR_OBJECTCLASS
-                                         + "' - change the configuration instead.");
-        }
-        if (Role.USER == role.getType() && m_userIdAttr.equals(key)) {
-            throw new StorageException(  "Cannot modify ID attribute '" + m_userIdAttr
-                                       + "' - recreate the user instead.");
-        }
-        if (Role.GROUP == role.getType() && m_groupEntryIdAttr.equals(key)) {
-            throw new StorageException(  "Cannot modify ID attribute '" + m_groupEntryIdAttr
-                                       + "' - recreate the group instead.");
-        }
-        LDAPConnection connection = openConnection();
-        try {
-            String dn = getRoleDN(role);
-            LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(key, value));
-            connection.modify(dn, modification);
+            if (value instanceof String) {
+                connection.modify(dn, new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(key, (String) value)));
+            }
+            else if (value instanceof byte[]) {
+                connection.modify(dn, new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(key, (byte[]) value)));
+            }
+            // note: from an architectural view we shouldn't throw on this, but user will expect feedback on failed storage,
+            //       so provide an exception that the caller may throw or ignore ... no return value since it's an error.
+            else {
+                throw new StorageException(  "Invalid value type '" + value.getClass().getName()
+                                             + "' - only String or byte[] are allowed.");
+            }
         } catch (LDAPException e) {
             throw new StorageException(  "Error setting attribute '" + key + "' = '" + value
                                        + "' for role '" + role.getName() + "': "
@@ -906,7 +887,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
         throw new IllegalStateException("clearing attributes is not yet implemented");
     }
     
-    public void setUserCredential(User user, String key, String value) throws StorageException {
+    public void setUserCredential(User user, String key, Object value) throws StorageException {
         LDAPConnection connection = openConnection();
         try {
             String dn = getRoleDN(user);
@@ -933,47 +914,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService {
                 LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
                 connection.modify(dn, modification);
             } else {
-                LDAPModification modification = new LDAPModification(LDAPModification.ADD,
-                                                                     new LDAPAttribute(attrName,
-                                                                                       createCredentialValueString(key, value)));
-                connection.modify(dn, modification);
-            }
-        } catch (LDAPException e) {
-            throw new StorageException(  "Error setting credential for user '" + user.getName() + "': "
-                                       + e.getMessage() + " / " + e.getLDAPErrorMessage());
-        } finally {
-            closeConnection();
-        }
-    }
-
-    public void setUserCredential(User user, String key, byte[] value) throws StorageException {
-        LDAPConnection connection = openConnection();
-        try {
-            String dn = getRoleDN(user);
-            LDAPEntry entry = getEntry(connection, dn);
-            if (null == entry) {
-                throw new StorageException("Could not find user '" + user.getName() + "'");
-            }
-            String attrName = (Role.USER == user.getType()) ? m_userCredentialAttr : m_groupCredentialAttr; 
-            LDAPAttribute attribute = entry.getAttribute(attrName);
-            if (null != attribute) {
-                for (String attrValue : attribute.getStringValueArray()) {
-                    String[] data = attrValue.split(PATTERN_SPLIT_LIST_VALUE);
-                    if (CREDENTIAL_VALUE_ARRAY_SIZE != data.length) {
-                        throw new StorageException(  "Wrong credential format: could not split into " + CREDENTIAL_VALUE_ARRAY_SIZE
-                                                   + " chunks: '" + value + "' - entry: " + entry);
-                    }
-                    if (data[1].equals(key)) {
-                        // modify existing entry
-                        attribute.removeValue(attrValue);
-                    }
-                }
-                // if we get here the value does not yet exist or was removed above - now add it
-                attribute.addValue(createCredentialValueString(key, value));
-                LDAPModification modification = new LDAPModification(LDAPModification.REPLACE, attribute);
-                connection.modify(dn, modification);
-            } else {
-
                 LDAPModification modification = new LDAPModification(LDAPModification.ADD,
                                                                      new LDAPAttribute(attrName,
                                                                                        createCredentialValueString(key, value)));
