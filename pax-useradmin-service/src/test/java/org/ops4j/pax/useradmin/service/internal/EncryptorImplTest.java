@@ -132,11 +132,11 @@ public class EncryptorImplTest {
     private byte[] encrypt(String algorithm,
                            String rngAlgorithm,
                            String saltLength,
-                           String value) throws Exception {
+                           byte[] value) throws Exception {
         EncryptorImpl encryptor = new EncryptorImpl(algorithm,
                                                     rngAlgorithm,
                                                     saltLength);
-        byte[] encryptedValue = encryptor.encrypt(value.getBytes());
+        byte[] encryptedValue = encryptor.encrypt(value);
         Assert.assertNotNull("Encrypted value is null", encryptedValue);
         Assert.assertTrue("Encrypted value is too short", encryptedValue.length > 0);
         return encryptedValue;
@@ -155,11 +155,11 @@ public class EncryptorImplTest {
         encrypt(ENCRYPTION_ALGORITHM_MD5,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
-                  VALUE);
+                  VALUE.getBytes());
         encrypt(ENCRYPTION_ALGORITHM_SHA,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                   UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
-                  VALUE);
+                  VALUE.getBytes());
     }
 
     // testing Encryptor.compare()
@@ -203,7 +203,7 @@ public class EncryptorImplTest {
                 encrypt(ENCRYPTION_ALGORITHM_MD5,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
-                        VALUE));
+                        VALUE.getBytes()));
         compare(ENCRYPTION_ALGORITHM_SHA,
                 UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                 UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
@@ -211,6 +211,6 @@ public class EncryptorImplTest {
                 encrypt(ENCRYPTION_ALGORITHM_SHA,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM,
                         UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH,
-                        VALUE));
+                        VALUE.getBytes()));
     }
 }
