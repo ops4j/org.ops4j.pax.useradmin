@@ -26,6 +26,10 @@ import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 
 /**
+ * Implementation of the <code>Group</code> interface as specified in the
+ * OSGi companion specification.
+ * 
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009

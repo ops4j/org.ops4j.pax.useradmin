@@ -40,6 +40,9 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * Activator which starts a ServiceTracker for StorageProvider services.
  * UserAdmin services are started/stopped on adding/removing providers.
  * 
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/framework/BundleActivator.html
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/util/tracker/ServiceTrackerCustomizer.html
+ * 
  * @author Matthias Kuespert
  * @since 02.07.2009
  */

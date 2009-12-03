@@ -25,6 +25,8 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the <code>User</code> interface.
  * 
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html
+ * 
  * @author Matthias Kuespert
  * @since  02.07.2009
  */

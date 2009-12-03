@@ -27,6 +27,8 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the Authorization interface.
  * 
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html
+ * 
  * @author Matthias Kuespert
  * @since 02.07.2009
  */

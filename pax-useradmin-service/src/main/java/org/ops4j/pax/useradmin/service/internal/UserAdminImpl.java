@@ -51,7 +51,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * and group/role data using pluggable storage providers that connect to an
  * underlying datastore.
  * 
- * @see UserAdmin
+ * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html
  * 
  * @author Matthias Kuespert
  * @since 02.07.2009
