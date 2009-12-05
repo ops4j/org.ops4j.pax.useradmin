@@ -54,18 +54,10 @@
     <junit.version>4.4</junit.version>
     <easymock.version>2.4</easymock.version>
     
-    <!-- Plugin versions -->
-    <!--     
-    <cobertura-maven-plugin.version>2.2</cobertura-maven-plugin.version>
-    <maven-checkstyle-plugin.version>2.3</maven-checkstyle-plugin.version>
-    <maven-bundle-plugin.version>2.0.0</maven-bundle-plugin.version>
-    <dashboard-maven-plugin.version>1.0.0-beta-1</dashboard-maven-plugin.version>
-    <maven-pmd-plugin.version>xxx</maven-pmd-plugin.version>
-     -->
-    
   </properties>
 
-  <!-- More info ... -->
+  <!-- More project info ...
+    -->
   <packaging>pom</packaging>
   <name>OPS4J - Pax UserAdmin</name>
   <description>Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service</description>
@@ -212,6 +204,17 @@
     -->
   <reporting>
     <plugins>
+      <!-- Source cross-reference configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
+          <aggregate>false</aggregate>
+        </configuration>
+      </plugin>
       <!-- Cobertura report configuration
         -->
       <plugin>
@@ -230,7 +233,8 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <!-- version: latest -->
         <configuration>
-          <aggregate>true</aggregate>
+          <!-- Note: setting aggregate to true will break the links since we have no aggregate source/test xref -->
+          <aggregate>false</aggregate>
           <targetJdk>${target.jdk.version}</targetJdk>
           <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
         </configuration>
@@ -266,17 +270,6 @@
               <packages>org.ops4j.pax.${topProjectName}.command*</packages>
             </group>
           </groups>
-        </configuration>
-      </plugin>
-      <!-- Source cross-reference configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <!-- Note: setting this to true will break the links from the dashbord reports -->
-          <aggregate>false</aggregate>
         </configuration>
       </plugin>
       <!-- Changelog configuration
@@ -315,7 +308,7 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
         <!-- version: latest -->
         <configuration>
-          <!-- Note: setting this to true will break the links from the dashbord reports -->
+          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
           <aggregate>false</aggregate>
           <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
         </configuration>
@@ -338,6 +331,8 @@
      -->
     <pluginManagement>
       <plugins>
+        <!-- Site plugin
+          -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-site-plugin</artifactId>
@@ -347,18 +342,7 @@
                 <locales>en</locales>
             </configuration>
         </plugin>
-        <!--  plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.5.0</version>
-        </plugin -->
-        <!--  plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.3</version>
-        </plugin -->
-        <!--
-        | Felix bundle plugin / Bnd version and configuration
+        <!-- Felix bundle plugin / Bnd version and configuration
           -->
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -381,6 +365,11 @@
             </instructions>
           </configuration>
         </plugin>
+        <!--  plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.5.0</version>
+        </plugin -->
       </plugins>
     </pluginManagement>
 
