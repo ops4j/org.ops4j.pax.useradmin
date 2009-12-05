@@ -61,8 +61,8 @@ public class GroupImpl extends UserImpl implements Group {
                 // - the spec doesn't mention anything
             } catch (StorageException e) {
                 getAdmin().logMessage(this,
-                                        LogService.LOG_ERROR, "error when adding basic member to group '" + getName() + "':"
-                             + e.getMessage());
+                                      LogService.LOG_ERROR, "error when adding basic member to group '" + getName() + "':"
+                                      + e.getMessage());
             }
         }
         return false;
@@ -79,8 +79,8 @@ public class GroupImpl extends UserImpl implements Group {
                 return storageProvider.addRequiredMember(this, role);
             } catch (StorageException e) {
                 getAdmin().logMessage(this,
-                                        LogService.LOG_ERROR, "error when adding required member to group '" + getName() + "':"
-                             + e.getMessage());
+                                      LogService.LOG_ERROR, "error when adding required member to group '" + getName() + "':"
+                                      + e.getMessage());
             }
         }
         return false;
@@ -116,7 +116,7 @@ public class GroupImpl extends UserImpl implements Group {
             }
         } catch (StorageException e) {
             getAdmin().logMessage(this,
-                                   LogService.LOG_ERROR, "error when retrieving basic members of group '" + getName() + "':"
+                                  LogService.LOG_ERROR, "error when retrieving basic members of group '" + getName() + "':"
                                   + e.getMessage());
         }
         return null;
@@ -134,8 +134,8 @@ public class GroupImpl extends UserImpl implements Group {
             }
         } catch (StorageException e) {
             getAdmin().logMessage(this,
-                                    LogService.LOG_ERROR, "error when retrieving required members of group '" + getName()
-                          + "':" + e.getMessage());
+                                  LogService.LOG_ERROR, "error when retrieving required members of group '" + getName()
+                                  + "':" + e.getMessage());
         }
         return null;
     }

@@ -3,89 +3,114 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
+  <!-- Parent: OPS4J master pom
+    -->
   <parent>
     <artifactId>master</artifactId>
     <groupId>org.ops4j.pax</groupId>
     <version>3.1.0</version>
   </parent>
   
+  <!-- Static coordinates - cannot be or serve as property values since they are set for
+       each module independently.
+    -->
   <groupId>org.ops4j.pax</groupId>
   <artifactId>useradmin</artifactId>
+  <!-- Note:
+       - modules should not have a version entry to simplify maintainance.
+       - internal cross-referencing of versions should be done using ${project.version}
+    -->
+  <version>0.0.1-SNAPSHOT</version>
+
+  <!-- Default properties
+    -->
+  <properties>
+  
+    <!-- The top-level project name.
+         Note: the top level artifact name. MUST match the root-directory name and the root-package name of all modules
+      -->
+    <topProjectName>useradmin</topProjectName>
+  
+    <!-- The JDK we're developing for -->
+    <target.jdk.version>1.5</target.jdk.version>
+    
+    <!-- The directory to which the generated site is deployed.
+    
+       Note: relative paths matter on site:deploy
+    
+       If the URL of the generated site to deploy is a relative file URL, then the dashboard-plugin
+       creates invalid internal links for the cobertura overview->detail links. E.g. use the following
+       property to reproduce the problem:
+       
+       <site.deploy.dir>file://${project.build.directory}/website/</site.deploy.dir>
+       
+       Yes: unfortunately ${project.build.directory} resolves to a relative path - not an absolute one. Try it
+       and check the cobertura reports to verify this behaviour.
+      -->
+    <site.deploy.dir>file:///tmp/sites/${topProjectName}</site.deploy.dir>
+    
+    <!-- Global dependency versions -->
+    <osgi.spec.version>4.2.0</osgi.spec.version>
+    <junit.version>4.4</junit.version>
+    <easymock.version>2.4</easymock.version>
+    
+    <!-- Plugin versions -->
+    <!--     
+    <cobertura-maven-plugin.version>2.2</cobertura-maven-plugin.version>
+    <maven-checkstyle-plugin.version>2.3</maven-checkstyle-plugin.version>
+    <maven-bundle-plugin.version>2.0.0</maven-bundle-plugin.version>
+    <dashboard-maven-plugin.version>1.0.0-beta-1</dashboard-maven-plugin.version>
+    <maven-pmd-plugin.version>xxx</maven-pmd-plugin.version>
+     -->
+    
+  </properties>
+
+  <!-- More info ... -->
   <packaging>pom</packaging>
   <name>OPS4J - Pax UserAdmin</name>
-  <version>0.0.1-SNAPSHOT</version>
-  
-  <description>Pax UserAdmin - OPS4J implementation of the OSGi UserAdmin service and more ...</description>
+  <description>Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service</description>
   <inceptionYear>2009</inceptionYear>
 
+
+  <!-- Standard modules -->
+  <modules>
+    <!-- TODO:
+    <module>pax-useradmin-provider-rdbms</module>
+    <module>pax-useradmin-webservice-api</module>
+    <module>pax-useradmin-provider-file</module>
+    -->
+    <module>pax-${topProjectName}-service</module>
+    <module>pax-${topProjectName}-provider-preferences</module>
+    <module>pax-${topProjectName}-provider-ldap</module>
+    <module>pax-${topProjectName}-command</module>
+  </modules>
+
+  <!-- Profiles to tailor custom executions
+    -->
   <profiles>
+
+    <!-- Include integration tests
+      -->
     <profile>
-      <id>all</id>
-        <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
+      <id>integration-test</id>
       <modules>
-        <!-- TODO:
-        <module>pax-useradmin-provider-rdbms</module>
-        <module>pax-useradmin-webservice-api</module>
-        <module>pax-useradmin-provider-file</module>
-        -->
-        <module>pax-useradmin-service</module>
-        <module>pax-useradmin-provider-preferences</module>
-        <module>pax-useradmin-provider-ldap</module>
-        <module>pax-useradmin-command</module>
-        <module>pax-useradmin-itest</module>
+        <module>pax-${topProjectName}-itest</module>
       </modules>
-      <repositories>
-        <!-- TODO:
-           remove this repository as soon as Felix Gogo release is available 
-        <repository>
-          <id>m2apache.snapshots</id>
-          <url>http://repository.apache.org/snapshots</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-        - needed for Pax shell -
-        <repository>
-          <id>ops4j.snapshots</id>
-          <url>http://repository.ops4j.org/mvn-snapshots</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>ops4j.releases</id>
-          <url>http://repository.ops4j.org/mvn-releases</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-        -->
-      </repositories>
     </profile>
     
+    <!-- Use CI infrastructure
+      -->
     <profile>
-      <id>no-itest</id>
-      <modules>
-        <module>pax-useradmin-service</module>
-        <module>pax-useradmin-provider-preferences</module>
-        <module>pax-useradmin-provider-ldap</module>
-        <module>pax-useradmin-command</module>
-        <module>pax-useradmin-webservice-api</module>
-      </modules>
+      <id>continuous-integration</id>
+      <properties>
+        <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/${topProjectName}/</site.deploy.dir>
+      </properties>
     </profile>
-  </profiles>
 
+  </profiles>
+ 
+  <!-- Socializing
+    -->
   <developers>
     <developer>
       <id>mkuespert</id>
@@ -100,21 +125,26 @@
     </developer>
   </developers>
 
+  <!-- SCM configuration - used for releases
+    -->
   <scm>
-    <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin</connection>
-    <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin</developerConnection>
+    <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProjectName}</connection>
+    <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProjectName}</developerConnection>
   </scm>
 
-  <properties>
-    <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/useradmin</site.deploy.dir>
-  </properties>
-
+  <!-- Deployment configuration
+    -->
   <distributionManagement>
     <site>
-      <id>useradmin-website</id>
+      <id>${topProjectName}-website</id>
       <url>${site.deploy.dir}</url>
     </site>
   </distributionManagement>
+  
+  <issueManagement>
+    <system>Jira</system>
+    <url></url>
+  </issueManagement>
 
   <dependencyManagement>
     <dependencies>
@@ -124,13 +154,13 @@
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
-        <version>4.2.0</version>
+        <version>${osgi.spec.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.compendium</artifactId>
-        <version>4.2.0</version>
+        <version>${osgi.spec.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -140,19 +170,19 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.4</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
-        <version>2.4</version>
+        <version>${easymock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymockclassextension</artifactId>
-        <version>2.4</version>
+        <version>${easymock.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -178,37 +208,31 @@
     </dependency>
   </dependencies>
 
+  <!-- Report configuration
+    -->
   <reporting>
     <plugins>
-      <!-- Cobertura configuration
+      <!-- Cobertura report configuration
         -->
-       <plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
         <!--
           Note 1: versioning is crucial here: otherwise different cobertura versions
           used here and in the dashboard-plugin may lead to incompatible classes
-          Note 2: putting this into pluginManagement will not work because version 2.1 will be used ... see effective-pom
-        -->
+          -->
         <version>2.2</version>
-      </plugin>
-      <!--
-         Codehaus dashboard plugin configuration 
-         Note: putting this into pluginManagement doesn't work: dashboard-report not linked
-        -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dashboard-maven-plugin</artifactId>
-        <version>1.0.0-beta-1</version>
       </plugin>
       <!-- PMD/CPD configuration
         -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <!-- version: latest -->
         <configuration>
           <aggregate>true</aggregate>
-          <targetJdk>1.5</targetJdk>
+          <targetJdk>${target.jdk.version}</targetJdk>
+          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
         </configuration>
       </plugin>
       <!-- Javadoc configuration
@@ -216,27 +240,43 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- version: latest -->
         <configuration>
+          <!-- aggregate is deprecated: see http://maven.apache.org/plugins/maven-javadoc-plugin/examples/aggregate.html -->
           <aggregate>true</aggregate>
-          <!--  <stylesheetfile>${basedir}/src/site/resources/css/javadoc.css</stylesheetfile>   -->
+          <detectLinks>true</detectLinks>
+          <links>
+            <link>http://www.osgi.org/javadoc/r4v42/</link>
+          </links>
           <groups>
             <group>
               <title>UserAdmin Service</title>
-              <packages>org.ops4j.pax.useradmin.service*</packages>
+              <packages>org.ops4j.pax.${topProjectName}.service*</packages>
             </group>
             <group>
               <title>LDAP Provider</title>
-              <packages>org.ops4j.pax.useradmin.provider.ldap*</packages>
+              <packages>org.ops4j.pax.${topProjectName}.provider.ldap*</packages>
             </group>
             <group>
               <title>PreferencesService Provider</title>
-              <packages>org.ops4j.pax.useradmin.provider.preferences*</packages>
+              <packages>org.ops4j.pax.${topProjectName}.provider.preferences*</packages>
             </group>
             <group>
               <title>Shell Command</title>
-              <packages>org.ops4j.pax.useradmin.command*</packages>
+              <packages>org.ops4j.pax.${topProjectName}.command*</packages>
             </group>
           </groups>
+        </configuration>
+      </plugin>
+      <!-- Source cross-reference configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <!-- Note: setting this to true will break the links from the dashbord reports -->
+          <aggregate>false</aggregate>
         </configuration>
       </plugin>
       <!-- Changelog configuration
@@ -244,25 +284,79 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-changelog-plugin</artifactId>
+        <!-- version: latest -->
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.2</version>
+        <!-- Note: due to a bug in 2.2 the 'clean' goal MUST be called before creating the report - otherwise
+             you'll get a 'unexpected end of file' error -->
+        <configuration>
+          <xmlOutput>true</xmlOutput>
+        </configuration>
+      </plugin>
+      <!-- Checkstyle configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <!-- TODO: configLocation>${settings.localRepository}/path /to/checkstyle.config</configLocation -->
+          <!-- TODO: enableRulesSummary>false</enableRulesSummary -->
+          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+        </configuration>
+      </plugin>
+      <!-- Surefire report configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <!-- version: latest -->
+        <configuration>
+          <!-- Note: setting this to true will break the links from the dashbord reports -->
+          <aggregate>false</aggregate>
+          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+        </configuration>
+      </plugin>
+      <!--
+         Codehaus dashboard plugin configuration 
+        -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dashboard-maven-plugin</artifactId>
+        <version>1.0.0-beta-1</version>
       </plugin>
     </plugins>
   </reporting>
 
+  <!-- Build configuration
+    -->
   <build>
     <!-- plugin version management and global configuration
      -->
     <pluginManagement>
       <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>2.0.1</version>
+            <inherited>true</inherited>
+            <configuration>
+                <locales>en</locales>
+            </configuration>
+        </plugin>
         <!--  plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
           <version>1.5.0</version>
         </plugin -->
-        <plugin>
+        <!--  plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.3</version>
-        </plugin>
+        </plugin -->
         <!--
         | Felix bundle plugin / Bnd version and configuration
           -->
@@ -290,6 +384,8 @@
       </plugins>
     </pluginManagement>
 
+    <!-- Default resource handling
+      -->
     <resources>
       <resource>
         <directory>src/resources</directory>
@@ -307,6 +403,8 @@
       </resource>
     </resources>
 
+    <!-- Plugins which run for all modules. 
+      -->
     <plugins>
      <!-- 
       <plugin>

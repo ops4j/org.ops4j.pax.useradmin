@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Builds the dashboard and deploys the generated site
+# Deploys the generated site
 #
 while getopts ":m:P:s:" o ; do
    case $o in
@@ -10,5 +10,4 @@ while getopts ":m:P:s:" o ; do
      esac
 done
 #
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} dashboard:dashboard && \
 ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${SITE_DIR_OPT} site:deploy

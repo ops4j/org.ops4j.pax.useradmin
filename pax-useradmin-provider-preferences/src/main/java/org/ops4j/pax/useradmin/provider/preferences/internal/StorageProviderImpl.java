@@ -145,7 +145,7 @@ public class StorageProviderImpl implements StorageProvider {
                 break;
             default:
                 throw new StorageException("Invalid role type for role '" + name + " / "
-                                + node.name() + "': " + type);
+                                           + node.name() + "': " + type);
         }
         return role;
     }
@@ -218,8 +218,8 @@ public class StorageProviderImpl implements StorageProvider {
                 anyoneNode.putInt(NODE_TYPE, Role.USER);
             }
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error creating anonymous role '" + Role.USER_ANYONE + "': "
-                                         + e.getMessage());
+            throw new StorageException("Error creating anonymous role '" + Role.USER_ANYONE + "': "
+                                       + e.getMessage());
         }
     }
 
