@@ -5,7 +5,7 @@
 while getopts ":m:P:" o ; do
    case $o in
      m ) MAVEN_BIN_DIR="$OPTARG/bin/" ;;
-     P ) PROFILE_OPT="-P $OPTARG," ;;
+     P ) PROFILE_OPT="-P $OPTARG" ;;
    esac
 done
 #

@@ -82,8 +82,8 @@ fi
 # - deploy artifacts to the configured remote repository (w/o running tests again)
 #
 if [ ! -z ${DO_DEPLOY} ]; then
-  echo "running: ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} -Dmaven.test.skip=true "
-  ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} -Dmaven.test.skip=true 
+  echo "running: ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT} "
+  ${DEPLOY_SCRIPT} ${MAVEN_OPT} ${PROFILE_OPT}
   if [ 0 != $? ]; then
     echo "error deploying artifacts"
     exit -1
