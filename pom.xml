@@ -11,8 +11,8 @@
     <version>3.1.0</version>
   </parent>
   
-  <!-- Static coordinates - cannot be or serve as property values since they are set for
-       each module independently.
+  <!-- Project coordinates - cannot be or serve as global property values
+       since they are set for each module independently.
     -->
   <groupId>org.ops4j.pax</groupId>
   <artifactId>useradmin</artifactId>
@@ -49,7 +49,7 @@
       -->
     <site.deploy.dir>file:///tmp/sites/${topProjectName}</site.deploy.dir>
     
-    <!-- Global dependency versions -->
+    <!-- Globally managed versions -->
     <osgi.spec.version>4.2.0</osgi.spec.version>
     <junit.version>4.4</junit.version>
     <easymock.version>2.4</easymock.version>
@@ -64,7 +64,8 @@
   <inceptionYear>2009</inceptionYear>
 
 
-  <!-- Standard modules -->
+  <!-- Standard modules
+    -->
   <modules>
     <!-- TODO:
     <module>pax-useradmin-provider-rdbms</module>
@@ -133,11 +134,15 @@
     </site>
   </distributionManagement>
   
+  <!-- Issue management configuration
+    -->
   <issueManagement>
     <system>Jira</system>
-    <url></url>
+    <url>http://issues.ops4j.org/browse/PAXUSERADMIN</url>
   </issueManagement>
 
+  <!-- Global dependency management (version, scope, ...)
+  -->
   <dependencyManagement>
     <dependencies>
       <!--
@@ -180,7 +185,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <!-- Global dependencies
+  <!-- Global dependency configuration
   -->
   <dependencies>
     <dependency>
@@ -201,6 +206,16 @@
   </dependencies>
 
   <!-- Report configuration
+  
+       Note: module reports are NOT aggregated and stored in the respective subdirectories. Report
+             aggregation is done only via the dashboard report.
+             
+             However, this approach leads to other problems:
+             
+             - Some reports (e.g. surefire, PMD, CPD) remain on the main site but contain invalid data.
+               How to remove them?
+             - module source- and test-xrefs are not linked
+             - main source- and test-xrefs are not contained in the main site report
     -->
   <reporting>
     <plugins>
@@ -233,9 +248,9 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <!-- version: latest -->
         <configuration>
-          <!-- Note: setting aggregate to true will break the links since we have no aggregate source/test xref -->
-          <aggregate>false</aggregate>
           <targetJdk>${target.jdk.version}</targetJdk>
+          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
+          <aggregate>false</aggregate>
           <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
         </configuration>
       </plugin>
@@ -286,6 +301,7 @@
         <!-- Note: due to a bug in 2.2 the 'clean' goal MUST be called before creating the report - otherwise
              you'll get a 'unexpected end of file' error -->
         <configuration>
+          <!-- Ensure Xml file generation to have results picked up by the dashboard plugin -->
           <xmlOutput>true</xmlOutput>
         </configuration>
       </plugin>
@@ -314,7 +330,9 @@
         </configuration>
       </plugin>
       <!--
-         Codehaus dashboard plugin configuration 
+         Codehaus dashboard plugin configuration
+         
+         Note: according to the doc this MUST be the last reporting plugin entry
         -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
