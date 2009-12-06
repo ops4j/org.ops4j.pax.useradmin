@@ -345,6 +345,26 @@
   <!-- Build configuration
     -->
   <build>
+
+    <!-- Resource handling
+      -->
+    <resources>
+      <resource>
+        <directory>src/resources</directory>
+      </resource>
+      <!--
+       | additional resource entries, useful when building Eclipse RCP applications
+      -->
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>plugin.xml</include>
+          <include>plugin.properties</include>
+          <include>icons/**</include>
+        </includes>
+      </resource>
+    </resources>
+
     <!-- plugin version management and global configuration
      -->
     <pluginManagement>
@@ -418,25 +438,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <!-- Default resource handling
-      -->
-    <resources>
-      <resource>
-        <directory>src/resources</directory>
-      </resource>
-      <!--
-       | additional resource entries, useful when building Eclipse RCP applications
-      -->
-      <resource>
-        <directory>.</directory>
-        <includes>
-          <include>plugin.xml</include>
-          <include>plugin.properties</include>
-          <include>icons/**</include>
-        </includes>
-      </resource>
-    </resources>
 
     <!-- Plugins which run for all modules. 
       -->
