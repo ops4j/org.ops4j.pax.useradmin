@@ -384,6 +384,16 @@
           </configuration>
         </plugin>
         <!-- License management
+        
+             see: http://code.google.com/p/maven-license-plugin/wiki/Configuration#Plugin_info_on_maven_website
+             
+             Usage: 
+               - run "mvn license:check -P integration-test" to check all headers
+               - run "mvn license:remove -P integration-test" to remove existing header from all modules
+               - run "mvn license:format -P integration-test" to create/update the header in all modules
+               
+               Note: 
+                 -not to be automated: this plugin manipulates the source code!
           -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
