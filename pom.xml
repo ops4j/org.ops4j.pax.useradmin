@@ -383,11 +383,29 @@
             </instructions>
           </configuration>
         </plugin>
-        <!--  plugin>
+        <!-- License management
+          -->
+        <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
           <version>1.5.0</version>
-        </plugin -->
+          <configuration>
+            <header>http://scm.ops4j.org/repos/ops4j/projects/pax/useradmin/src/etc/license-header.txt</header>
+            <quiet>false</quiet>
+            <includes>
+              <include>**/*.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/*.apt</exclude>
+              <exclude>**/*.css</exclude>
+              <exclude>**/*.ldif</exclude>
+              <exclude>**/*.log</exclude>
+              <exclude>**/*.permissions</exclude>
+              <exclude>**/*.sh</exclude>
+              <exclude>**/*.xml</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -413,17 +431,10 @@
     <!-- Plugins which run for all modules. 
       -->
     <plugins>
-     <!-- 
       <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
-        <configuration>
-          <header>${basedir}/src/etc/header.txt</header>
-          <quiet>false</quiet>
-
-        </configuration>
       </plugin>
-      -->
     </plugins>
   </build>
 
