@@ -39,9 +39,33 @@ base_dir=$(dirname $0)
 DEPLOY_SCRIPT=${base_dir}/deploy.sh
 DEPLOY_SITE_SCRIPT=${base_dir}/deploy-site.sh
 #
-# - run subtasks
+# - check version: read main POM and check for its version. If it's not a SNAPSHOT version then don't 
+#   build it if the 'continuous-integration' profile is specified. Otherwise proceed as usual.
 #
-## TODO: if actual version is not a snapshot ... exit(code) / TODO: code = 0 or error needs to be defined 
+#   Used to avoid continuous builds while creating a release
+#
+#   Note: relies on 
+#         1. the parent pom is specified at the top of the POM file
+#         2. the project version following the parent section with no other <version> tag in between
+#
+current_version=$(awk ' \
+    BEGIN { parentRead=0; } \
+    { \
+     if ( $0 ~ /<\/parent>/ ) parentRead=1; \
+     if (parentRead == 1 && $0 ~ /<version>/ ) { \
+       split($0, arrayWithoutStartTag, ">"); \
+       split(arrayWithoutStartTag[2], arrayWithoutEndTag, "<"); \
+       print arrayWithoutEndTag[1]; \
+       exit 0; \
+     } \
+    }' pom.xml)
+if    [ ! -z `echo ${PROFILES} | grep "continuous-integration"` ] \
+    & [ -z `echo ${current_version} | grep "SNAPSHOT"` ]; then
+    echo "Refusing to build non-SNAPSHOT version: ${current_version}"
+    exit -1
+fi
+#
+echo "Building version $current_version"
 #
 # - clean project
 #

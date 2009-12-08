@@ -22,7 +22,15 @@
     -->
   <version>0.0.1-SNAPSHOT</version>
 
-  <!-- Default properties
+  <!-- More project info ...
+    -->
+  <packaging>pom</packaging>
+  <name>OPS4J - Pax UserAdmin</name>
+  <description>Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service</description>
+  <inceptionYear>2009</inceptionYear>
+
+
+  <!-- Default properties - maybe overridden via commandline or env
     -->
   <properties>
   
@@ -55,14 +63,6 @@
     <easymock.version>2.4</easymock.version>
     
   </properties>
-
-  <!-- More project info ...
-    -->
-  <packaging>pom</packaging>
-  <name>OPS4J - Pax UserAdmin</name>
-  <description>Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service</description>
-  <inceptionYear>2009</inceptionYear>
-
 
   <!-- Standard modules
     -->
@@ -145,8 +145,7 @@
   -->
   <dependencyManagement>
     <dependencies>
-      <!--
-       | OSGi dependencies
+      <!-- OSGi dependencies
        -->
       <dependency>
         <groupId>org.osgi</groupId>
@@ -161,8 +160,7 @@
         <scope>provided</scope>
       </dependency>
 
-      <!-- 
-       | Unit testing dependencies
+      <!-- Unit testing dependencies
        -->
       <dependency>
         <groupId>junit</groupId>
@@ -329,6 +327,26 @@
           <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
         </configuration>
       </plugin>
+      <!-- Changes report configuration
+        -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changes-plugin</artifactId>
+        <!-- version: latest -->
+        <configuration>
+          <onlyCurrentVersion>true</onlyCurrentVersion>
+          <resolutionIds>Unresolved,Fixed,Won't Fix,Duplicate,Incomplete,Cannot Reproduce</resolutionIds>
+          <statusIds>Open,In Progress,Reopened,Resolved,Closed</statusIds>
+          <typeIds></typeIds>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>jira-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
       <!--
          Codehaus dashboard plugin configuration
          
@@ -377,6 +395,7 @@
             <version>2.0.1</version>
             <inherited>true</inherited>
             <configuration>
+                <!--  only one to have only one run -->
                 <locales>en</locales>
             </configuration>
         </plugin>
@@ -420,7 +439,7 @@
           <artifactId>maven-license-plugin</artifactId>
           <version>1.5.0</version>
           <configuration>
-            <header>http://scm.ops4j.org/repos/ops4j/projects/pax/useradmin/src/etc/license-header.txt</header>
+            <header>http://scm.ops4j.org/repos/ops4j/projects/pax/${topProjectName}/src/etc/license-header.txt</header>
             <quiet>false</quiet>
             <includes>
               <include>**/*.java</include>
@@ -442,6 +461,8 @@
     <!-- Plugins which run for all modules. 
       -->
     <plugins>
+      <!-- License management 
+        -->
       <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
