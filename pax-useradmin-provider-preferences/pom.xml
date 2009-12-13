@@ -3,43 +3,60 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+  <!-- Parent: Pax-UserAdmin master pom
+    -->
 	<parent>
 		<artifactId>useradmin</artifactId>
 		<groupId>org.ops4j.pax</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+  <!-- Project coordinates - cannot be or serve as global property values
+       since they are set for each module independently.
+    -->
+  <groupId>org.ops4j.pax.useradmin</groupId>
+  <artifactId>pax-useradmin-provider-preferences</artifactId>
+  <!-- Note:
+       - modules do not have a version entry to simplify maintainance.
+       - internal cross-referencing of versions is done using ${project.version}
+    -->
+  <packaging>bundle</packaging>
+
+  <!-- Property definition and defaults - may override inherited properties and 
+       can be overridden via commandline or profile
+    -->
 	<properties>
 		<bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
 		<bundle.namespace>${project.groupId}.provider.preferences</bundle.namespace>
+    <bundle.description>A Pax UserAdmin StorageProvider based on the PreferencesService.</bundle.description>
 	</properties>
 
-	<groupId>org.ops4j.pax.useradmin</groupId>
-	<artifactId>pax-useradmin-provider-preferences</artifactId>
-	<name>${bundle.symbolicName}</name>
-	<packaging>bundle</packaging>
-	<description>A Pax UserAdmin StorageProvider based on the PreferencesService</description>
+  <!-- More project info ...
+    -->
+  <description>The ${project.artifactId} bundle module. ${bundle.description}</description>
+  <name>${bundle.symbolicName}</name>
 
+  <!-- Dependency configuration
+  -->
 	<dependencies>
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<artifactId>pax-useradmin-service</artifactId>
 			<groupId>org.ops4j.pax.useradmin</groupId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
+  <!-- Build configuration
+  -->
   <build>
     <plugins>
       <plugin>

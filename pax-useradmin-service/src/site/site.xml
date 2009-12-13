@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Pax UserAdmin">
 
+  <!-- needed b/o relative banner src-paths are not inherited properly
+    -->
   <bannerRight>
     <name>OPS4J</name>
-    <src>../ops4j-logo.png</src>
+    <src>../images/ops4j-logo.png</src>
     <href>http://www.ops4j.org</href>
   </bannerRight>
 
+  <!-- needed b/o broken links in inherited custom parent-menu 
+    -->
   <body>
-
-    <menu name="Pax UserAdmin">
-      <item name="Introduction" href="../index.html"/>
-      <item name="Quickstart" href="../quickstart.html"/>
-      <item name="User Guide" href="../userguide.html"/>
-    </menu>
-
-    <menu ref="reports"/>
-
+    <menu ref="parent" inherit="top"/>
+    <menu ref="reports" name="Module Reports" inherit="bottom"/>
   </body>
+
 </project>

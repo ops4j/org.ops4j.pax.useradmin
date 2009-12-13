@@ -1,5 +1,4 @@
 
-
 Pax UserAdmin Service Bundle
 
   This bundle contains the UserAdmin service implementation and SPI as well as the extender logic that 
@@ -10,8 +9,8 @@ Pax UserAdmin Service Bundle
   The UserAdmin service is a straightforward implementation of the OSGi UserAdmin specification. View
   source code {{{../xref/org/ops4j/pax/useradmin/service/internal/package-summary.html}here}}.
   
-  It forwards all data manipulation requests to the StorageProvider service which is bound to
-  the service instance.
+  It forwards all data manipulation requests to a configurable StorageProvider service and provides
+  tools to manage data across StorageProvider implementations.
   
   <<StorageProvider SPI>>
 
@@ -19,7 +18,7 @@ Pax UserAdmin Service Bundle
   an interface that must be implemented by storage provider services in order to be detected by
   the UserAdmin bundles extender logic.
   
-  The Pax UserAdmin project contains two StorageProvider implementations:
+  The Pax UserAdmin project contains two default StorageProvider implementations:
 
   [[1]] Preferences Provider
   
@@ -48,3 +47,6 @@ Coordinates
 *---------------+---------+
  Version:       | 0.0.1-SNAPSHOT
 *---------------+---------+
+ Documentation: | {{{../pax-useradmin-service/project-info.html}Module Page}}
+*---------------+---------+
+ 

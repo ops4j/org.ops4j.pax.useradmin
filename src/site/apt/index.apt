@@ -101,7 +101,7 @@ Distribution
 ~~  API and connects it to an underlying storage using a dynamic plugin-mechanism based on the
 ~~  {{StorageProvider}} SPI.
 
-  * currently two pax-useradmin-provider-<type> bundles: {{{bundles/provider-ldap.html}Ldap}} and {{{bundles/provider-preferences.html}PreferencesService}} based.
+  * currently two pax-useradmin-provider-<type> bundles: {{{bundles/provider-ldap/overview.html}Ldap}} and {{{bundles/provider-preferences/overview.html}PreferencesService}} based.
 
 ~~  Storage providers for the OSGi PreferencesService and Ldap are included in the distribution. More may
 ~~  be added - see StorageProvider discovery.

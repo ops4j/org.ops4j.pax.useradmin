@@ -10,12 +10,12 @@ Quickstart
 ---
   svn co https://scm.ops4j.org/repos/ops4j/projects/pax/useradmin useradmin
   cd useradmin
-  ./src/scripts/build-all.sh -s file://`pwd`/target/website [ -Pno-itest ]
+  ./src/scripts/build-all.sh [-s <some URL> ] [ -P integration-test ]
 ---
 
-  The -s option specifies where the generated site is stored.
+  The -s option specifies where the generated site is stored - default is </tmp/sites/useradmin>.
   
-  The <no-itest> profile may be used to shorten compile time.
+  Using the <integration-test> profile forces running the integration tests.
   
   <<Basic Framework Configuration & Startup>>
   

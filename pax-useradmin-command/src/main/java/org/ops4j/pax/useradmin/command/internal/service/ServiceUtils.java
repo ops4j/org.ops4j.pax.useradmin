@@ -51,7 +51,12 @@ public class ServiceUtils {
                 }
             }
         } catch (InvalidSyntaxException e) {
-            // never happens since null is an allowed filter
+            /** Just testing: PMD should report a warning - insert:
+            // should never happen ...
+            throw new IllegalStateException("Must not happen: null is an allowed filter - any more to check?");
+
+              * to fix it
+             **/
         }
         return service;
     }

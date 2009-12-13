@@ -3,18 +3,27 @@
           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Parent: Pax-UserAdmin master pom
+    -->
   <parent>
     <artifactId>useradmin</artifactId>
     <groupId>org.ops4j.pax</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
+  <!-- Project coordinates - cannot be or serve as global property values
+       since they are set for each module independently.
+    -->
   <groupId>org.ops4j.pax.useradmin</groupId>
   <artifactId>pax-useradmin-itest</artifactId>
-  <name>Pax UserAdmin Integration Tests</name>
-  <packaging>jar</packaging>
+  <!-- Note:
+       - modules do not have a version entry to simplify maintainance.
+       - internal cross-referencing of versions is done using ${project.version}
+    -->
+  <packaging>jar</packaging> <!-- TODO: should we package as 'bundle'? -->
 
-  <!-- Versions of dependencies used for integration testing 
+  <!-- Property definition and defaults - may override inherited properties and 
+       can be overridden via commandline or profile
     -->
   <properties>
     <pax.ldapserver.apacheds.version>0.2.0</pax.ldapserver.apacheds.version>
@@ -28,8 +37,16 @@
     <apache.felix.version>1.0.2</apache.felix.version>
     <apache.felix.version>2.0.0</apache.felix.version>
       -->
+    <bundle.description>Integration tests.</bundle.description>
   </properties>
 
+  <!-- More project info ...
+    -->
+  <description>The ${project.artifactId} module. ${bundle.description}</description>
+  <name>${project.groupId}.${project.artifactId}</name>
+
+  <!-- Dependency configuration
+  -->
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -136,6 +153,8 @@
     </dependency>
   </dependencies>
 
+  <!-- Build configuration
+  -->
   <build>
     <testResources>
       <testResource>
@@ -148,16 +167,7 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
       </plugin>
-      <!-- Configure memory space for surefire 
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-Xmx1024m</argLine>
-          <disableXmlReport>true</disableXmlReport>
-        </configuration>
-      </plugin>
+
       <!-- Use Pax Exam plugin to generate a dependency file which is used
            to configure the test run (instead of specifying versions twice). 
         -->

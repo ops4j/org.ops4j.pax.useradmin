@@ -21,7 +21,6 @@ import org.junit.Assert;
 import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.useradmin.UserAdmin;
 
@@ -41,19 +40,25 @@ public abstract class ServiceTestBase extends UserAdminTestBase {
      * @return The <code>UserAdmin</code> service instance to test.
      */
     protected UserAdmin getUserAdmin() {
+        UserAdmin     service = null;
         BundleContext context = getBundleContext();
+        Assert.assertNotNull("Bundle context is null.", context);
         try {
-            for (ServiceReference reference : context.getServiceReferences(UserAdmin.class.getName(), null)) {
+            ServiceReference[] userAdminServices = context.getServiceReferences(UserAdmin.class.getName(), null);
+            Assert.assertNotNull("No UserAdmin service(s) found.", userAdminServices);
+            for (ServiceReference reference : userAdminServices) {
                 String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
                 if (null != type) {
                     if (type.equals(getProviderType())) {
-                        return (UserAdmin) context.getService(reference);
+                        service = (UserAdmin) context.getService(reference);
+                        break;
                     }
                 }
             }
-        } catch (InvalidSyntaxException e) {
+        } catch (Exception e) {
+            Assert.fail("Unexpected " + e.getClass().getName() + " requesting UserAdmin service for provider: " + getProviderType());
         }
-        Assert.fail("No UserAdmin service found for provider " + getProviderType());
-        return null;
+        Assert.assertNotNull("No UserAdmin service found for provider " + getProviderType(), service);
+        return service;
     }
 }

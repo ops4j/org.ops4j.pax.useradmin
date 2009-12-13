@@ -10,4 +10,6 @@ while getopts ":m:P:s:" o ; do
      esac
 done
 #
+# TODO: howto clean exiting site?
+#
 ${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} ${SITE_DIR_OPT} site:deploy
