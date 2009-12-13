@@ -99,12 +99,12 @@ if [ 0 != $? ]; then
   echo "error building project site"
   exit -1
 fi
-mvn ${PROFILE_OPT} jxr:jxr
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} jxr:jxr
 if [ 0 != $? ]; then
   echo "error creating source xref"
   exit -1
 fi
-mvn ${PROFILE_OPT} jxr:test-jxr
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} jxr:test-jxr
 if [ 0 != $? ]; then
   echo "error creating test source xref"
   exit -1
