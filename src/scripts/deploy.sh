@@ -9,4 +9,4 @@ while getopts ":m:P:" o ; do
    esac
 done
 #
-${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} deploy
+${MAVEN_BIN_DIR}mvn ${PROFILE_OPT} -Dmaven.test.skip=true deploy
