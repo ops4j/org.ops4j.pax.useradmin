@@ -67,15 +67,17 @@ Single StorageProvider Configuration
    [[1]] Preferences
 
 ------------
+scan-composite:mvn:org.ops4j.pax.runner.profiles/compendium/4.2.0/composite
+scan-composite:mvn:org.ops4j.pax.runner.profiles/core/4.2.0/composite
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
 #
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-service/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
 ------------
 
    [[2]] LDAP with bundled LDAP server
@@ -84,15 +86,17 @@ scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
    run everything without custom configuration:
        
 ------------
+scan-composite:mvn:org.ops4j.pax.runner.profiles/compendium/4.2.0/composite
+scan-composite:mvn:org.ops4j.pax.runner.profiles/core/4.2.0/composite
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
 #
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
-scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.ldapserver/pax-ldapserver-apacheds/0.2.1
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
 ------------
 
    [[3]] LDAP with external LDAP server
@@ -101,14 +105,16 @@ scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
    can omit the bundled LDAP server):
    
 ------------
+scan-composite:mvn:org.ops4j.pax.runner.profiles/compendium/4.2.0/composite
+scan-composite:mvn:org.ops4j.pax.runner.profiles/core/4.2.0/composite
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
 #
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
 ------------
 
    but the LDAP provider must be configured to access the external LDAP server. Configuration is done
@@ -116,9 +122,9 @@ scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
    example configuration file may look like:
 
 ------------
-org.ops4j.pax.user.ldap.server.url = ldap.ops4j.org
-org.ops4j.pax.user.ldap.server.port = 8099
-org.ops4j.pax.user.ldap.root.dn = dc=ops4j,dc=org
+org.ops4j.pax.useradmin.ldap.server.url = ldap.ops4j.org
+org.ops4j.pax.useradmin.ldap.server.port = 8099
+org.ops4j.pax.useradmin.ldap.root.dn = dc=ops4j,dc=org
 ------------
 
    Store this file as <configuration/org.ops4j.pax.useradmin.provider.ldap.cfg>
@@ -132,17 +138,19 @@ Multi StorageProvider Configuration
    [[1]] Preferences and Ldap (bundled) provider
    
 ------------
+scan-composite:mvn:org.ops4j.pax.runner.profiles/compendium/4.2.0/composite
+scan-composite:mvn:org.ops4j.pax.runner.profiles/core/4.2.0/composite
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-api/1.3.0
 scan-bundle:mvn:org.ops4j.pax.logging/pax-logging-service/1.3.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.eventadmin/1.0.0
 scan-bundle:mvn:org.apache.felix/org.apache.felix.configadmin/1.0.10
 scan-bundle:mvn:org.apache.felix/org.apache.felix.fileinstall/1.0.0
 #
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-service/0.0.1-SNAPSHOT
-scan-bundle:mvn:org.ops4j.pax/pax-ldapserver-apacheds/0.0.1-SNAPSHOT
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-service/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.ldapserver/pax-ldapserver-apacheds/0.2.1
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-provider-ldap/0.0.1-SNAPSHOT
 scan-bundle:mvn:org.apache.felix/org.apache.felix.prefs/1.0.2
-scan-bundle:mvn:org.ops4j.pax/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
+scan-bundle:mvn:org.ops4j.pax.useradmin/pax-useradmin-provider-preferences/0.0.1-SNAPSHOT
 ------------
 
    [[2]] Two providers of the same type
