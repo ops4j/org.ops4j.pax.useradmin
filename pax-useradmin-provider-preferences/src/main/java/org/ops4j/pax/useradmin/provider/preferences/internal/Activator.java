@@ -25,6 +25,7 @@ import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 
 /**
  * Activator of the Pax UserAdmin Preferences StorageProvider bundle.
@@ -44,6 +45,8 @@ public class Activator implements BundleActivator {
         // set service properties
         //
         Dictionary<String, String> properties = new Hashtable<String, String>();
+        properties.put(Constants.SERVICE_PID,
+                       ConfigurationConstants.SERVICE_PID);
         properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
                        ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //

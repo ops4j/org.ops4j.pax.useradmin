@@ -56,7 +56,10 @@ public abstract class ServiceTestBase extends UserAdminTestBase {
                 }
             }
         } catch (Exception e) {
-            Assert.fail("Unexpected " + e.getClass().getName() + " requesting UserAdmin service for provider: " + getProviderType());
+            Assert.fail("Unexpected " + e.getClass().getName() 
+                                      + " when requesting UserAdmin service for provider '" 
+                                      + getProviderType() + "'\n"
+                                      + "message: " + e.getMessage());
         }
         Assert.assertNotNull("No UserAdmin service found for provider " + getProviderType(), service);
         return service;
