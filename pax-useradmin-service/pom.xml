@@ -1,65 +1,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
- 
-  <!-- Parent: Pax-UserAdmin master pom
-    -->
-  <parent>
-    <groupId>org.ops4j.pax</groupId>
-    <artifactId>useradmin</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-  <!-- Project coordinates - cannot be or serve as global property values
+    <!-- Parent: Pax-UserAdmin master pom
+    -->
+    <parent>
+        <groupId>org.ops4j.pax</groupId>
+        <artifactId>useradmin</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <!-- Project coordinates - cannot be or serve as global property values
        since they are set for each module independently.
     -->
-  <groupId>org.ops4j.pax.useradmin</groupId>
-  <artifactId>pax-useradmin-service</artifactId>
-  <!-- Note:
+    <groupId>org.ops4j.pax.useradmin</groupId>
+    <artifactId>pax-useradmin-service</artifactId>
+    <!-- Note:
        - modules do not have a version entry to simplify maintainance.
        - internal cross-referencing of versions is done using ${project.version}
     -->
-  <packaging>bundle</packaging>
+    <packaging>bundle</packaging>
 
-  <!-- Property definition and defaults - may override inherited properties and 
+    <!-- Property definition and defaults - may override inherited properties and
        can be overridden via commandline or profile
     -->
-  <properties>
-    <bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
-    <bundle.namespace>${project.groupId}.service</bundle.namespace>
-    <bundle.description>An extendible implementation of the OSGi UserAdmin service.</bundle.description>
-  </properties>
+    <properties>
+        <bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
+        <bundle.namespace>${project.groupId}.service</bundle.namespace>
+        <bundle.description>An extendible implementation of the OSGi UserAdmin service.</bundle.description>
+    </properties>
 
-  <!-- TODO: decide if some of the following entries should be moved to some parent pom -->
+    <!-- TODO: decide if some of the following entries should be moved to some parent pom -->
 
-  <!-- More project info ...
+    <!-- More project info ...
     -->
-  <description>The ${project.artifactId} bundle module. ${bundle.description}</description>
-  <name>${bundle.symbolicName}</name>
+    <description>The ${project.artifactId} bundle module. ${bundle.description}</description>
+    <name>${bundle.symbolicName}</name>
 
-  <!-- Dependency configuration
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-  </dependencies>
-  
-  <!-- Build configuration
-  -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+    <!-- Dependency configuration
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- Build configuration
+    -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

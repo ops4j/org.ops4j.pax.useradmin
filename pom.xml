@@ -1,227 +1,230 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <!-- Parent: OPS4J master pom
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Parent: OPS4J master pom
     -->
-  <parent>
-    <artifactId>master</artifactId>
-    <groupId>org.ops4j.pax</groupId>
-    <version>3.1.0</version>
-  </parent>
-  
-  <!-- Project coordinates - cannot be or serve as global property values
+    <parent>
+        <artifactId>master</artifactId>
+        <groupId>org.ops4j.pax</groupId>
+        <version>3.1.0</version>
+    </parent>
+
+    <!-- Project coordinates - cannot be or serve as global property values
        since they are set for each module independently.
     -->
-  <groupId>org.ops4j.pax</groupId>
-  <artifactId>useradmin</artifactId>
-  <!-- Note:
+    <groupId>org.ops4j.pax</groupId>
+    <artifactId>useradmin</artifactId>
+    <!-- Note:
        - modules should not have a version entry to simplify maintainance.
        - internal cross-referencing of versions should be done using ${project.version}
     -->
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <!-- Property definition and defaults - can be overridden via commandline or profile
+    <!-- Property definition and defaults - can be overridden via commandline or profile
     -->
-  <properties>
-  
-    <!-- The top-level project name.
-         Note: used for source-management and build configuration (i.e. the root-directory 
-               name and the root-package name of all modules)
-      -->
-    <topProject.name>useradmin</topProject.name>
+    <properties>
 
-    <!-- The top-level project name prefix.
-         Note: used for source-management and build configuration (i.e. naming of modules, ...)
-      -->
-    <topProject.prefix>pax</topProject.prefix>
+        <!-- The top-level project name.
+           Note: used for source-management and build configuration (i.e. the root-directory
+                 name and the root-package name of all modules)
+        -->
+        <topProject.name>useradmin</topProject.name>
 
-    <!-- The top-level project ID as used in system integration.
-         Note: to be used by referring toolchains (i.e. continuous builds, issue management, ...)
-               to identify this project
-      -->
-    <topProject.id>PAXUSERADMIN</topProject.id>
-  
-    <!-- The JDK we're developing for -->
-    <target.jdk.version>1.5</target.jdk.version>
-    
-    <!-- The directory to which the generated site is deployed.
-    
-       Note: relative paths matter on site:deploy
-    
-       If the URL of the generated site to deploy is a relative file URL, then the dashboard-plugin
-       creates invalid internal links for the cobertura overview->detail links. E.g. use the following
-       property to reproduce the problem:
-       
-       <site.deploy.dir>file://${project.build.directory}/website/</site.deploy.dir>
-       
-       Unfortunately ${project.build.directory} resolves to a relative path - not an absolute one. Try it
-       and check the cobertura reports to verify this behaviour.
-      -->
-    <site.deploy.dir>file:///tmp/sites/${topProject.name}/</site.deploy.dir>
-    
-    <!-- Globally managed versions
-      -->
-    <osgi.spec.version>4.2.0</osgi.spec.version>
-    <junit.version>4.4</junit.version>
-    <easymock.version>2.4</easymock.version>
-    
-  </properties>
+        <!-- The top-level project name prefix.
+           Note: used for source-management and build configuration (i.e. naming of modules, ...)
+        -->
+        <topProject.prefix>pax</topProject.prefix>
 
-  <!-- More project info ...
-    -->
-  <name>${project.groupId}.${project.artifactId}</name>
-  <description>
-    Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service based on version ${osgi.spec.version} of the specs.
-  </description>
-  <inceptionYear>2009</inceptionYear>
-  <url>http://www.ops4j.org/projects/pax/${topProject.name}/</url>
+        <!-- The top-level project ID as used in system integration.
+           Note: to be used by referring toolchains (i.e. continuous builds, issue management, ...)
+                 to identify this project
+        -->
+        <topProject.id>PAXUSERADMIN</topProject.id>
 
-  <!-- Standard modules
-    -->
-  <modules>
-    <!-- TODO:
-    <module>${topProject.prefix}-useradmin-provider-rdbms</module>
-    <module>${topProject.prefix}-useradmin-webservice-api</module>
-    <module>${topProject.prefix}-useradmin-provider-file</module>
-    -->
-    <module>${topProject.prefix}-${topProject.name}-service</module>
-    <module>${topProject.prefix}-${topProject.name}-provider-preferences</module>
-    <module>${topProject.prefix}-${topProject.name}-provider-ldap</module>
-    <module>${topProject.prefix}-${topProject.name}-command</module>
-  </modules>
+        <!-- The JDK we're developing for -->
+        <target.jdk.version>1.5</target.jdk.version>
 
-  <!-- Profiles to tailor custom executions
-    -->
-  <profiles>
+        <!-- The directory to which the generated site is deployed.
 
-    <!-- Include integration tests
-      -->
-    <profile>
-      <id>integration-test</id>
-      <modules>
-        <module>${topProject.prefix}-${topProject.name}-itest</module>
-      </modules>
-    </profile>
-    
-    <!-- Use CI infrastructure
-      -->
-    <profile>
-      <id>continuous-integration</id>
-      <properties>
-        <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/${topProject.name}/</site.deploy.dir>
-      </properties>
-    </profile>
+         Note: relative paths matter on site:deploy
 
-  </profiles>
- 
-  <!-- Developer information
-    -->
-  <developers>
-    <developer>
-      <id>mkuespert</id>
-      <name>Matthias Kuespert</name>
-      <email>mkuespert@googlemail.com</email>
-      <organization>MK Software</organization>
-      <organizationUrl>http://www.kuespert-web.de</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>UTC+1</timezone>
-    </developer>
-  </developers>
+         If the URL of the generated site to deploy is a relative file URL, then the dashboard-plugin
+         creates invalid internal links for the cobertura overview->detail links. E.g. use the following
+         property to reproduce the problem:
 
-  <!-- SCM configuration - used for releases
-    -->
-  <scm>
-    <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}</connection>
-    <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}</developerConnection>
-  </scm>
+         <site.deploy.dir>file://${project.build.directory}/website/</site.deploy.dir>
 
-  <!-- CI configuration - used for automated builds
-    -->
-  <ciManagement>
-    <url>http://ci.ops4j.org/browse/${topProject.id}</url>
-  </ciManagement>
-  
-  <!-- Deployment configuration
-    -->
-  <distributionManagement>
-    <site>
-      <id>${topProject.name}-website</id>
-      <url>${site.deploy.dir}</url>
-    </site>
-  </distributionManagement>
-  
-  <!-- Issue management configuration
-    -->
-  <issueManagement>
-    <system>Jira</system>
-    <url>http://issues.ops4j.org/browse/${topProject.id}</url>
-  </issueManagement>
+         Unfortunately ${project.build.directory} resolves to a relative path - not an absolute one. Try it
+         and check the cobertura reports to verify this behaviour.
+        -->
+        <site.deploy.dir>file:///tmp/sites/${topProject.name}/</site.deploy.dir>
 
-  <!-- Global dependency management (version, scope, ...)
+        <!-- Globally managed versions
+        -->
+        <osgi.spec.version>4.2.0</osgi.spec.version>
+        <junit.version>4.4</junit.version>
+        <easymock.version>2.4</easymock.version>
+
+    </properties>
+
+    <!-- More project info ...
     -->
-  <dependencyManagement>
+    <name>${project.groupId}.${project.artifactId}</name>
+    <description>
+        Pax UserAdmin - An extendible implementation of the OSGi UserAdmin service based on version ${osgi.spec.version}
+        of the specs.
+    </description>
+    <inceptionYear>2009</inceptionYear>
+    <url>http://www.ops4j.org/projects/pax/${topProject.name}/</url>
+
+    <!-- Standard modules
+    -->
+    <modules>
+        <!-- TODO:
+        <module>${topProject.prefix}-useradmin-provider-rdbms</module>
+        <module>${topProject.prefix}-useradmin-webservice-api</module>
+        <module>${topProject.prefix}-useradmin-provider-file</module>
+        -->
+        <module>${topProject.prefix}-${topProject.name}-service</module>
+        <module>${topProject.prefix}-${topProject.name}-provider-preferences</module>
+        <module>${topProject.prefix}-${topProject.name}-provider-ldap</module>
+        <module>${topProject.prefix}-${topProject.name}-command</module>
+    </modules>
+
+    <!-- Profiles to tailor custom executions
+    -->
+    <profiles>
+
+        <!-- Include integration tests
+        -->
+        <profile>
+            <id>integration-test</id>
+            <modules>
+                <module>${topProject.prefix}-${topProject.name}-itest</module>
+            </modules>
+        </profile>
+
+        <!-- Use CI infrastructure
+        -->
+        <profile>
+            <id>continuous-integration</id>
+            <properties>
+                <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/${topProject.name}/
+                </site.deploy.dir>
+            </properties>
+        </profile>
+
+    </profiles>
+
+    <!-- Developer information
+    -->
+    <developers>
+        <developer>
+            <id>mkuespert</id>
+            <name>Matthias Kuespert</name>
+            <email>mkuespert@googlemail.com</email>
+            <organization>MK Software</organization>
+            <organizationUrl>http://www.kuespert-web.de</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>UTC+1</timezone>
+        </developer>
+    </developers>
+
+    <!-- SCM configuration - used for releases
+    -->
+    <scm>
+        <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}</connection>
+        <developerConnection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}
+        </developerConnection>
+    </scm>
+
+    <!-- CI configuration - used for automated builds
+    -->
+    <ciManagement>
+        <url>http://ci.ops4j.org/browse/${topProject.id}</url>
+    </ciManagement>
+
+    <!-- Deployment configuration
+    -->
+    <distributionManagement>
+        <site>
+            <id>${topProject.name}-website</id>
+            <url>${site.deploy.dir}</url>
+        </site>
+    </distributionManagement>
+
+    <!-- Issue management configuration
+    -->
+    <issueManagement>
+        <system>Jira</system>
+        <url>http://issues.ops4j.org/browse/${topProject.id}</url>
+    </issueManagement>
+
+    <!-- Global dependency management (version, scope, ...)
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- OSGi dependencies
+            -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${osgi.spec.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${osgi.spec.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Unit testing dependencies
+            -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>${easymock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymockclassextension</artifactId>
+                <version>${easymock.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Global dependency configuration
+    -->
     <dependencies>
-      <!-- OSGi dependencies
-        -->
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
-        <version>${osgi.spec.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.compendium</artifactId>
-        <version>${osgi.spec.version}</version>
-        <scope>provided</scope>
-      </dependency>
-
-      <!-- Unit testing dependencies
-        -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>${easymock.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymockclassextension</artifactId>
-        <version>${easymock.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-  </dependencyManagement>
 
-  <!-- Global dependency configuration
-    -->
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymockclassextension</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <!-- Report configuration
+    <!-- Report configuration
   
        Note: module reports are NOT aggregated and are stored in the respective subdirectories. Report
              aggregation is done only via the dashboard report.
@@ -237,296 +240,300 @@
              
                TODO: howto run the xref generation twice?
     -->
-  <reporting>
-    <plugins>
-      <!-- Source cross-reference configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
-          <aggregate>false</aggregate>
-        </configuration>
-      </plugin>
+    <reporting>
+        <plugins>
+            <!-- Source cross-reference configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
+                    <aggregate>false</aggregate>
+                </configuration>
+            </plugin>
 
-      <!-- Cobertura report configuration
-        -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <!--
-          Note 1: versioning is crucial here: otherwise different cobertura versions
-          used here and in the dashboard-plugin may lead to incompatible classes
-          -->
-        <version>2.2</version>
-      </plugin>
+            <!-- Cobertura report configuration
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <!--
+                Note 1: versioning is crucial here: otherwise different cobertura versions
+                used here and in the dashboard-plugin may lead to incompatible classes
+                -->
+                <version>2.2</version>
+            </plugin>
 
-      <!-- PMD/CPD configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <targetJdk>${target.jdk.version}</targetJdk>
-          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
-          <aggregate>false</aggregate>
-          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
-        </configuration>
-      </plugin>
+            <!-- PMD/CPD configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <targetJdk>${target.jdk.version}</targetJdk>
+                    <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
+                    <aggregate>false</aggregate>
+                    <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+                </configuration>
+            </plugin>
 
-      <!-- Javadoc configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <!-- aggregate is deprecated: see http://maven.apache.org/plugins/maven-javadoc-plugin/examples/aggregate.html -->
-          <aggregate>true</aggregate>
-          <detectLinks>true</detectLinks>
-          <links>
-            <link>http://www.osgi.org/javadoc/r4v42/</link>
-          </links>
-          <groups>
-            <group>
-              <title>UserAdmin Service</title>
-              <packages>org.ops4j.pax.${topProject.name}.service*</packages>
-            </group>
-            <group>
-              <title>LDAP Provider</title>
-              <packages>org.ops4j.pax.${topProject.name}.provider.ldap*</packages>
-            </group>
-            <group>
-              <title>PreferencesService Provider</title>
-              <packages>org.ops4j.pax.${topProject.name}.provider.preferences*</packages>
-            </group>
-            <group>
-              <title>Shell Command</title>
-              <packages>org.ops4j.pax.${topProject.name}.command*</packages>
-            </group>
-          </groups>
-        </configuration>
-      </plugin>
+            <!-- Javadoc configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <!-- aggregate is deprecated: see http://maven.apache.org/plugins/maven-javadoc-plugin/examples/aggregate.html -->
+                    <aggregate>true</aggregate>
+                    <detectLinks>true</detectLinks>
+                    <links>
+                        <link>http://www.osgi.org/javadoc/r4v42/</link>
+                    </links>
+                    <groups>
+                        <group>
+                            <title>UserAdmin Service</title>
+                            <packages>org.ops4j.pax.${topProject.name}.service*</packages>
+                        </group>
+                        <group>
+                            <title>LDAP Provider</title>
+                            <packages>org.ops4j.pax.${topProject.name}.provider.ldap*</packages>
+                        </group>
+                        <group>
+                            <title>PreferencesService Provider</title>
+                            <packages>org.ops4j.pax.${topProject.name}.provider.preferences*</packages>
+                        </group>
+                        <group>
+                            <title>Shell Command</title>
+                            <packages>org.ops4j.pax.${topProject.name}.command*</packages>
+                        </group>
+                    </groups>
+                </configuration>
+            </plugin>
 
-      <!-- Changelog configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-changelog-plugin</artifactId>
-        <!-- version: latest -->
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.2</version>
-        <!-- Note: due to a bug in 2.2 the 'clean' goal MUST be called before creating the report - otherwise
-             you'll get a 'unexpected end of file' error -->
-        <configuration>
-          <!-- Ensure Xml file generation to have results picked up by the dashboard plugin -->
-          <xmlOutput>true</xmlOutput>
-        </configuration>
-      </plugin>
+            <!-- Changelog configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changelog-plugin</artifactId>
+                <!-- version: latest -->
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.2</version>
+                <!-- Note: due to a bug in 2.2 the 'clean' goal MUST be called before creating the report - otherwise
+        you'll get a 'unexpected end of file' error -->
+                <configuration>
+                    <!-- Ensure Xml file generation to have results picked up by the dashboard plugin -->
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
 
-      <!-- Checkstyle configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <!-- TODO: configLocation>${settings.localRepository}/path /to/checkstyle.config</configLocation -->
-          <!-- TODO: enableRulesSummary>false</enableRulesSummary -->
-          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
-        </configuration>
-      </plugin>
+            <!-- Checkstyle configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <!-- TODO: configLocation>${settings.localRepository}/path /to/checkstyle.config</configLocation -->
+                    <!-- TODO: enableRulesSummary>false</enableRulesSummary -->
+                    <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+                </configuration>
+            </plugin>
 
-      <!-- Surefire report configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
-          <aggregate>false</aggregate>
-          <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
-        </configuration>
-      </plugin>
+            <!-- Surefire report configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
+                    <aggregate>false</aggregate>
+                    <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+                </configuration>
+            </plugin>
 
-      <!-- Changes report configuration
-        -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-changes-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <onlyCurrentVersion>true</onlyCurrentVersion>
-          <resolutionIds>Unresolved,Fixed,Won't Fix,Duplicate,Incomplete,Cannot Reproduce</resolutionIds>
-          <statusIds>Open,In Progress,Reopened,Resolved,Closed</statusIds>
-          <typeIds></typeIds>
-        </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>jira-report</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
+            <!-- Changes report configuration
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-changes-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <onlyCurrentVersion>true</onlyCurrentVersion>
+                    <resolutionIds>Unresolved,Fixed,Won't Fix,Duplicate,Incomplete,Cannot Reproduce</resolutionIds>
+                    <statusIds>Open,In Progress,Reopened,Resolved,Closed</statusIds>
+                    <typeIds></typeIds>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>jira-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
 
-      <!-- Codehaus dashboard plugin configuration
-         
-         Note: according to the doc this MUST be the last reporting plugin entry
-        -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dashboard-maven-plugin</artifactId>
-        <version>1.0.0-beta-1</version>
-      </plugin>
-    </plugins>
-  </reporting>
+            <!-- Codehaus dashboard plugin configuration
 
-  <!-- Build configuration
+             Note: according to the doc this MUST be the last reporting plugin entry
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>dashboard-maven-plugin</artifactId>
+                <version>1.0.0-beta-1</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <!-- Build configuration
     -->
-  <build>
-    <!-- Resource handling
-      -->
-    <resources>
-      <resource>
-        <directory>src/resources</directory>
-      </resource>
-
-      <!-- additional resource entries, useful when building Eclipse RCP applications
-      -->
-      <resource>
-        <directory>.</directory>
-        <includes>
-          <include>plugin.xml</include>
-          <include>plugin.properties</include>
-          <include>icons/**</include>
-        </includes>
-      </resource>
-    </resources>
-
-    <!-- plugin version management and global configuration
-      -->
-    <pluginManagement>
-      <plugins>
-        <!-- Surefire configuration
-          -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <argLine>-Xmx1024m</argLine>
-          </configuration>
-        </plugin>
-
-        <!-- Site plugin
-          -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-site-plugin</artifactId>
-            <version>2.0.1</version>
-            <inherited>true</inherited>
-            <configuration>
-                <!--  only one to have only one run -->
-                <locales>en</locales>
-            </configuration>
-        </plugin>
-
-        <!-- Felix bundle plugin / Bnd version and configuration
-          -->
-        <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.0.0</version>
-          <extensions>true</extensions>
-          <configuration>
-            <instructions>
-              <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
-              <Bundle-Version>${project.version}</Bundle-Version>
-              <!--
-               | assume public classes are in the top package, and private classes are under ".internal"
-              -->
-              <Export-Package>!${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${project.version}"</Export-Package>
-              <Private-Package>${bundle.namespace}.internal.*</Private-Package>
-              <!--
-               | each module can override these defaults in their osgi.bnd file
-              -->
-              <_include>-osgi.bnd</_include>
-            </instructions>
-          </configuration>
-        </plugin>
-
-        <!-- License management plugin
-        
-             see: http://code.google.com/p/maven-license-plugin/wiki/Configuration#Plugin_info_on_maven_website
-             
-             Usage: 
-               - run "mvn license:check -P integration-test" to check all headers
-               - run "mvn license:remove -P integration-test" to remove existing header from all modules
-               - run "mvn license:format -P integration-test" to create/update the header in all modules
-               
-               Note: 
-                 -not to be automated: this plugin manipulates the source code!
-          -->
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.5.0</version>
-          <configuration>
-            <header>http://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}/src/etc/license-header.txt</header>
-            <quiet>false</quiet>
-            <includes>
-              <include>**/*.java</include>
-            </includes>
-            <excludes>
-              <exclude>**/*.apt</exclude>
-              <exclude>**/*.css</exclude>
-              <exclude>**/*.ldif</exclude>
-              <exclude>**/*.log</exclude>
-              <exclude>**/*.permissions</exclude>
-              <exclude>**/*.sh</exclude>
-              <exclude>**/*.xml</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <!-- Plugins which run for all modules. 
-      -->
-    <plugins>
-      <!-- License management
-      
-           Note: not bound to any lifecycle ... must be called explicitly
+    <build>
+        <!-- Resource handling
         -->
-      <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
-      </plugin>
+        <resources>
+            <resource>
+                <directory>src/resources</directory>
+            </resource>
 
-      <!-- Source Xref generation
-      
-           Note: this configuration is only used when called explicitly - the configuration
-                 used when called during the site lifecycle is in the reports section.
-                 
-                 When called explicitly the plugin will create an aggregated report to be
-                 used in the main menu on the project site.
+            <!-- additional resource entries, useful when building Eclipse RCP applications
+            -->
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>plugin.xml</include>
+                    <include>plugin.properties</include>
+                    <include>icons/**</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <!-- plugin version management and global configuration
         -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <!-- version: latest -->
-        <configuration>
-          <aggregate>true</aggregate>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <pluginManagement>
+            <plugins>
+                <!-- Surefire configuration
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <argLine>-Xmx1024m</argLine>
+                    </configuration>
+                </plugin>
+
+                <!-- Site plugin
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>2.0.1</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <!--  only one to have only one run -->
+                        <locales>en</locales>
+                    </configuration>
+                </plugin>
+
+                <!-- Felix bundle plugin / Bnd version and configuration
+                -->
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.0.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
+                            <Bundle-Version>${project.version}</Bundle-Version>
+                            <!--
+                             | assume public classes are in the top package, and private classes are under ".internal"
+                            -->
+                            <Export-Package>
+                                !${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${project.version}"
+                            </Export-Package>
+                            <Private-Package>${bundle.namespace}.internal.*</Private-Package>
+                            <!--
+                             | each module can override these defaults in their osgi.bnd file
+                            -->
+                            <_include>-osgi.bnd</_include>
+                        </instructions>
+                    </configuration>
+                </plugin>
+
+                <!-- License management plugin
+
+                   see: http://code.google.com/p/maven-license-plugin/wiki/Configuration#Plugin_info_on_maven_website
+
+                   Usage:
+                     - run "mvn license:check -P integration-test" to check all headers
+                     - run "mvn license:remove -P integration-test" to remove existing header from all modules
+                     - run "mvn license:format -P integration-test" to create/update the header in all modules
+
+                     Note:
+                       -not to be automated: this plugin manipulates the source code!
+                -->
+                <plugin>
+                    <groupId>com.mycila.maven-license-plugin</groupId>
+                    <artifactId>maven-license-plugin</artifactId>
+                    <version>1.5.0</version>
+                    <configuration>
+                        <header>
+                            http://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}/src/etc/license-header.txt
+                        </header>
+                        <quiet>false</quiet>
+                        <includes>
+                            <include>**/*.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/*.apt</exclude>
+                            <exclude>**/*.css</exclude>
+                            <exclude>**/*.ldif</exclude>
+                            <exclude>**/*.log</exclude>
+                            <exclude>**/*.permissions</exclude>
+                            <exclude>**/*.sh</exclude>
+                            <exclude>**/*.xml</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- Plugins which run for all modules.
+        -->
+        <plugins>
+            <!-- License management
+
+               Note: not bound to any lifecycle ... must be called explicitly
+            -->
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+            </plugin>
+
+            <!-- Source Xref generation
+
+               Note: this configuration is only used when called explicitly - the configuration
+                     used when called during the site lifecycle is in the reports section.
+
+                     When called explicitly the plugin will create an aggregated report to be
+                     used in the main menu on the project site.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <!-- version: latest -->
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
