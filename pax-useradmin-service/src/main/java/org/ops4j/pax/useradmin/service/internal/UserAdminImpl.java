@@ -435,7 +435,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         } else {
             String message =   "No event service available - cannot send event of type '"
                              + getEventTypeName(type) + "' for role '" + role.getName() + "'";
-            logMessage(this, LogService.LOG_ERROR,
+            logMessage(this, LogService.LOG_DEBUG,
                        message);
         }
     }
