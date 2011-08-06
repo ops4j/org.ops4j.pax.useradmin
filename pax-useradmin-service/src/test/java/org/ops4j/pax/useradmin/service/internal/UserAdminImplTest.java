@@ -270,7 +270,7 @@ public class UserAdminImplTest {
             EasyMock.expect(eventTracker.getService()).andReturn(null);
             EasyMock.expect(role.getName()).andReturn("some Name");
             EasyMock.expect(logTracker.getService()).andReturn(logService);
-            logService.log(EasyMock.eq(LogService.LOG_ERROR), EasyMock.isA(String.class));
+            logService.log(EasyMock.eq(LogService.LOG_DEBUG), EasyMock.isA(String.class));
             //
         } catch (Exception e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
