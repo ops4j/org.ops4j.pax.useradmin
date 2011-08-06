@@ -60,8 +60,14 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
+    /**
+     * The context of the OSGi bundle containing this service. 
+     */
     private BundleContext       m_context         = null;
 
+    /**
+     * The administrative permission used to verify access to restricted functionality.
+     */
     private UserAdminPermission m_adminPermission = null;
 
     /**
