@@ -68,9 +68,10 @@ public abstract class AbstractProperties extends Hashtable {
      * Stores a String value.
      * 
      * @param storageProvider The StorageProvider to use.
-     * @param key The key.
-     * @param value The value.
-     * @throws StorageException
+     * @param key The key to access the value.
+     * @param value The value to store with the given key.
+     * @return The value that was stored.
+     * @throws StorageException if an error occurs when storing the data
      */
     protected abstract Object store(StorageProvider storageProvider, String key, Object value) throws StorageException;
 
@@ -78,8 +79,8 @@ public abstract class AbstractProperties extends Hashtable {
      * Removes an entry.
      * 
      * @param storageProvider The StorageProvider to use.
-     * @param key The key.
-     * @throws StorageException
+     * @param key The key to remove.
+     * @throws StorageException if an error occurs when deleting the data
      */
     protected abstract void remove(StorageProvider storageProvider, String key)
     throws StorageException;

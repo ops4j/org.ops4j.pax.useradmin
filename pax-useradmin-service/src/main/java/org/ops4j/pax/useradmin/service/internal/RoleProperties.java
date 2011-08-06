@@ -37,14 +37,14 @@ public class RoleProperties extends AbstractProperties {
     /**
      * Initializing constructor.
      * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminTools, Map)
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
     protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         super(role, util, properties);
     }
 
     /**
-     * @see AbstractProperties#store(StorageProvider, String, String)
+     * @see AbstractProperties#store(StorageProvider, String, Object)
      */
     @Override
     protected Object store(StorageProvider storageProvider, String key, Object value) throws StorageException {

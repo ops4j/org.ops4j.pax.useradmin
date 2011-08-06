@@ -74,7 +74,8 @@ public interface StorageProvider {
      * @see UserAdmin#removeRole(String)
      * 
      * @param role The <code>Role</code> to delete.
-     * @throws StorageException if the role could not be deleted.
+     * @return True if the role could be deleted.
+     * @throws StorageException if an error occured while storing the role
      */
     boolean deleteRole(Role role) throws StorageException;
 

@@ -27,7 +27,7 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the <code>User</code> interface.
  * 
- * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html" />
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009
@@ -70,9 +70,9 @@ public class UserImpl extends RoleImpl implements User {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
         }
-        if (!(key instanceof String)) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
-        }
+//        if (!(key instanceof String)) {
+//            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
+//        }
         if ("".equals(key)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
         }
@@ -85,7 +85,7 @@ public class UserImpl extends RoleImpl implements User {
         //
         getAdmin().checkAdminPermission();
         for (Object credentialKey : m_credentials.keySet()) {
-            if (((String) credentialKey).equals(key)) {
+            if (credentialKey.equals(key)) {
                 // check this credential
                 byte[] credentialValue = (byte[]) m_credentials.get(key);
                 return null != credentialValue && getAdmin().compareToEncryptedValue(value, credentialValue);

@@ -53,7 +53,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * and group/role data using pluggable storage providers that connect to an
  * underlying datastore.
  * 
- * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html" />
  * 
  * @author Matthias Kuespert
  * @since 02.07.2009
@@ -131,7 +131,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @return The event code as string
      */
     private String getEventTypeName(int type) {
-        String typeName = null;
+        String typeName;
         switch (type) {
             case UserAdminEvent.ROLE_CHANGED:
                 typeName = "ROLE_CHANGED";
@@ -141,7 +141,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                 break;
             case UserAdminEvent.ROLE_REMOVED:
                 typeName = "ROLE_REMOVED";
+                break;
             default:
+                // TODO: shouldn't that result in an exception?
                 typeName = "Event" + type;
         }
         return typeName;
@@ -151,7 +153,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * Checks if the caller has admin permissions when security is enabled. If
      * security is not enabled nothing happens here.
      * 
-     * @throws <code>SecurityException</code> If security is enabled, a security
+     * @throws SecurityException if security is enabled, a security
      *         manager exists and the caller does not have the
      *         UserAdminPermission with name admin.
      */
@@ -173,12 +175,12 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @param encryptionRandomAlgorithmSaltLength The klength of the salt to use for random number generation.
      * @return An implementation of the encryptor.
      * 
-     * @throws ConfigurationException
+     * @throws ConfigurationException if the given algorithm doesn't exist
      */
     private EncryptorImpl createEncryptor(String encryptionAlgorithm,
                                           String encryptionRandomAlgorithm,
                                           String encryptionRandomAlgorithmSaltLength) throws ConfigurationException {
-        EncryptorImpl encryptor = null;
+        EncryptorImpl encryptor;
         try {
             encryptor = new EncryptorImpl(encryptionAlgorithm,
                                             encryptionRandomAlgorithm,
@@ -274,8 +276,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == user) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_USER));
         }
-        AuthorizationImpl authorization = new AuthorizationImpl(this, user);
-        return authorization;
+        return new AuthorizationImpl(this, user);
     }
 
     /**
@@ -306,7 +307,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             StorageProvider storage = getStorageProvider();
             Collection<Role> roles = storage.findRoles(this, filter);
             if (!roles.isEmpty()) {
-                return roles.toArray(new Role[0]);
+                return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
             logMessage(this, LogService.LOG_ERROR, e.getMessage());
@@ -326,8 +327,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         }
         try {
             StorageProvider storage = getStorageProvider();
-            User user = storage.getUser(this, key, value);
-            return user;
+            return storage.getUser(this, key, value);
         } catch (StorageException e) {
             logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
@@ -454,7 +454,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#encrypt(Object)
      */
     public byte[] encrypt(Object value) {
-        byte[] valueBytes = null;
+        byte[] valueBytes;
         if (value instanceof String) {
             valueBytes = ((String)value).getBytes();
         } else if (value instanceof byte[]) {
@@ -470,11 +470,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
     
     /**
-     * @see UserAdminUtil#verifyEncryptedValue(Object, byte[])
+     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
      */
     public boolean compareToEncryptedValue(Object inputValue,
-                                        byte[] storedValue) {
-        byte[] valueBytes = null;
+                                           byte[] storedValue) {
+        byte[] valueBytes;
         if (inputValue instanceof String) {
             valueBytes = ((String)inputValue).getBytes();
         } else if (inputValue instanceof byte[]) {
@@ -497,8 +497,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     public User createUser(String name,
                            Map<String, Object> properties,
                            Map<String, Object> credentials) {
-        UserImpl user = new UserImpl(name, this, properties, credentials);
-        return user;
+        return new UserImpl(name, this, properties, credentials);
     }
 
     /**
@@ -507,7 +506,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     public Group createGroup(String name,
                              Map<String, Object> properties,
                              Map<String, Object> credentials) {
-        GroupImpl group = new GroupImpl(name, this, properties, credentials);
-        return group;
+        return new GroupImpl(name, this, properties, credentials);
     }
 }

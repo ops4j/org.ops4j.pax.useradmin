@@ -29,7 +29,7 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the Authorization interface.
  * 
- * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html" />
  * 
  * @author Matthias Kuespert
  * @since 02.07.2009
@@ -84,7 +84,7 @@ public class AuthorizationImpl implements Authorization {
                 }
             }
             if (!roleNames.isEmpty()) {
-                return roleNames.toArray(new String[0]);
+                return roleNames.toArray(new String[roleNames.size()]);
             }
         } catch (InvalidSyntaxException e) {
             // will never be reached because UserAdmin.getRoles() allows null filters
@@ -98,19 +98,8 @@ public class AuthorizationImpl implements Authorization {
      * @see Authorization#hasRole(String)
      */
     public boolean hasRole(String name) {
-//        String[] roles = getRoles();
-//        if (null != roles) {
-//            for (String role : roles) {
-//                if (role.equals(name)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
         RoleImpl roleToCheck = (RoleImpl) m_userAdmin.getRole(name);
-        if (null != roleToCheck) {
-            return ImplicationResult.IMPLIEDBY_YES == roleToCheck.isImpliedBy(m_user, new ArrayList<String>());
-        }
-        return false;
+        return    null != roleToCheck
+               && ImplicationResult.IMPLIEDBY_YES == roleToCheck.isImpliedBy(m_user, new ArrayList<String>());
     }
 }

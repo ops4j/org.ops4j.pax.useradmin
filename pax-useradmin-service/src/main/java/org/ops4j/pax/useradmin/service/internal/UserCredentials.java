@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdminPermission;
 
@@ -37,7 +38,7 @@ public class UserCredentials extends AbstractProperties {
     /**
      * Initializing constructor.
      * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminTools, Map)
+     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
     protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
         super(user, util, properties);
@@ -55,7 +56,7 @@ public class UserCredentials extends AbstractProperties {
      */
     @Override
     protected void checkGetPermission(String key) {
-        getUtil().checkPermission((String) key, UserAdminPermission.GET_CREDENTIAL);
+        getUtil().checkPermission(key, UserAdminPermission.GET_CREDENTIAL);
     }
 
     /**

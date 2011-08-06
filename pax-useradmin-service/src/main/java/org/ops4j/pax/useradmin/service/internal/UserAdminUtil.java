@@ -37,7 +37,7 @@ public interface UserAdminUtil {
      *            to change.
      * @param credential The <code>UserAdminPermission</code> code.
      * 
-     * @throws <code>SecurityException</code> If security is enabled, a security
+     * @throws SecurityException if security is enabled, a security
      *         manager exists and the caller does not have the specified
      *         permission.
      */

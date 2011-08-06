@@ -26,7 +26,7 @@ import org.osgi.service.useradmin.Role;
 /**
  * Implementation of the UserAdmin Role interface.
  * 
- * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html" />
  * 
  * @author Matthias Kuespert
  * @since 02.07.2009
@@ -58,15 +58,15 @@ public abstract class RoleImpl implements Role {
         IMPLIEDBY_YES,           // given role is implied by this one
         IMPLIEDBY_NO,            // given role is not implied by this one
         IMPLIEDBY_LOOPDETECTED   // detected a loop - e.g. a group containing itself.
-    };
+    }
 
     /**
      * Constructor.
      * 
-     * @param name The name of the role.
-     * @param admin The UserAdmin that uses this role.
+     * @param name       The name of the role.
+     * @param userAdmin  The UserAdmin that uses this role.
      * @param properties A map containing the raw properties of this role as
-     *            read by the StorageProvider.
+     *                   read by the StorageProvider.
      */
     protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, Object> properties) {
         if (name == null) {

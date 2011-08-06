@@ -31,7 +31,7 @@ import org.osgi.service.useradmin.Role;
  * Implementation of the <code>Group</code> interface as specified in the
  * OSGi companion specification.
  * 
- * @see http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html" />
  * 
  * @author Matthias Kuespert
  * @since  02.07.2009
@@ -114,7 +114,7 @@ public class GroupImpl extends UserImpl implements Group {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
             if (!roles.isEmpty()) {
-                 return roles.toArray(new Role[0]);
+                 return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
             getAdmin().logMessage(this,
@@ -132,7 +132,7 @@ public class GroupImpl extends UserImpl implements Group {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getRequiredMembers(getAdmin(), this);
             if (!roles.isEmpty()) {
-                return roles.toArray(new Role[0]);
+                return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
             getAdmin().logMessage(this,
