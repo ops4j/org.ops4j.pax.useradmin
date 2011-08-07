@@ -27,7 +27,7 @@ import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
  * A dictionary to manage user credentials and communicate changes.
- * 
+ *
  * @author Matthias Kuespert
  * @since  02.07.2009
  */
@@ -37,7 +37,7 @@ public class UserCredentials extends AbstractProperties {
 
     /**
      * Initializing constructor.
-     * 
+     *
      * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
     protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
@@ -66,7 +66,7 @@ public class UserCredentials extends AbstractProperties {
     protected Object store(StorageProvider storageProvider, String key, Object plainValue)
         throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-        byte[] encryptedValue = getUtil().encrypt(plainValue);
+        Object encryptedValue = getUtil().encrypt(plainValue);
 //        System.out.println("enc = " + plainValue + "  - " + encryptedValue);
         storageProvider.setUserCredential(getUser(), key, encryptedValue);
         return encryptedValue;
@@ -83,7 +83,7 @@ public class UserCredentials extends AbstractProperties {
 
 /*
  * Activate when OSGi finally moves to Map
- * 
+ *
     @Override
     protected void clear(StorageProvider storageProvider) throws StorageException {
         for (Object key : keySet()) {
@@ -91,5 +91,5 @@ public class UserCredentials extends AbstractProperties {
         }
         storageProvider.clearUserCredentials(getUser());
     }
-*/    
+*/
 }

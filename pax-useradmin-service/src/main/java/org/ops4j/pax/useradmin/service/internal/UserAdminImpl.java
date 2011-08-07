@@ -52,16 +52,16 @@ import org.osgi.util.tracker.ServiceTracker;
  * An implementation of the OSGi UserAdmin service. Allows to administer user
  * and group/role data using pluggable storage providers that connect to an
  * underlying datastore.
- * 
+ *
  * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html" />
- * 
+ *
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
 public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
 
     /**
-     * The context of the OSGi bundle containing this service. 
+     * The context of the OSGi bundle containing this service.
      */
     private BundleContext       m_context         = null;
 
@@ -97,7 +97,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
-     * 
+     *
      * @param context The <code>BundleContext</code>
      * @param storageService A <code>ServiceTracker</code> to locate the <code>StorageProvider</code> service to use.
      * @param logService A <code>ServiceTracker</code> to locate the <code>LogService</code> to use.
@@ -132,7 +132,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * Maps event codes to strings.
-     * 
+     *
      * @param type The type of the event
      * @return The event code as string
      */
@@ -158,7 +158,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     /**
      * Checks if the caller has admin permissions when security is enabled. If
      * security is not enabled nothing happens here.
-     * 
+     *
      * @throws SecurityException if security is enabled, a security
      *         manager exists and the caller does not have the
      *         UserAdminPermission with name admin.
@@ -172,15 +172,15 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             sm.checkPermission(m_adminPermission);
         }
     }
-    
+
     /**
      * Creates an appropriate encryptor.
-     * 
+     *
      * @param encryptionAlgorithm The encryption algorithm to use.
      * @param encryptionRandomAlgorithm The random number algorithm to use.
      * @param encryptionRandomAlgorithmSaltLength The klength of the salt to use for random number generation.
      * @return An implementation of the encryptor.
-     * 
+     *
      * @throws ConfigurationException if the given algorithm doesn't exist
      */
     private EncryptorImpl createEncryptor(String encryptionAlgorithm,
@@ -200,10 +200,10 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     // ManagedService interface
-    
+
     /**
      * Copies all properties to an internal Map.
-     * 
+     *
      * @see ManagedService#updated(Dictionary)
      */
     @SuppressWarnings(value = "unchecked")
@@ -232,7 +232,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
                                           encryptionRandomAlgorithmSaltLength);
         }
     }
-    
+
     // UserAdmin interface
 
     /**
@@ -386,7 +386,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * @see UserAdminUtil#logMessage(Object, int, String)
-     * 
+     *
      * TODO: do we need a check for valid levels? What to do then: exception or ignore?
      */
     public void logMessage(Object source, int level, String message) {
@@ -407,7 +407,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         final UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);
         //
         // send event to all listeners, asynchronously - in a separate thread!!
-        // 
+        //
         Object[] eventListeners = m_eventListeners.getServices();
         if (null != eventListeners) {
             for (Object listenerObject : eventListeners) {
@@ -455,31 +455,31 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             sm.checkPermission(new UserAdminPermission(name, action));
         }
     }
-    
+
     /**
      * @see UserAdminUtil#encrypt(Object)
      */
-    public byte[] encrypt(Object value) {
-        byte[] valueBytes;
-        if (value instanceof String) {
-            valueBytes = ((String)value).getBytes();
-        } else if (value instanceof byte[]) {
-            valueBytes = (byte[]) value;
-        } else {
-            throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
-        }
-        //
+    public Object encrypt(Object value) {
         if (null != m_encryptor) {
-            valueBytes = m_encryptor.encrypt(valueBytes);
+            byte[] valueBytes;
+            if (value instanceof String) {
+                valueBytes = ((String) value).getBytes();
+            } else if (value instanceof byte[]) {
+                valueBytes = (byte[]) value;
+            } else {
+                throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
+            }
+            //
+            return m_encryptor.encrypt(valueBytes);
         }
-        return valueBytes;
+        return value;
     }
-    
+
     /**
-     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
+     * @see UserAdminUtil#compareToEncryptedValue(Object, Object)
      */
     public boolean compareToEncryptedValue(Object inputValue,
-                                           byte[] storedValue) {
+                                           Object storedValue) {
         byte[] valueBytes;
         if (inputValue instanceof String) {
             valueBytes = ((String)inputValue).getBytes();
@@ -489,14 +489,24 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
         //
-        if (null != m_encryptor) {
-            return m_encryptor.compare(valueBytes, storedValue);
+        byte[] storedValueBytes;
+        if (storedValue instanceof String) {
+            storedValueBytes = ((String)storedValue).getBytes();
+        } else if (storedValue instanceof byte[]) {
+            storedValueBytes = (byte[]) storedValue;
+        } else {
+            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
+            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
-        return Arrays.equals(valueBytes, storedValue);
+        //
+        if (null != m_encryptor) {
+            return m_encryptor.compare(valueBytes, storedValueBytes);
+        }
+        return Arrays.equals(valueBytes, storedValueBytes);
     }
-    
+
     // UserAdminFactory interface
-    
+
     /**
      * @see UserAdminFactory#createUser(String, Map, Map)
      */

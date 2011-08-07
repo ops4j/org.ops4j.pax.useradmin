@@ -26,9 +26,9 @@ import org.osgi.service.useradmin.User;
 
 /**
  * Implementation of the <code>User</code> interface.
- * 
+ *
  * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html" />
- * 
+ *
  * @author Matthias Kuespert
  * @since  02.07.2009
  */
@@ -38,12 +38,12 @@ public class UserImpl extends RoleImpl implements User {
      * The credentials stored for this user.
      */
     private UserCredentials m_credentials = null;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @see RoleImpl#RoleImpl(String, UserAdminImpl, Map)
-     * 
+     *
      * @param credentials The credentials of this user.
      */
     protected UserImpl(String name,
@@ -80,6 +80,7 @@ public class UserImpl extends RoleImpl implements User {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
         if (!(value instanceof String || value instanceof byte[])) {
+            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE_TYPE);
         }
         //
@@ -104,7 +105,7 @@ public class UserImpl extends RoleImpl implements User {
     /**
      * Checks if this user is implied by the given role. Users are only implied
      * by themselves.
-     * 
+     *
      * @param role The role to check.
      * @param checkedRoles Used for loop detection.
      * @return True if this role is implied by the given one, false otherwise.
@@ -114,7 +115,7 @@ public class UserImpl extends RoleImpl implements User {
             return ImplicationResult.IMPLIEDBY_LOOPDETECTED;
         }
         checkedRoles.add(getName());
-        return    getName().equals(Role.USER_ANYONE) 
+        return    getName().equals(Role.USER_ANYONE)
                || getName().equals(role.getName())   ? ImplicationResult.IMPLIEDBY_YES : ImplicationResult.IMPLIEDBY_NO;
         // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
     }
