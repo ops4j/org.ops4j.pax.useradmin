@@ -70,26 +70,21 @@ public class UserImpl extends RoleImpl implements User {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
         }
-//        if (!(key instanceof String)) {
-//            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
-//        }
         if ("".equals(key)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
         }
         if (null == value) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
-        if (!(value instanceof String || value instanceof byte[])) {
-            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE_TYPE);
-        }
-        //
-        getAdmin().checkAdminPermission();
-        for (Object credentialKey : m_credentials.keySet()) {
-            if (credentialKey.equals(key)) {
-                // check this credential
-                byte[] credentialValue = (byte[]) m_credentials.get(key);
-                return null != credentialValue && getAdmin().compareToEncryptedValue(value, credentialValue);
+        if (value instanceof String || value instanceof byte[]) {
+            getAdmin().checkAdminPermission();
+            for (Object credentialKey : m_credentials.keySet()) {
+                if (credentialKey.equals(key)) {
+                    // check this credential
+                    byte[] credentialValue = (byte[]) m_credentials.get(key);
+                    return    null != credentialValue
+                           && getAdmin().compareToEncryptedValue(value, credentialValue);
+                }
             }
         }
         return false;

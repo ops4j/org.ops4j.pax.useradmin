@@ -37,10 +37,10 @@ import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
  * Testing the UserImpl and UserCredentials classes.
- * 
+ *
  * Note: only successful calls are tested here - failures of the AbstractProperties class are
- *       tested in the RoleImplTest class 
- * 
+ *       tested in the RoleImplTest class
+ *
  * @author Matthias Kuespert
  * @since  11.07.2009
  */
@@ -48,12 +48,12 @@ public class UserImplTest {
 
     private static final String USER_NAME1 = "someUser";
     private static final String USER_NAME2 = "someOtherUser";
-    
+
     private static final String KEY1       = "testCredential1";
     private static final String VALUE1     = "someCredentialValue1";
     private static final String KEY2       = "testCredential2";
     private static final byte[] VALUE2     = "someCredentialValue2".getBytes();
-    
+
     private Map<String, Object> getCredentials() {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(KEY1, VALUE1.getBytes());
@@ -94,7 +94,7 @@ public class UserImplTest {
         Assert.assertEquals("Mismatching name", USER_NAME1, user.getName());
         Assert.assertEquals("Invalid type", Role.USER, user.getType());
         Assert.assertEquals("Invalid UserAdmin instance", userAdmin, user.getAdmin());
-        Dictionary credentials = user.getCredentials(); 
+        Dictionary credentials = user.getCredentials();
         Assert.assertNotNull(credentials);
         Assert.assertEquals("Mismatching property count", 2, credentials.size());
         Assert.assertTrue("Mismatching property", Arrays.equals(VALUE1.getBytes(), (byte[])credentials.get(KEY1)));
@@ -114,7 +114,7 @@ public class UserImplTest {
         //
         EasyMock.verify(userAdmin);
     }
-    
+
     @Test
     @SuppressWarnings(value = "unchecked")
     public void addCredentialStorageException() {
@@ -252,7 +252,7 @@ public class UserImplTest {
 
     // Note: a test for the clear() method is not needed since the Dictionary
     // class does not provide a clear method
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void hasCredentialNullKey() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
@@ -283,13 +283,11 @@ public class UserImplTest {
         EasyMock.verify(userAdmin, sp);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test // (expected = IllegalArgumentException.class)
     public void hasCredentialWrongValueType() {
         UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, getCredentials());
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
-        //
-        userAdmin.checkAdminPermission();
         //
         EasyMock.replay(userAdmin, sp);
         //

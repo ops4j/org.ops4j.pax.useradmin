@@ -479,7 +479,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#compareToEncryptedValue(Object, Object)
      */
     public boolean compareToEncryptedValue(Object inputValue,
-                                           Object storedValue) {
+                                           byte[] storedValue) {
         byte[] valueBytes;
         if (inputValue instanceof String) {
             valueBytes = ((String)inputValue).getBytes();
@@ -489,20 +489,20 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
         //
-        byte[] storedValueBytes;
-        if (storedValue instanceof String) {
-            storedValueBytes = ((String)storedValue).getBytes();
-        } else if (storedValue instanceof byte[]) {
-            storedValueBytes = (byte[]) storedValue;
-        } else {
-            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
-            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
-        }
+//        byte[] storedValueBytes;
+//        if (storedValue instanceof String) {
+//            storedValueBytes = ((String)storedValue).getBytes();
+//        } else if (storedValue instanceof byte[]) {
+//            storedValueBytes = (byte[]) storedValue;
+//        } else {
+//            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
+//            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
+//        }
         //
         if (null != m_encryptor) {
-            return m_encryptor.compare(valueBytes, storedValueBytes);
+            return m_encryptor.compare(valueBytes, storedValue);
         }
-        return Arrays.equals(valueBytes, storedValueBytes);
+        return Arrays.equals(valueBytes, storedValue);
     }
 
     // UserAdminFactory interface
