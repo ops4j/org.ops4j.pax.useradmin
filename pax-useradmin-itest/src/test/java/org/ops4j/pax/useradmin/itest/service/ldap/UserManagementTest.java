@@ -37,7 +37,7 @@ import org.osgi.service.prefs.PreferencesService;
 /**
  * Testing the user-management parts of the preferences service based
  * implementation of the UserAdmin service.
- * 
+ *
  * @author Matthias Kuespert
  * @since 09.07.2009
  */
@@ -58,13 +58,13 @@ public class UserManagementTest extends UserManagement {
     protected String getProviderType() {
         return ConfigurationConstants.STORAGEPROVIDER_TYPE;
     }
-    
+
     @Configuration
     public static Option[] configure() {
         return options(getBasicFrameworkConfiguration(),
                        FrameworkConfiguration.get());
     }
-    
+
     @Before
     public void setup() {
         FrameworkConfiguration.setup(getBundleContext(), doEnableSecurity());

@@ -19,7 +19,7 @@ package org.ops4j.pax.useradmin.provider.ldap;
 
 /**
  * Definition of constants and default values used for configuration.
- * 
+ *
  * @author Matthias Kuespert
  * @since 18.07.2009
  */
@@ -39,7 +39,7 @@ public interface ConfigurationConstants {
     public static final String PROTOCOL_LDAP                       = "ldap";
 
     // property names
-    
+
     public static final String PROP_LDAP_SERVER_URL                = "org.ops4j.pax.useradmin.ldap.server.url";
     public static final String PROP_LDAP_SERVER_PORT               = "org.ops4j.pax.useradmin.ldap.server.port";
     public static final String PROP_LDAP_ROOT_DN                   = "org.ops4j.pax.useradmin.ldap.root.dn";
@@ -57,13 +57,13 @@ public interface ConfigurationConstants {
     public static final String PROP_GROUP_ATTR_ID                  = "org.ops4j.pax.useradmin.ldap.group.attr.id";
     public static final String PROP_GROUP_ATTR_MANDATORY           = "org.ops4j.pax.useradmin.ldap.group.attr.mandatory";
     public static final String PROP_GROUP_ATTR_CREDENTIAL          = "org.ops4j.pax.useradmin.ldap.group.attr.credential";
-    
+
     public static final String PROP_GROUP_ENTRY_OBJECTCLASS        = "org.ops4j.pax.useradmin.ldap.group.entry.objectclass";
     public static final String PROP_GROUP_ENTRY_ATTR_ID            = "org.ops4j.pax.useradmin.ldap.group.entry.attr.id";
     public static final String PROP_GROUP_ENTRY_ATTR_MEMBER        = "org.ops4j.pax.useradmin.ldap.group.entry.attr.member";
 
     // default values
-    
+
     public static final String DEFAULT_LDAP_SERVER_URL             = "localhost";
     public static final String DEFAULT_LDAP_SERVER_PORT            = "8099";
     public static final String DEFAULT_LDAP_ROOT_DN                = "dc=ops4j,dc=org";
@@ -75,12 +75,12 @@ public interface ConfigurationConstants {
     public static final String DEFAULT_USER_ATTR_MANDATORY         = "cn, sn";
     public static final String DEFAULT_USER_ATTR_CREDENTIAL        = "userpassword";
 
-    public static final String DEFAULT_GROUP_OBJECTCLASS           = "organizationalUnit, simpleSecurityObject, top ";
+    public static final String DEFAULT_GROUP_OBJECTCLASS           = "organizationalUnit, simpleSecurityObject"; // top not allowed!
     public static final String DEFAULT_GROUP_ATTR_ID               = "ou";
     public static final String DEFAULT_GROUP_ATTR_MANDATORY        = "userpassword";
     public static final String DEFAULT_GROUP_ATTR_CREDENTIAL       = "userpassword";
 
-    public static final String DEFAULT_GROUP_ENTRY_OBJECTCLASS     = "groupOfNames, top ";
+    public static final String DEFAULT_GROUP_ENTRY_OBJECTCLASS     = "groupOfNames"; // top not allowed!
     public static final String DEFAULT_GROUP_ENTRY_ATTR_ID         = "cn";
     public static final String DEFAULT_GROUP_ENTRY_ATTR_MEMBER     = "member"; // note: assumed mandatory by this implementation
 }

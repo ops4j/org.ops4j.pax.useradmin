@@ -18,13 +18,7 @@
 package org.ops4j.pax.useradmin.itest.service;
 
 import junit.framework.Assert;
-
-import org.ops4j.pax.useradmin.itest.UserAdminTestBase;
-import org.osgi.service.useradmin.Authorization;
-import org.osgi.service.useradmin.Group;
-import org.osgi.service.useradmin.Role;
-import org.osgi.service.useradmin.User;
-import org.osgi.service.useradmin.UserAdmin;
+import org.osgi.service.useradmin.*;
 
 /**
  * @author Matthias Kuespert
@@ -34,12 +28,12 @@ public abstract class AuthorizationManagement extends ServiceTestBase {
 
     private static final String USER_NAME1 = "tboss";
     private static final String USER_NAME2 = "jdeveloper";
-    
+
     private static final String GROUP_NAME1 = "developers";
     private static final String GROUP_NAME2 = "staff";
     private static final String GROUP_NAME3 = "admins";
     private static final String GROUP_NAME4 = "additional-admins";
-    
+
     private User user1 = null;
     private User user2 = null;
 
@@ -47,12 +41,12 @@ public abstract class AuthorizationManagement extends ServiceTestBase {
     private Group group2 = null;
     private Group group3 = null;
     private Group group4 = null;
-    
+
     protected void setup() {
         //
         UserAdmin userAdmin = getUserAdmin();
-        user1 = (User) userAdmin.createRole(USER_NAME1, Role.USER);
-        user2 = (User) userAdmin.createRole(USER_NAME2, Role.USER);
+        user1  = (User) userAdmin.createRole(USER_NAME1, Role.USER);
+        user2  = (User) userAdmin.createRole(USER_NAME2, Role.USER);
         group1 = (Group) userAdmin.createRole(GROUP_NAME1, Role.GROUP);
         group2 = (Group) userAdmin.createRole(GROUP_NAME2, Role.GROUP);
         group3 = (Group) userAdmin.createRole(GROUP_NAME3, Role.GROUP);
@@ -92,7 +86,7 @@ public abstract class AuthorizationManagement extends ServiceTestBase {
         Assert.assertNotNull("Group has no members", group3.getMembers());
         Assert.assertEquals("Mismatching member count", 2, group3.getMembers().length);
     }
-    
+
     protected void hasRole() {
         UserAdmin userAdmin = getUserAdmin();
         Authorization auth = userAdmin.getAuthorization(user1);

@@ -112,8 +112,7 @@
         <profile>
             <id>continuous-integration</id>
             <properties>
-                <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/${topProject.name}/
-                </site.deploy.dir>
+                <site.deploy.dir>scp://www.ops4j.org/var/http/www.ops4j.org/projects/pax/${topProject.name}/</site.deploy.dir>
             </properties>
         </profile>
 
@@ -136,6 +135,7 @@
     </developers>
 
     <!-- SCM configuration - used for releases
+    
     -->
     <scm>
         <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}</connection>
@@ -225,19 +225,19 @@
     </dependencies>
 
     <!-- Report configuration
-  
+
        Note: module reports are NOT aggregated and are stored in the respective subdirectories. Report
              aggregation is done only via the dashboard report.
-             
+
              However, this approach leads to other problems:
-             
+
              - Some reports (e.g. surefire, PMD, CPD) remain on the main site but contain invalid data.
-             
-               This is solved by not using the reports reference in site.xml and instead providing a custom 
+
+               This is solved by not using the reports reference in site.xml and instead providing a custom
                report section (see src/site/site.xml#Generated Reports and corresponding *-reports.apt files)
-               
+
              - There is no global entry to  source/test-source xref site
-             
+
                TODO: howto run the xref generation twice?
     -->
     <reporting>

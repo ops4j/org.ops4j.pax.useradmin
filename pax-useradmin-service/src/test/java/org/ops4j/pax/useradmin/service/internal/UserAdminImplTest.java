@@ -45,7 +45,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Testing the UserAdminImpl class.
- * 
+ *
  * @author Matthias Kuespert
  * @since  12.07.2009
  */
@@ -65,7 +65,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(logTracker, eventTracker);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void createNoLogServiceTracker() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -78,7 +78,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(spTracker, eventTracker);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void createNoEventAdminTracker() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -91,7 +91,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(spTracker, logTracker);
     }
-    
+
     private UserAdminImpl createUserAdmin(BundleContext context, ServiceTracker spTracker, ServiceTracker logTracker, ServiceTracker eventTracker) {
         try {
             spTracker.open();
@@ -179,7 +179,7 @@ public class UserAdminImplTest {
         EasyMock.verify(properties, spTracker, logTracker, eventTracker);
     }
     */
-    
+
     @Test
     public void logOk() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -251,7 +251,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void fireEventNoServiceNoListenersOk() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -281,7 +281,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, uaRef, spTracker, logTracker, eventTracker, role, logService);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void fireEventNullRole() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -304,7 +304,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, uaRef, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void fireEventServicePresentOk() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -343,10 +343,10 @@ public class UserAdminImplTest {
     /*
     @Test
     public void fireEventListenerPresentOk() {
-        
+
     }
     */
-    
+
     @Test
     public void createUserOk() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -365,7 +365,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void createGroupOk() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -384,7 +384,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void getStorageProviderNoService() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -410,7 +410,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(context, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void createUserRoleNoName() {
         BundleContext context = EasyMock.createMock(BundleContext.class);
@@ -460,7 +460,7 @@ public class UserAdminImplTest {
             EasyMock.expect(spTracker.getService()).andReturn(sp);
             EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(role1);
             EasyMock.expect(logTracker.getService()).andReturn(log);
-            log.log(LogService.LOG_WARNING, "[" + UserAdminImpl.class.getName() + "] role already exists: " + NAME1);
+            log.log(LogService.LOG_INFO, "[" + UserAdminImpl.class.getName() + "] createRole() - role already exists: " + NAME1);
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -507,6 +507,7 @@ public class UserAdminImplTest {
         UserImpl role = new UserImpl(NAME1, userAdmin, null, null);
         EventAdmin eventAdmin = EasyMock.createMock(EventAdmin.class);
         ServiceReference ref = EasyMock.createMock(ServiceReference.class);
+        LogService log = EasyMock.createMock(LogService.class);
         try {
             EasyMock.expect(spTracker.getService()).andReturn(sp);
             EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(null);
@@ -518,6 +519,8 @@ public class UserAdminImplTest {
             EasyMock.expect(ref.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
             EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
             eventAdmin.postEvent(EasyMock.isA(Event.class));
+            EasyMock.expect(logTracker.getService()).andReturn(log);
+            log.log(EasyMock.eq(LogService.LOG_ERROR), EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -537,6 +540,7 @@ public class UserAdminImplTest {
         GroupImpl group = new GroupImpl(NAME1, userAdmin, null, null);
         EventAdmin eventAdmin = EasyMock.createMock(EventAdmin.class);
         ServiceReference ref = EasyMock.createMock(ServiceReference.class);
+        LogService log = EasyMock.createMock(LogService.class);
         try {
             EasyMock.expect(spTracker.getService()).andReturn(sp);
             EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(null);
@@ -548,6 +552,8 @@ public class UserAdminImplTest {
             EasyMock.expect(ref.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
             EasyMock.expect(ref.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
             eventAdmin.postEvent(EasyMock.isA(Event.class));
+            EasyMock.expect(logTracker.getService()).andReturn(log);
+            log.log(EasyMock.eq(LogService.LOG_ERROR), EasyMock.isA(String.class));
         } catch (StorageException e) {
             Assert.fail("Unexpected exception: " + e.getMessage());
         }
@@ -555,7 +561,7 @@ public class UserAdminImplTest {
         Assert.assertNotNull("Group not created", userAdmin.createRole(NAME1, Role.GROUP));
         EasyMock.verify(context, sp, ref, eventAdmin, spTracker, logTracker, eventTracker);
     }
- 
+
     @Test (expected = IllegalArgumentException.class)
     public void removeRoleNullName() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
@@ -569,7 +575,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void removeDefaultRole() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
@@ -784,7 +790,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(sp, log, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void getRoleNullName() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
@@ -795,7 +801,7 @@ public class UserAdminImplTest {
         userAdmin.getRole(null);
         EasyMock.verify(spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void getRoleEmptyName() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
@@ -857,7 +863,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(sp, log, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test (expected = IllegalArgumentException.class)
     public void getUserNullKey() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
@@ -911,14 +917,14 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(sp, log, spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void getUserOk() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);
         ServiceTracker logTracker = EasyMock.createMock(ServiceTracker.class);
         ServiceTracker eventTracker = EasyMock.createMock(ServiceTracker.class);
         UserAdminImpl userAdmin = createUserAdmin(spTracker, logTracker, eventTracker);
-        
+
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         UserImpl user = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
         //
@@ -955,7 +961,7 @@ public class UserAdminImplTest {
         //
         EasyMock.verify(spTracker, logTracker, eventTracker);
     }
-    
+
     @Test
     public void getAuthorizationOk() {
         ServiceTracker spTracker = EasyMock.createMock(ServiceTracker.class);

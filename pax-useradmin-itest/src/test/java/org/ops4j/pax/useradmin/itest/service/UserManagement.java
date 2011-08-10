@@ -30,21 +30,21 @@ import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * User management related tests.
- * 
+ *
  * @author Matthias Kuespert
  * @since  09.07.2009
  */
 public abstract class UserManagement extends ServiceTestBase {
-    
+
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_TITLE = "title";
     private static final String KEY_PASSWD = "myDomain2";
-    
+
     private static final String VALUE_DESCRIPTION = "some description";
     private static final String VALUE_TITLE = "some title";
     private static final String VALUE_CHANGED_DESCRIPTION = "some changed description";
     private static final String VALUE_PASSWD = "secret";
-    
+
     private static final String USER_NAME = "jdeveloper";
     private static final String GROUP_NAME = "developers";
 
@@ -124,7 +124,7 @@ public abstract class UserManagement extends ServiceTestBase {
         Assert.assertTrue("Could not delete user", userAdmin.removeRole(user.getName()));
         Assert.assertNull("Unexpected user found", userAdmin.getRole(USER_NAME));
     }
-    
+
     protected void createAndRemoveUserWithGroupsOk() {
         UserAdmin userAdmin = getUserAdmin();
         User user = (User) userAdmin.createRole(USER_NAME, Role.USER);
@@ -203,23 +203,26 @@ public abstract class UserManagement extends ServiceTestBase {
     private void getCredentials(User user) {
         String stringValue;
         byte[] byteValue;
-        byteValue = (byte[]) user.getCredentials().get(KEY_DESCRIPTION);
-        Assert.assertNotNull("Retrieving string value for key returned null", byteValue);
-        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_DESCRIPTION.getBytes(), byteValue));
+        //
+        stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertNotNull("Retrieving string value for key returned null", stringValue);
+        Assert.assertEquals("Value mismatch", VALUE_DESCRIPTION, stringValue);
         byteValue = (byte[]) user.getCredentials().get(KEY_PASSWD);
         Assert.assertNotNull("Retrieving byte value for key returned null", byteValue);
         Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_PASSWD.getBytes(), byteValue));
         //
         Assert.assertNotNull(user.getCredentials().put(KEY_DESCRIPTION, VALUE_CHANGED_DESCRIPTION));
-        byteValue = (byte[])user.getCredentials().get(KEY_DESCRIPTION);
-        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_CHANGED_DESCRIPTION.getBytes(), byteValue));
+        stringValue = (String) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertEquals("Value mismatch", VALUE_CHANGED_DESCRIPTION, stringValue);
     }
     private void removeCredentials(User user) {
-        byte[] byteValue = (byte[]) user.getCredentials().get(KEY_DESCRIPTION);
-        Assert.assertNotNull("Retrieving string value for key returned null", byteValue);
-        Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_CHANGED_DESCRIPTION.getBytes(), byteValue));
+        // byte[] value = (byte[]) user.getCredentials().get(KEY_DESCRIPTION);
+        String value = (String) user.getCredentials().get(KEY_DESCRIPTION);
+        Assert.assertNotNull("Retrieving string value for key returned null",  value);
+        // Assert.assertTrue("Value mismatch", Arrays.equals(VALUE_CHANGED_DESCRIPTION.getBytes(),  value));
+        Assert.assertEquals("Value mismatch", VALUE_CHANGED_DESCRIPTION,  value);
         // Assert.assertEquals(VALUE_CHANGED_DESCRIPTION, (String) user.getCredentials().get(KEY_DESCRIPTION));
-        
+
         Assert.assertNotNull("Value 1 not set", user.getCredentials().get(KEY_DESCRIPTION));
         Assert.assertNotNull("Could not remove credential", user.getCredentials().remove(KEY_DESCRIPTION));
         Assert.assertNull("Value 1 still set", user.getCredentials().get(KEY_DESCRIPTION));
@@ -240,7 +243,7 @@ public abstract class UserManagement extends ServiceTestBase {
         Assert.assertEquals("Role type mismatch", Role.USER, user.getType());
         getCredentials(user);
     }
-    
+
     protected void setAndRemoveUserCredentialsOk() {
         setAndGetUserCredentialsOk();
         //
@@ -249,7 +252,7 @@ public abstract class UserManagement extends ServiceTestBase {
         Assert.assertNotNull("Could not retrieve user", user);
         removeCredentials(user);
     }
-    
+
     protected void setAndGetGroupCredentialsOk() {
         UserAdmin userAdmin = getUserAdmin();
         Group group = (Group) userAdmin.createRole(GROUP_NAME, Role.GROUP);

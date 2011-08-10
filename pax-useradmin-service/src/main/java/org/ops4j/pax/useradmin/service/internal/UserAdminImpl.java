@@ -239,18 +239,22 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdmin#createRole(String, int)
      */
     public Role createRole(String name, int type) {
-        if (null == name) {
+        checkAdminPermission();
+        //
+        if (null == name || name.isEmpty()) {
+            // logMessage(this, LogService.LOG_ERROR, UserAdminMessages.MSG_INVALID_NAME); // TODO: check if necessary/useful
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
         }
-        if (   (type != Role.GROUP)
-            && (type != Role.USER)) {
+        if (   !((type == Role.GROUP) || (type == Role.USER))) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_ROLE_TYPE);
         }
+        //
+        // return null if the role already exists (see chapter 107.8.6.1)
+        //
         if (null != getRole(name)) {
-            logMessage(this, LogService.LOG_WARNING, "role already exists: " + name);
+            logMessage(this, LogService.LOG_INFO, "createRole() - role already exists: " + name);
             return null;
         }
-        checkAdminPermission();
         //
         Role role = null;
         try {
@@ -266,9 +270,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
                 default:
                     // never reached b/o previous checks
-                    break;
             }
             fireEvent(UserAdminEvent.ROLE_CREATED, role);
+            logMessage(this, LogService.LOG_INFO, "role created: " + name + " - " + role);
         } catch (StorageException e) {
             logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
@@ -476,7 +480,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     /**
-     * @see UserAdminUtil#compareToEncryptedValue(Object, Object)
+     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
      */
     public boolean compareToEncryptedValue(Object inputValue,
                                            byte[] storedValue) {

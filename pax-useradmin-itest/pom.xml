@@ -9,6 +9,7 @@
         <artifactId>useradmin</artifactId>
         <groupId>org.ops4j.pax</groupId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <!-- Project coordinates - cannot be or serve as global property values
@@ -124,6 +125,14 @@
             <artifactId>pax-ldapserver-apacheds</artifactId>
             <version>${pax.ldapserver.apacheds.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
+                </exclusion>
+            </exclusions>
+            <!--
+            -->
         </dependency>
 
         <!-- Our own stuff:
