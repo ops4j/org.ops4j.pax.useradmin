@@ -17,21 +17,21 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.service.spi.SPIRole;
 import org.osgi.service.useradmin.Role;
 
 /**
  * Implementation of the UserAdmin Role interface.
  * 
- * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html" />
- * 
+ * @see <a
+ *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html</a>
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public abstract class RoleImpl implements Role {
+public abstract class RoleImpl implements Role, SPIRole {
 
     /**
      * The name of the role.
@@ -44,29 +44,21 @@ public abstract class RoleImpl implements Role {
     private UserAdminImpl  m_admin      = null;
 
     /**
-     * The properties of this role.
-     * 
-     * Note: changing properties is detected and leads to storage update and
-     * notification events.
+     * The properties of this role. Note: changing properties is detected and
+     * leads to storage update and notification events.
      */
     private RoleProperties m_properties = null;
 
     /**
-     * States used as return value for isImpliedBy() calls.
-     */
-    protected enum ImplicationResult {
-        IMPLIEDBY_YES,           // given role is implied by this one
-        IMPLIEDBY_NO,            // given role is not implied by this one
-        IMPLIEDBY_LOOPDETECTED   // detected a loop - e.g. a group containing itself.
-    }
-
-    /**
      * Constructor.
      * 
-     * @param name       The name of the role.
-     * @param userAdmin  The UserAdmin that uses this role.
-     * @param properties A map containing the raw properties of this role as
-     *                   read by the StorageProvider.
+     * @param name
+     *            The name of the role.
+     * @param userAdmin
+     *            The UserAdmin that uses this role.
+     * @param properties
+     *            A map containing the raw properties of this role as read by
+     *            the StorageProvider.
      */
     protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, Object> properties) {
         if (name == null) {
@@ -107,16 +99,5 @@ public abstract class RoleImpl implements Role {
     protected UserAdminImpl getAdmin() {
         return m_admin;
     }
-    
-    /**
-     * Checks if this role is implied by the given one.
-     * 
-     * @param role The role to check.
-     * @param checkedRoles Used for loop detection.
-     * @return An <code>ImplicationResult</code>.
-     */
-    protected abstract ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles);
-//    {
-//        throw new IllegalStateException("Internal error: RoleImpl.impliedBy() must not be called.");
-//    }
+
 }

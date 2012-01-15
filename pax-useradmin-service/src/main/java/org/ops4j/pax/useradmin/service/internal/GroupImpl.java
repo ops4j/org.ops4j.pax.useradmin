@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.service.spi.SPIRole;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.service.log.LogService;
@@ -28,13 +29,14 @@ import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 
 /**
- * Implementation of the <code>Group</code> interface as specified in the
- * OSGi companion specification.
+ * Implementation of the <code>Group</code> interface as specified in the OSGi
+ * companion specification.
  * 
- * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html" />
- * 
+ * @see <a href=
+ *      "http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html"
+ *      />
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
 public class GroupImpl extends UserImpl implements Group {
 
@@ -43,10 +45,7 @@ public class GroupImpl extends UserImpl implements Group {
      * 
      * @see UserImpl#UserImpl(String, UserAdminImpl, Map, Map)
      */
-    protected GroupImpl(String name,
-                        UserAdminImpl admin,
-                        Map<String, Object> properties,
-                        Map<String, Object> credentials) {
+    protected GroupImpl(String name, UserAdminImpl admin, Map<String, Object> properties, Map<String, Object> credentials) {
         super(name, admin, properties, credentials);
     }
 
@@ -62,9 +61,7 @@ public class GroupImpl extends UserImpl implements Group {
                 // TODO: verify that we really don't need to fire an event here
                 // - the spec doesn't mention anything
             } catch (StorageException e) {
-                getAdmin().logMessage(this,
-                                      LogService.LOG_ERROR, "error when adding basic member to group '" + getName() + "':"
-                                      + e.getMessage());
+                getAdmin().logMessage(this, LogService.LOG_ERROR, "error when adding basic member to group '" + getName() + "':" + e.getMessage());
             }
         }
         return false;
@@ -80,9 +77,7 @@ public class GroupImpl extends UserImpl implements Group {
                 StorageProvider storageProvider = getAdmin().getStorageProvider();
                 return storageProvider.addRequiredMember(this, role);
             } catch (StorageException e) {
-                getAdmin().logMessage(this,
-                                      LogService.LOG_ERROR, "error when adding required member to group '" + getName() + "':"
-                                      + e.getMessage());
+                getAdmin().logMessage(this, LogService.LOG_ERROR, "error when adding required member to group '" + getName() + "':" + e.getMessage());
             }
         }
         return false;
@@ -98,9 +93,7 @@ public class GroupImpl extends UserImpl implements Group {
                 StorageProvider storageProvider = getAdmin().getStorageProvider();
                 return storageProvider.removeMember(this, role);
             } catch (StorageException e) {
-                getAdmin().logMessage(this,
-                                        LogService.LOG_ERROR, "error when removing member from group '" + getName() + "':"
-                             + e.getMessage());
+                getAdmin().logMessage(this, LogService.LOG_ERROR, "error when removing member from group '" + getName() + "':" + e.getMessage());
             }
         }
         return false;
@@ -114,12 +107,10 @@ public class GroupImpl extends UserImpl implements Group {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
             if (!roles.isEmpty()) {
-                 return roles.toArray(new Role[roles.size()]);
+                return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
-            getAdmin().logMessage(this,
-                                  LogService.LOG_ERROR, "error when retrieving basic members of group '" + getName() + "':"
-                                  + e.getMessage());
+            getAdmin().logMessage(this, LogService.LOG_ERROR, "error when retrieving basic members of group '" + getName() + "':" + e.getMessage());
         }
         return null;
     }
@@ -135,9 +126,7 @@ public class GroupImpl extends UserImpl implements Group {
                 return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
-            getAdmin().logMessage(this,
-                                  LogService.LOG_ERROR, "error when retrieving required members of group '" + getName()
-                                  + "':" + e.getMessage());
+            getAdmin().logMessage(this, LogService.LOG_ERROR, "error when retrieving required members of group '" + getName() + "':" + e.getMessage());
         }
         return null;
     }
@@ -145,6 +134,7 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * @see Group#getType()
      */
+    @Override
     public int getType() {
         return Role.GROUP;
     }
@@ -152,11 +142,14 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * Checks if this group is implied by the given role.
      * 
-     * @param role The role to check.
-     * @param checkedRoles Used for loop detection.
+     * @param role
+     *            The role to check.
+     * @param checkedRoles
+     *            Used for loop detection.
      * @return True if this role is implied by the given one, false otherwise.
      */
-    protected ImplicationResult isImpliedBy(Role role, Collection<String> checkedRoles) {
+    @Override
+    public ImplicationResult isImpliedBy(SPIRole role, Collection<String> checkedRoles) {
         // check if this group is implied
         ImplicationResult isImplied = super.isImpliedBy(role, checkedRoles);
         if (ImplicationResult.IMPLIEDBY_NO != isImplied) {
@@ -167,12 +160,18 @@ public class GroupImpl extends UserImpl implements Group {
             if (null != members) {
                 Collection<String> localCheckedRoles = new ArrayList<String>(checkedRoles);
                 for (Role member : members) {
-                    isImplied = ((RoleImpl) member).isImpliedBy(role,
-                                                                localCheckedRoles);
-                    if (ImplicationResult.IMPLIEDBY_YES != isImplied) {
-                        // not implied because not all required members are
-                        // implied or a loop was detected
-                        return isImplied;
+                    if (member instanceof SPIRole) {
+                        isImplied = ((SPIRole) member).isImpliedBy(role, localCheckedRoles);
+                        if (ImplicationResult.IMPLIEDBY_YES != isImplied) {
+                            // not implied because not all required members are
+                            // implied or a loop was detected
+                            return isImplied;
+                        }
+                    } else {
+                        if (member != null) {
+                            getAdmin().logMessage(GroupImpl.class.getSimpleName(), LogService.LOG_WARNING, "RequiredMember " + member.getName()
+                                    + " is ignored because " + member.getClass().getName() + " does not implement the SPIRole interface");
+                        }
                     }
                 }
             }
@@ -180,11 +179,17 @@ public class GroupImpl extends UserImpl implements Group {
             if (null != members) {
                 Collection<String> localCheckedRoles = new ArrayList<String>(checkedRoles);
                 for (Role member : members) {
-                    isImplied = ((RoleImpl) member).isImpliedBy(role,
-                                                                localCheckedRoles);
-                    if (ImplicationResult.IMPLIEDBY_YES == isImplied) {
-                        // implied because one basic member is implied
-                        return isImplied;
+                    if (member instanceof SPIRole) {
+                        isImplied = ((SPIRole) member).isImpliedBy(role, localCheckedRoles);
+                        if (ImplicationResult.IMPLIEDBY_YES == isImplied) {
+                            // implied because one basic member is implied
+                            return isImplied;
+                        }
+                    } else {
+                        if (member != null) {
+                            getAdmin().logMessage(GroupImpl.class.getSimpleName(), LogService.LOG_WARNING, "BasicMember " + member.getName()
+                                    + " is ignored because " + member.getClass().getName() + " does not implement the SPIRole interface");
+                        }
                     }
                 }
             }

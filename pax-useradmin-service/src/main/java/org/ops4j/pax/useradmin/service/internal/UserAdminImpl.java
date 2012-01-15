@@ -52,9 +52,9 @@ import org.osgi.util.tracker.ServiceTracker;
  * An implementation of the OSGi UserAdmin service. Allows to administer user
  * and group/role data using pluggable storage providers that connect to an
  * underlying datastore.
- *
- * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html" />
- *
+ * 
+ * @see <a
+ *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html</a>
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
@@ -66,7 +66,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     private BundleContext       m_context         = null;
 
     /**
-     * The administrative permission used to verify access to restricted functionality.
+     * The administrative permission used to verify access to restricted
+     * functionality.
      */
     private UserAdminPermission m_adminPermission = null;
 
@@ -91,22 +92,28 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     private ServiceTracker      m_eventListeners  = null;
 
     /**
-     * The encryptor that is used for encrypting sensible data (e.g. user credentials).
+     * The encryptor that is used for encrypting sensible data (e.g. user
+     * credentials).
      */
     private EncryptorImpl       m_encryptor       = null;
 
     /**
-     * Constructor - creates and initializes a <code>UserAdminImpl</code> instance.
-     *
-     * @param context The <code>BundleContext</code>
-     * @param storageService A <code>ServiceTracker</code> to locate the <code>StorageProvider</code> service to use.
-     * @param logService A <code>ServiceTracker</code> to locate the <code>LogService</code> to use.
-     * @param eventService A <code>ServiceTracker</code> to locate the <code>EventAdmin</code> service to use.
+     * Constructor - creates and initializes a <code>UserAdminImpl</code>
+     * instance.
+     * 
+     * @param context
+     *            The <code>BundleContext</code>
+     * @param storageService
+     *            A <code>ServiceTracker</code> to locate the
+     *            <code>StorageProvider</code> service to use.
+     * @param logService
+     *            A <code>ServiceTracker</code> to locate the
+     *            <code>LogService</code> to use.
+     * @param eventService
+     *            A <code>ServiceTracker</code> to locate the
+     *            <code>EventAdmin</code> service to use.
      */
-    protected UserAdminImpl(BundleContext context,
-                            ServiceTracker storageService,
-                            ServiceTracker logService,
-                            ServiceTracker eventService) {
+    protected UserAdminImpl(BundleContext context, ServiceTracker storageService, ServiceTracker logService, ServiceTracker eventService) {
         if (null == storageService) {
             throw new IllegalArgumentException("No StorageProvider ServiceTracker specified.");
         }
@@ -132,8 +139,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * Maps event codes to strings.
-     *
-     * @param type The type of the event
+     * 
+     * @param type
+     *            The type of the event
      * @return The event code as string
      */
     private String getEventTypeName(int type) {
@@ -158,10 +166,10 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     /**
      * Checks if the caller has admin permissions when security is enabled. If
      * security is not enabled nothing happens here.
-     *
-     * @throws SecurityException if security is enabled, a security
-     *         manager exists and the caller does not have the
-     *         UserAdminPermission with name admin.
+     * 
+     * @throws SecurityException
+     *             if security is enabled, a security manager exists and the
+     *             caller does not have the UserAdminPermission with name admin.
      */
     protected void checkAdminPermission() {
         SecurityManager sm = System.getSecurityManager();
@@ -175,26 +183,25 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * Creates an appropriate encryptor.
-     *
-     * @param encryptionAlgorithm The encryption algorithm to use.
-     * @param encryptionRandomAlgorithm The random number algorithm to use.
-     * @param encryptionRandomAlgorithmSaltLength The klength of the salt to use for random number generation.
+     * 
+     * @param encryptionAlgorithm
+     *            The encryption algorithm to use.
+     * @param encryptionRandomAlgorithm
+     *            The random number algorithm to use.
+     * @param encryptionRandomAlgorithmSaltLength
+     *            The klength of the salt to use for random number generation.
      * @return An implementation of the encryptor.
-     *
-     * @throws ConfigurationException if the given algorithm doesn't exist
+     * @throws ConfigurationException
+     *             if the given algorithm doesn't exist
      */
-    private EncryptorImpl createEncryptor(String encryptionAlgorithm,
-                                          String encryptionRandomAlgorithm,
-                                          String encryptionRandomAlgorithmSaltLength) throws ConfigurationException {
+    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength)
+            throws ConfigurationException {
         EncryptorImpl encryptor;
         try {
-            encryptor = new EncryptorImpl(encryptionAlgorithm,
-                                            encryptionRandomAlgorithm,
-                                            encryptionRandomAlgorithmSaltLength);
+            encryptor = new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM
-                                               + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
-                                             "Encryption algorithm not supported: " + e.getMessage(), e);
+            throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, "Encryption algorithm not supported: "
+                    + e.getMessage(), e);
         }
         return encryptor;
     }
@@ -203,7 +210,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
 
     /**
      * Copies all properties to an internal Map.
-     *
+     * 
      * @see ManagedService#updated(Dictionary)
      */
     @SuppressWarnings(value = "unchecked")
@@ -212,24 +219,15 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             // ignore empty properties
             return;
         }
-        String encryptionAlgorithm = UserAdminTools.getOptionalProperty(properties,
-                                                                        UserAdminConstants.PROP_ENCRYPTION_ALGORITHM,
-                                                                        UserAdminConstants.ENCRYPTION_ALGORITHM_NONE);
+        String encryptionAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_ALGORITHM, UserAdminConstants.ENCRYPTION_ALGORITHM_NONE);
         if (UserAdminConstants.ENCRYPTION_ALGORITHM_NONE.equals(encryptionAlgorithm)) {
             // set no encryption
             m_encryptor = null;
-        }
-        else {
+        } else {
             // create encryptor ...
-            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties,
-                                                                                  UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM,
-                                                                                  UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
-            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties,
-                                                                                            UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH,
-                                                                                            UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-            m_encryptor = createEncryptor(encryptionAlgorithm,
-                                          encryptionRandomAlgorithm,
-                                          encryptionRandomAlgorithmSaltLength);
+            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
+            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+            m_encryptor = createEncryptor(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
         }
     }
 
@@ -241,11 +239,11 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     public Role createRole(String name, int type) {
         checkAdminPermission();
         //
-        if (null == name || name.isEmpty()) {
+        if (null == name || name.trim().length() == 0) {
             // logMessage(this, LogService.LOG_ERROR, UserAdminMessages.MSG_INVALID_NAME); // TODO: check if necessary/useful
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
         }
-        if (   !((type == Role.GROUP) || (type == Role.USER))) {
+        if (!((type == Role.GROUP) || (type == Role.USER))) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_ROLE_TYPE);
         }
         //
@@ -389,9 +387,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     }
 
     /**
-     * @see UserAdminUtil#logMessage(Object, int, String)
-     *
-     * TODO: do we need a check for valid levels? What to do then: exception or ignore?
+     * @see UserAdminUtil#logMessage(Object, int, String) TODO: do we need a
+     *      check for valid levels? What to do then: exception or ignore?
      */
     public void logMessage(Object source, int level, String message) {
         LogService log = (LogService) m_logService.getService();
@@ -443,10 +440,8 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
             Event event = new Event(UserAdminConstants.EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
         } else {
-            String message =   "No event service available - cannot send event of type '"
-                             + getEventTypeName(type) + "' for role '" + role.getName() + "'";
-            logMessage(this, LogService.LOG_DEBUG,
-                       message);
+            String message = "No event service available - cannot send event of type '" + getEventTypeName(type) + "' for role '" + role.getName() + "'";
+            logMessage(this, LogService.LOG_DEBUG, message);
         }
     }
 
@@ -482,26 +477,25 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     /**
      * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
      */
-    public boolean compareToEncryptedValue(Object inputValue,
-                                           byte[] storedValue) {
+    public boolean compareToEncryptedValue(Object inputValue, byte[] storedValue) {
         byte[] valueBytes;
         if (inputValue instanceof String) {
-            valueBytes = ((String)inputValue).getBytes();
+            valueBytes = ((String) inputValue).getBytes();
         } else if (inputValue instanceof byte[]) {
             valueBytes = (byte[]) inputValue;
         } else {
             throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
         //
-//        byte[] storedValueBytes;
-//        if (storedValue instanceof String) {
-//            storedValueBytes = ((String)storedValue).getBytes();
-//        } else if (storedValue instanceof byte[]) {
-//            storedValueBytes = (byte[]) storedValue;
-//        } else {
-//            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
-//            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
-//        }
+        //        byte[] storedValueBytes;
+        //        if (storedValue instanceof String) {
+        //            storedValueBytes = ((String)storedValue).getBytes();
+        //        } else if (storedValue instanceof byte[]) {
+        //            storedValueBytes = (byte[]) storedValue;
+        //        } else {
+        //            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
+        //            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
+        //        }
         //
         if (null != m_encryptor) {
             return m_encryptor.compare(valueBytes, storedValue);
@@ -514,18 +508,14 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     /**
      * @see UserAdminFactory#createUser(String, Map, Map)
      */
-    public User createUser(String name,
-                           Map<String, Object> properties,
-                           Map<String, Object> credentials) {
+    public User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials) {
         return new UserImpl(name, this, properties, credentials);
     }
 
     /**
      * @see UserAdminFactory#createGroup(String, Map, Map)
      */
-    public Group createGroup(String name,
-                             Map<String, Object> properties,
-                             Map<String, Object> credentials) {
+    public Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials) {
         return new GroupImpl(name, this, properties, credentials);
     }
 }
