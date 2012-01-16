@@ -106,7 +106,7 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
-            if (!roles.isEmpty()) {
+            if (roles == null || !roles.isEmpty()) {
                 return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
@@ -122,7 +122,7 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getRequiredMembers(getAdmin(), this);
-            if (!roles.isEmpty()) {
+            if (roles == null || !roles.isEmpty()) {
                 return roles.toArray(new Role[roles.size()]);
             }
         } catch (StorageException e) {
