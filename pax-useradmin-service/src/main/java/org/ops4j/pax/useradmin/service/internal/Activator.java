@@ -64,7 +64,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
             throw new IllegalStateException("Internal error: StorageProvider service implementation not available.");
         }
         if (!m_services.containsKey(type)) {
-        	logMessage(LogService.LOG_DEBUG, " -- starting new UserAdmin service for provider: " + type);
+        	logMessage(LogService.LOG_INFO, " -- starting new UserAdmin service for provider: " + type);
             Dictionary<String, String> properties = new Hashtable<String, String>();
             properties.put(Constants.SERVICE_PID, UserAdminConstants.SERVICE_PID + "." + type);
             properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
@@ -117,6 +117,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         m_logServiceTracker = new ServiceTracker(context, 
                                                  LogService.class.getName(),
                                                  null);
+        m_logServiceTracker.open();
         
         // install a service tracker to track StorageProvider services and
         // configure ourselves as event handler
@@ -130,6 +131,9 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
      * @see BundleActivator#stop(BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
+    	m_logServiceTracker.close();
+    	m_logServiceTracker = null;
+    	
         m_providerTracker.close();
         // unregister all UserAdmin services we created
         for (ServiceRegistration registration : m_services.values()) {
