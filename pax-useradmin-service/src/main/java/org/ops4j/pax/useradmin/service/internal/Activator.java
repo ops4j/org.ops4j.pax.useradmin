@@ -35,8 +35,6 @@ import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.UserAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
 
 /**
  * Activator which starts a ServiceTracker for StorageProvider services.
@@ -50,9 +48,8 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  */
 public class Activator implements BundleActivator, ServiceTrackerCustomizer {
 
-//    private static final Log LOGGER = LogFactory.getLog(Activator.class);
-  
     private ServiceTracker m_providerTracker = null;
+    private ServiceTracker m_logServiceTracker = null;
     private BundleContext m_context = null;
     
     private Map<String, ServiceRegistration> m_services = new HashMap<String, ServiceRegistration>();
@@ -67,7 +64,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
             throw new IllegalStateException("Internal error: StorageProvider service implementation not available.");
         }
         if (!m_services.containsKey(type)) {
-            System.err.println(" -- starting new UserAdmin service for provider: " + type);
+        	logMessage(LogService.LOG_INFO, " -- starting new UserAdmin service for provider: " + type);
             Dictionary<String, String> properties = new Hashtable<String, String>();
             properties.put(Constants.SERVICE_PID, UserAdminConstants.SERVICE_PID + "." + type);
             properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
@@ -102,6 +99,13 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
         }
     }
 
+    private void logMessage(int level, String message) {
+        LogService log = (LogService) m_logServiceTracker.getService();
+        if (null != log) {
+            log.log(level, "[" + Activator.class.getName() + "] " + message);
+        }
+    }
+
     // BundleActivator interface
     /**
      * @see BundleActivator#start(BundleContext)
@@ -109,6 +113,12 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
     public void start(BundleContext context) throws Exception {
         
         m_context = context;
+        
+        m_logServiceTracker = new ServiceTracker(context, 
+                                                 LogService.class.getName(),
+                                                 null);
+        m_logServiceTracker.open();
+        
         // install a service tracker to track StorageProvider services and
         // configure ourselves as event handler
         m_providerTracker = new ServiceTracker(context,
@@ -121,6 +131,9 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
      * @see BundleActivator#stop(BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
+    	m_logServiceTracker.close();
+    	m_logServiceTracker = null;
+    	
         m_providerTracker.close();
         // unregister all UserAdmin services we created
         for (ServiceRegistration registration : m_services.values()) {
@@ -151,8 +164,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer {
      */
     public void modifiedService(ServiceReference reference, Object service) {
         // TODO Auto-generated method stub
-        System.err.println("modified service: " + reference.getProperty(Constants.BUNDLE_SYMBOLICNAME));
-        System.err.println("modified service: " + reference.getProperty(Constants.SERVICE_PID));
+    	logMessage(LogService.LOG_DEBUG, "modified service: " + reference.getProperty(Constants.BUNDLE_SYMBOLICNAME));
+    	logMessage(LogService.LOG_DEBUG, "modified service: " + reference.getProperty(Constants.SERVICE_PID));
     }
     
     /**
