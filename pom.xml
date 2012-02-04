@@ -135,7 +135,7 @@
     </developers>
 
     <!-- SCM configuration - used for releases
-    
+
     -->
     <scm>
         <connection>scm:svn:https://scm.ops4j.org/repos/ops4j/projects/pax/${topProject.name}</connection>
@@ -247,7 +247,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.3</version>
                 <configuration>
                     <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
                     <aggregate>false</aggregate>
@@ -266,12 +266,18 @@
                 <version>2.2</version>
             </plugin>
 
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>2.4</version>
+            </plugin>
+
             <!-- PMD/CPD configuration
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.6</version>
                 <configuration>
                     <targetJdk>${target.jdk.version}</targetJdk>
                     <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
@@ -285,7 +291,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.8.1</version>
                 <configuration>
                     <!-- aggregate is deprecated: see http://maven.apache.org/plugins/maven-javadoc-plugin/examples/aggregate.html -->
                     <aggregate>true</aggregate>
@@ -319,7 +325,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changelog-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -351,7 +357,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.12</version>
                 <configuration>
                     <!-- Note: setting aggregate to true will break the links from the dashbord reports -->
                     <aggregate>false</aggregate>
@@ -364,7 +370,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.6</version>
                 <configuration>
                     <onlyCurrentVersion>true</onlyCurrentVersion>
                     <resolutionIds>Unresolved,Fixed,Won't Fix,Duplicate,Incomplete,Cannot Reproduce</resolutionIds>
@@ -418,6 +424,25 @@
         -->
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+
+                <!-- Checkstyle configuration
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <!-- TODO: configLocation>${settings.localRepository}/path /to/checkstyle.config</configLocation -->
+                        <!-- TODO: enableRulesSummary>false</enableRulesSummary -->
+                        <!-- NOT_WORKING_AS_EXPECTED xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation -->
+                    </configuration>
+                </plugin>
+
                 <!-- Surefire configuration
                 -->
                 <plugin>
@@ -426,6 +451,7 @@
                     <configuration>
                         <argLine>-Xmx1024m</argLine>
                     </configuration>
+                    <version>2.12</version>
                 </plugin>
 
                 <!-- Site plugin
@@ -528,7 +554,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <!-- version: latest -->
+                <version>2.3</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
