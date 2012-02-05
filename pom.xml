@@ -7,8 +7,8 @@
     -->
     <parent>
         <artifactId>master</artifactId>
-        <groupId>org.ops4j.pax</groupId>
-        <version>3.1.0</version>
+        <groupId>org.ops4j</groupId>
+        <version>2.0.0</version>
     </parent>
 
     <!-- Project coordinates - cannot be or serve as global property values
