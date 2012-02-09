@@ -27,8 +27,8 @@ import java.util.Map;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.log.LogService;
 import org.osgi.service.prefs.BackingStoreException;
@@ -37,7 +37,6 @@ import org.osgi.service.prefs.PreferencesService;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * A PreferencesService based <code>StorageProvider</code> service.
@@ -61,26 +60,18 @@ public class StorageProviderImpl implements StorageProvider {
     private static final String CREDENTIALS_NODE       = "credentials";
     private static final String TYPES_NODE             = "types";
 
-    /**
-     * The ServiceTracker which monitors the service used to store data.
-     */
-    private ServiceTracker      m_preferencesService   = null;
+    private LogService          m_logService           = null;
 
-    /**
-     * The ServiceTracker which monitors the service used for logging.
-     */
-    private ServiceTracker      m_logService           = null;
+    private PreferencesService  m_preferencesService   = null;
 
     private Preferences         m_rootNode             = null;
 
-    private BundleContext       m_context              = null;
-
-    private PreferencesService getPreferencesService() throws StorageException {
-        PreferencesService service = (PreferencesService) m_preferencesService.getService();
-        if (null == service) {
-            throw new StorageException("No PreferencesService available");
-        }
-        return service;
+    private LogService getLogService() {
+        return m_logService;
+    }
+    
+    private PreferencesService getPreferencesService() {
+        return m_preferencesService;
     }
 
     private Map<String, Object> loadAttributes(Preferences node) throws BackingStoreException {
@@ -196,20 +187,16 @@ public class StorageProviderImpl implements StorageProvider {
     }
 
     public void logMessage(Object source, String message, int level) {
-        LogService log = (LogService) m_logService.getService();
-        if (null != log) {
-            log.log(level, "[" + source.getClass().getName() + "] " + message);
-        }
+        getLogService().log(level, "[" + source.getClass().getName() + "] " + message);
     }
 
-    public StorageProviderImpl(BundleContext context) throws StorageException {
-        m_context = context;
-        m_logService = new ServiceTracker(m_context, LogService.class.getName(), null);
-        m_logService.open();
+    public StorageProviderImpl(PreferencesService preferencesService, LogService logService) throws StorageException {
+        
+        m_preferencesService = preferencesService;
+        m_logService = logService;
+        
         logMessage(this, "Preferences StorageProvider starting ...", LogService.LOG_DEBUG);
-        m_preferencesService = new ServiceTracker(m_context, PreferencesService.class.getName(),
-                                                  null);
-        m_preferencesService.open();
+        
         //
         // create the anonymous user if it does not exist
         //
@@ -445,7 +432,7 @@ public class StorageProviderImpl implements StorageProvider {
 
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
         try {
-            Filter filter = m_context.createFilter("(" + key + "=" + value + ")");
+            Filter filter = FrameworkUtil.createFilter("(" + key + "=" + value + ")");
             Collection<Role> roles = loadRoles(factory, filter);
             Collection<User> users = new ArrayList<User>();
             for (Role role : roles) {
@@ -472,7 +459,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             Filter filter = null;
             if (null != filterString) {
-                filter = m_context.createFilter(filterString);
+                filter = FrameworkUtil.createFilter(filterString);
             }
             Collection<Role> roles = loadRoles(factory, filter);
             return roles;
