@@ -3,3 +3,7 @@
 *.ipr
 target
 out.txt
+.project
+.settings
+.classpath
+.metadata
