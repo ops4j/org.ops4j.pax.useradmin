@@ -79,7 +79,7 @@ public class UserImpl extends RoleImpl implements User {
             for (Object credentialKey : m_credentials.keySet()) {
                 if (credentialKey.equals(key)) {
                     // check this credential
-                    byte[] credentialValue = (byte[]) m_credentials.get(key);
+                    Object credentialValue = m_credentials.get(key);
                     return null != credentialValue && getAdmin().compareToEncryptedValue(value, credentialValue);
                 }
             }

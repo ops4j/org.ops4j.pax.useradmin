@@ -67,7 +67,6 @@ public class UserCredentials extends AbstractProperties {
         throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
         Object encryptedValue = getUtil().encrypt(plainValue);
-//        System.out.println("enc = " + plainValue + "  - " + encryptedValue);
         storageProvider.setUserCredential(getUser(), key, encryptedValue);
         return encryptedValue;
     }

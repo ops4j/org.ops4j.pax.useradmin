@@ -477,30 +477,29 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
     /**
      * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
      */
-    public boolean compareToEncryptedValue(Object inputValue, byte[] storedValue) {
-        byte[] valueBytes;
+    public boolean compareToEncryptedValue(Object inputValue, Object storedValue) {
+        byte[] inputValueBytes;
         if (inputValue instanceof String) {
-            valueBytes = ((String) inputValue).getBytes();
+            inputValueBytes = ((String) inputValue).getBytes();
         } else if (inputValue instanceof byte[]) {
-            valueBytes = (byte[]) inputValue;
+            inputValueBytes = (byte[]) inputValue;
         } else {
             throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
-        //
-        //        byte[] storedValueBytes;
-        //        if (storedValue instanceof String) {
-        //            storedValueBytes = ((String)storedValue).getBytes();
-        //        } else if (storedValue instanceof byte[]) {
-        //            storedValueBytes = (byte[]) storedValue;
-        //        } else {
-        //            // TODO: check chapter 107.8.5.2 - just ignore it, no exception
-        //            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
-        //        }
-        //
-        if (null != m_encryptor) {
-            return m_encryptor.compare(valueBytes, storedValue);
+        
+        byte[] storedValueBytes;
+        if (storedValue instanceof String) {
+            storedValueBytes = ((String) storedValue).getBytes();
+        } else if (storedValue instanceof byte[]) {
+            storedValueBytes = (byte[]) storedValue;
+        } else {
+            throw new IllegalArgumentException("Illegal value type: " + storedValue.getClass().getName());
         }
-        return Arrays.equals(valueBytes, storedValue);
+        
+        if (null != m_encryptor) {
+            return m_encryptor.compare(inputValueBytes, storedValueBytes);
+        }
+        return Arrays.equals(inputValueBytes, storedValueBytes);
     }
 
     // UserAdminFactory interface

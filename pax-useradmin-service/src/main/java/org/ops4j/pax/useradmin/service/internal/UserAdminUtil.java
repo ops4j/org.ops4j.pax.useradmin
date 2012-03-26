@@ -88,5 +88,5 @@ public interface UserAdminUtil {
      * @param storedValue The encrypted stored value.
      * @return True if the encrypted input value equals the stored value.
      */
-    boolean compareToEncryptedValue(Object inputValue, byte[] storedValue);
+    boolean compareToEncryptedValue(Object inputValue, Object storedValue);
 }
