@@ -20,6 +20,7 @@ package org.ops4j.pax.useradmin.service.spi;
 import java.util.Map;
 
 import org.osgi.service.useradmin.Group;
+import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 
 /**
@@ -35,9 +36,12 @@ public interface UserAdminFactory {
     /**
      * Create a <code>User</code> instance.
      * 
-     * @param name The name of the user.
-     * @param properties The properties of the user.
-     * @param credentials The credentials of the user.
+     * @param name
+     *            The name of the user.
+     * @param properties
+     *            The properties of the user.
+     * @param credentials
+     *            The credentials of the user.
      * @return A new <code>User</code> instance.
      */
     User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials);
@@ -45,10 +49,23 @@ public interface UserAdminFactory {
     /**
      * Create a <code>Group</code> instance.
      * 
-     * @param name The name of the group.
-     * @param properties The properties of the group.
-     * @param credentials The credentials of the group.
+     * @param name
+     *            The name of the group.
+     * @param properties
+     *            The properties of the group.
+     * @param credentials
+     *            The credentials of the group.
      * @return A new <code>Group</code> instance.
      */
     Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials);
+
+    /**
+     * Publish an event of the given type related to the role specified.
+     * 
+     * @param type
+     *            The type of event - see <code>UserAdminEvent</code>.
+     * @param role
+     *            The role which is related to the event.
+     */
+    void fireEvent(int type, Role role);
 }
