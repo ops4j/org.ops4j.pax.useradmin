@@ -67,7 +67,7 @@
 
         <!-- Globally managed versions
         -->
-        <osgi.spec.version>4.2.0</osgi.spec.version>
+        <osgi.spec.version>4.3.1</osgi.spec.version>
         <junit.version>4.4</junit.version>
         <easymock.version>2.4</easymock.version>
 
@@ -94,6 +94,7 @@
         <module>${topProject.prefix}-${topProject.name}-service</module>
         <module>${topProject.prefix}-${topProject.name}-provider-preferences</module>
         <module>${topProject.prefix}-${topProject.name}-provider-ldap</module>
+	<module>${topProject.prefix}-${topProject.name}-provider-jpa</module>
         <module>${topProject.prefix}-${topProject.name}-command</module>
     </modules>
 
@@ -411,6 +412,9 @@
                 <directory>src/resources</directory>
             </resource>
 
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
             <!-- additional resource entries, useful when building Eclipse RCP applications
             -->
             <resource>
