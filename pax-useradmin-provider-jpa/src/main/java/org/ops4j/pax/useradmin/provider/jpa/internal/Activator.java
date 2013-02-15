@@ -62,8 +62,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Enti
     public JPAStorageProvider addingService(ServiceReference<EntityManagerFactory> reference) {
         EntityManagerFactory service = context.getService(reference);
         if (service != null) {
-            JPAStorageProvider jpaStorageProvider = new JPAStorageProvider(service, (Long) reference.getProperty(Constants.SERVICE_ID));
             try {
+                JPAStorageProvider jpaStorageProvider = new JPAStorageProvider(service, (Long) reference.getProperty(Constants.SERVICE_ID));
                 jpaStorageProvider.register(context);
                 LOG.info("New JPAStorageProvider (EMF service.id = {}) is now ready to use and registered.", reference.getProperty(Constants.SERVICE_ID));
                 return jpaStorageProvider;
