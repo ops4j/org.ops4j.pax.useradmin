@@ -24,13 +24,17 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
+import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.service.log.LogService;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.PreferencesService;
@@ -44,32 +48,48 @@ import org.osgi.service.useradmin.User;
  * @author Matthias Kuespert
  * @since 08.07.2009
  */
-public class StorageProviderImpl implements StorageProvider {
+public class PreferencesStorageProvider implements StorageProvider {
 
-    private static final String PATH_SEPARATOR         = "/";
+    private static final String                  PATH_SEPARATOR         = "/";
 
-    private static final String PREFERENCE_USER        = "Pax UserAdmin";
+    private static final String                  PREFERENCE_USER        = "Pax UserAdmin";
 
-    private static final String NODE_TYPE              = "type";
+    private static final String                  NODE_TYPE              = "type";
 
-    private static final String MEMBERS_NODE           = "members";
-    private static final String REQUIRED_MEMBER_STRING = "required";
-    private static final String BASIC_MEMBER_STRING    = "basic";
+    private static final String                  MEMBERS_NODE           = "members";
+    private static final String                  REQUIRED_MEMBER_STRING = "required";
+    private static final String                  BASIC_MEMBER_STRING    = "basic";
 
-    private static final String PROPERTIES_NODE        = "properties";
-    private static final String CREDENTIALS_NODE       = "credentials";
-    private static final String TYPES_NODE             = "types";
+    private static final String                  PROPERTIES_NODE        = "properties";
+    private static final String                  CREDENTIALS_NODE       = "credentials";
+    private static final String                  TYPES_NODE             = "types";
 
-    private LogService          m_logService           = null;
+    private PreferencesService                   m_preferencesService   = null;
 
-    private PreferencesService  m_preferencesService   = null;
+    private Preferences                          m_rootNode             = null;
 
-    private Preferences         m_rootNode             = null;
+    private final Long                           trackedServiceID;
 
-    private LogService getLogService() {
-        return m_logService;
+    private ServiceRegistration<StorageProvider> serviceRegistration;
+
+    public PreferencesStorageProvider(PreferencesService preferencesService, Long trackedServiceID) throws StorageException {
+        m_preferencesService = preferencesService;
+        this.trackedServiceID = trackedServiceID;
+
+        //
+        // create the anonymous user if it does not exist
+        //
+        Preferences node = getRootNode();
+        try {
+            if (!node.nodeExists(Role.USER_ANYONE)) {
+                Preferences anyoneNode = node.node(Role.USER_ANYONE);
+                anyoneNode.putInt(NODE_TYPE, Role.USER);
+            }
+        } catch (BackingStoreException e) {
+            throw new StorageException("Error creating anonymous role '" + Role.USER_ANYONE + "': " + e.getMessage());
+        }
     }
-    
+
     private PreferencesService getPreferencesService() {
         return m_preferencesService;
     }
@@ -137,14 +157,12 @@ public class StorageProviderImpl implements StorageProvider {
                 role = factory.createGroup(name, properties, credentials);
                 break;
             default:
-                throw new StorageException("Invalid role type for role '" + name + " / "
-                                           + node.name() + "': " + type);
+                throw new StorageException("Invalid role type for role '" + name + " / " + node.name() + "': " + type);
         }
         return role;
     }
 
-    private Collection<Role> loadRoles(UserAdminFactory factory, Filter filter) throws BackingStoreException,
-        StorageException {
+    private Collection<Role> loadRoles(UserAdminFactory factory, Filter filter) throws BackingStoreException, StorageException {
         String[] roleNames = getRootNode().childrenNames();
         Collection<Role> roles = new ArrayList<Role>();
         for (String name : roleNames) {
@@ -156,8 +174,7 @@ public class StorageProviderImpl implements StorageProvider {
         return roles;
     }
 
-    protected Collection<Role> loadMembers(UserAdminFactory factory, Group group, String memberType) throws BackingStoreException,
-        StorageException {
+    protected Collection<Role> loadMembers(UserAdminFactory factory, Group group, String memberType) throws BackingStoreException, StorageException {
         Collection<Role> members = new ArrayList<Role>();
         Preferences node = getRootNode().node(group.getName());
         if (node.nodeExists(MEMBERS_NODE)) {
@@ -173,7 +190,7 @@ public class StorageProviderImpl implements StorageProvider {
         }
         return members;
     }
-    
+
     // TODO: use when removing users - check & test
     private void removeFromGroups(String memberName) throws BackingStoreException, StorageException {
         String[] roleNames = getRootNode().childrenNames();
@@ -183,32 +200,6 @@ public class StorageProviderImpl implements StorageProvider {
                 Preferences membersNode = node.node(MEMBERS_NODE);
                 membersNode.remove(memberName);
             }
-        }
-    }
-
-    public void logMessage(Object source, String message, int level) {
-        getLogService().log(level, "[" + source.getClass().getName() + "] " + message);
-    }
-
-    public StorageProviderImpl(PreferencesService preferencesService, LogService logService) throws StorageException {
-        
-        m_preferencesService = preferencesService;
-        m_logService = logService;
-        
-        logMessage(this, "Preferences StorageProvider starting ...", LogService.LOG_DEBUG);
-        
-        //
-        // create the anonymous user if it does not exist
-        //
-        Preferences node = getRootNode();
-        try {
-            if (!node.nodeExists(Role.USER_ANYONE)) {
-                Preferences anyoneNode = node.node(Role.USER_ANYONE);
-                anyoneNode.putInt(NODE_TYPE, Role.USER);
-            }
-        } catch (BackingStoreException e) {
-            throw new StorageException("Error creating anonymous role '" + Role.USER_ANYONE + "': "
-                                       + e.getMessage());
         }
     }
 
@@ -227,8 +218,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
         }
         return user;
     }
@@ -240,8 +230,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
         }
         return group;
     }
@@ -255,8 +244,7 @@ public class StorageProviderImpl implements StorageProvider {
                 return true;
             }
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error removing node '" + role.getName() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error removing node '" + role.getName() + "': " + e.getMessage());
         }
         return false;
     }
@@ -265,8 +253,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             return loadMembers(factory, group, BASIC_MEMBER_STRING);
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error retrieving basic members of group '"
-                                       + group.getName() + "': " + e.getMessage());
+            throw new StorageException("Error retrieving basic members of group '" + group.getName() + "': " + e.getMessage());
         }
     }
 
@@ -274,8 +261,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             return loadMembers(factory, group, REQUIRED_MEMBER_STRING);
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error retrieving required members of group '"
-                                       + group.getName() + "': " + e.getMessage());
+            throw new StorageException("Error retrieving required members of group '" + group.getName() + "': " + e.getMessage());
         }
     }
 
@@ -289,8 +275,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
         }
         return true;
     }
@@ -305,8 +290,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
         }
         return true;
     }
@@ -321,8 +305,7 @@ public class StorageProviderImpl implements StorageProvider {
         try {
             getRootNode().flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error flush()ing node '" + node.name() + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
         }
         return true;
     }
@@ -332,19 +315,14 @@ public class StorageProviderImpl implements StorageProvider {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
             if (value instanceof String) {
                 storeAttribute(node, key, (String) value);
-            }
-            else if (value instanceof byte[]) {
+            } else if (value instanceof byte[]) {
                 storeAttribute(node, key, (byte[]) value);
-            }
-            else {
-                throw new StorageException(  "Invalid value type '" + value.getClass().getName()
-                                             + "' - only String or byte[] are allowed.");
+            } else {
+                throw new StorageException("Invalid value type '" + value.getClass().getName() + "' - only String or byte[] are allowed.");
             }
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error storing attribute '" + key + "' = '" + value
-                                       + "' for role '" + role.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error storing attribute '" + key + "' = '" + value + "' for role '" + role.getName() + "': " + e.getMessage());
         }
     }
 
@@ -354,11 +332,9 @@ public class StorageProviderImpl implements StorageProvider {
             node.remove(key);
             getRootNode().flush();
         } catch (IllegalStateException e) {
-            throw new StorageException(  "Error removing attribute from role '" + role.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error removing attribute from role '" + role.getName() + "': " + e.getMessage());
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error removing attribute from role '" + role.getName()
-                                         + "': " + e.getMessage());
+            throw new StorageException("Error removing attribute from role '" + role.getName() + "': " + e.getMessage());
         }
     }
 
@@ -370,8 +346,7 @@ public class StorageProviderImpl implements StorageProvider {
                 node.flush();
             }
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error clearing attributes of role '" + role.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error clearing attributes of role '" + role.getName() + "': " + e.getMessage());
         }
     }
 
@@ -380,18 +355,14 @@ public class StorageProviderImpl implements StorageProvider {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             if (value instanceof String) {
                 storeAttribute(node, key, (String) value);
-            }
-            else if (value instanceof byte[]) {
+            } else if (value instanceof byte[]) {
                 storeAttribute(node, key, (byte[]) value);
-            }
-            else {
-                throw new StorageException(  "Invalid value type '" + value.getClass().getName()
-                                             + "' - only String or byte[] are allowed.");
+            } else {
+                throw new StorageException("Invalid value type '" + value.getClass().getName() + "' - only String or byte[] are allowed.");
             }
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error storing credential for user '" + user.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error storing credential for user '" + user.getName() + "': " + e.getMessage());
         }
     }
 
@@ -401,11 +372,9 @@ public class StorageProviderImpl implements StorageProvider {
             node.remove(key);
             getRootNode().flush();
         } catch (IllegalStateException e) {
-            throw new StorageException(  "Error removing credential from user '" + user.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error removing credential from user '" + user.getName() + "': " + e.getMessage());
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error removing credential from user '" + user.getName()
-                                         + "': " + e.getMessage());
+            throw new StorageException("Error removing credential from user '" + user.getName() + "': " + e.getMessage());
         }
     }
 
@@ -417,8 +386,7 @@ public class StorageProviderImpl implements StorageProvider {
                 node.flush();
             }
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error clearing credentials of user '" + user.getName()
-                                       + "': " + e.getMessage());
+            throw new StorageException("Error clearing credentials of user '" + user.getName() + "': " + e.getMessage());
         }
     }
 
@@ -447,8 +415,7 @@ public class StorageProviderImpl implements StorageProvider {
         } catch (InvalidSyntaxException e) {
             throw new StorageException("Invalid filter '" + e.getFilter() + "': " + e.getMessage());
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error retrieving user with attribute '" + key + " = "
-                                       + value + "': " + e.getMessage());
+            throw new StorageException("Error retrieving user with attribute '" + key + " = " + value + "': " + e.getMessage());
         } catch (StorageException e) {
             throw e;
         }
@@ -466,8 +433,32 @@ public class StorageProviderImpl implements StorageProvider {
         } catch (InvalidSyntaxException e) {
             throw new StorageException("Invalid filter '" + e.getFilter() + "': " + e.getMessage());
         } catch (BackingStoreException e) {
-            throw new StorageException(  "Error retrieving roles for filter '" + filterString + "': "
-                                       + e.getMessage());
+            throw new StorageException("Error retrieving roles for filter '" + filterString + "': " + e.getMessage());
         }
+    }
+
+    /**
+     * @param context
+     */
+    public synchronized void register(BundleContext context) {
+        if (serviceRegistration != null) {
+            throw new IllegalStateException("This object is already registered under another bundle context!");
+        }
+        //Propagate the properties of the EMF service...
+        Dictionary<String, Object> properties = new Hashtable<String, Object>();
+        //Set service PID
+        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
+        //Set stoarage provider type
+        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        //set the service id of the underlying service
+        properties.put(ConfigurationConstants.TRACKED_SERVICE_ID, trackedServiceID);
+        serviceRegistration = context.registerService(StorageProvider.class, this, properties);
+    }
+
+    public synchronized void unregister() {
+        if (serviceRegistration == null) {
+            throw new IllegalStateException("This object is not registered!");
+        }
+        serviceRegistration.unregister();
     }
 }

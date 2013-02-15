@@ -15,7 +15,7 @@
        since they are set for each module independently.
     -->
     <groupId>org.ops4j.pax.useradmin</groupId>
-    <artifactId>pax-useradmin-provider-preferences</artifactId>
+    <artifactId>org.ops4j.pax.useradmin.provider.preferences</artifactId>
     <!-- Note:
        - modules do not have a version entry to simplify maintainance.
        - internal cross-referencing of versions is done using ${project.version}
@@ -26,7 +26,7 @@
        can be overridden via commandline or profile
     -->
     <properties>
-        <bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
+        <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
         <bundle.namespace>${project.groupId}.provider.preferences</bundle.namespace>
         <bundle.description>A Pax UserAdmin StorageProvider based on the PreferencesService.</bundle.description>
     </properties>
@@ -53,6 +53,12 @@
             <groupId>org.ops4j.pax.useradmin</groupId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <type>jar</type>
+             <version>1.6.0</version>
         </dependency>
     </dependencies>
 

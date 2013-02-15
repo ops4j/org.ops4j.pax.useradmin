@@ -17,24 +17,16 @@
 
 package org.ops4j.pax.useradmin.provider.preferences.internal;
 
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-
-import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
-import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.log.LogService;
 import org.osgi.service.prefs.PreferencesService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Activator of the Pax UserAdmin Preferences StorageProvider bundle.
@@ -42,42 +34,13 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Matthias Kuespert
  * @since 08.07.2009
  */
-public class Activator implements BundleActivator, ServiceTrackerCustomizer, LogService {
+public class Activator implements BundleActivator, ServiceTrackerCustomizer<PreferencesService, PreferencesStorageProvider> {
 
-    private BundleContext m_bundleContext = null;
-    private ServiceTracker m_preferencesTracker = null;
-    private ServiceTracker m_logServiceTracker = null;
-    
-    // Map PreferencesService references to StorageProvider registrations
-    private Map<ServiceReference, ServiceRegistration> m_registrations =
-        new HashMap<ServiceReference, ServiceRegistration>();
-    
-    private void registerStorageProvider(ServiceReference reference, PreferencesService preferences) {
-        try {
-            StorageProvider provider = new StorageProviderImpl(preferences, this);
+    private static final Logger                                            LOG = LoggerFactory.getLogger(Activator.class);
 
-            Dictionary<String, String> properties = new Hashtable<String, String>();
-            properties.put(Constants.SERVICE_PID,
-                ConfigurationConstants.SERVICE_PID);
-            properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
-                ConfigurationConstants.STORAGEPROVIDER_TYPE);
+    private ServiceTracker<PreferencesService, PreferencesStorageProvider> preferencesTracker;
 
-            ServiceRegistration registration =
-                m_bundleContext.registerService(StorageProvider.class.getName(), provider, properties);
-
-            m_registrations.put(reference, registration);
-        }
-        catch (StorageException e) {
-            log(LogService.LOG_ERROR, "Failed to created preferences storage provider", e);
-        }
-    }
-    
-    private void unregisterStorageProvider(ServiceReference reference) {
-        ServiceRegistration registration = m_registrations.get(reference);
-        if (registration != null) {
-            registration.unregister();
-        }
-    }
+    private BundleContext                                                  context;
 
     /**
      * Initialize servicetrackers
@@ -85,11 +48,10 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Log
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
     public void start(BundleContext context) throws Exception {
-        m_bundleContext = context;
-        m_logServiceTracker = new ServiceTracker(context, LogService.class.getName(), null);
-        m_logServiceTracker.open();
-        m_preferencesTracker = new ServiceTracker(context, PreferencesService.class.getName(), this);
-        m_preferencesTracker.open();
+        this.context = context;
+        LOG.info("Startup storage provider bundle {} (version {}), waiting for coresponding service...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
+        preferencesTracker = new ServiceTracker<PreferencesService, PreferencesStorageProvider>(context, PreferencesService.class, this);
+        preferencesTracker.open();
     }
 
     /**
@@ -98,11 +60,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Log
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        m_preferencesTracker.close();
-        m_preferencesTracker = null;
-        m_logServiceTracker.close();
-        m_logServiceTracker = null;
-        m_bundleContext = null;
+        LOG.info("Shutdown storage provider bundle {} (version {})...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
+        preferencesTracker.close();
     }
 
     /**
@@ -110,61 +69,52 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer, Log
      * 
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(ServiceReference)
      */
-    public Object addingService(ServiceReference reference) {
-        PreferencesService preferences = (PreferencesService) m_bundleContext.getService(reference);
-        if(preferences == null){
+    public PreferencesStorageProvider addingService(ServiceReference<PreferencesService> reference) {
+        PreferencesService preferences = context.getService(reference);
+        if (preferences != null) {
+            try {
+                PreferencesStorageProvider provider = new PreferencesStorageProvider(preferences, (Long) reference.getProperty(Constants.SERVICE_ID));
+                provider.register(context);
+                LOG.info("New PreferencesStorageProvider (PreferencesService service.id = {}) is now ready to use and registered.", reference.getProperty(Constants.SERVICE_ID));
+                return provider;
+            } catch (RuntimeException e) {
+                //unget the service
+                context.ungetService(reference);
+                LOG.warn("registration of storage provider failed!", e);
+                return null;
+            } catch (StorageException e) {
+                context.ungetService(reference);
+                LOG.warn("registration of storage provider failed!", e);
+                return null;
+            }
+        } else {
             return null;
         }
-        registerStorageProvider(reference, preferences);
-        return preferences;
+
     }
 
     /**
-     * Called when a known {@link PreferencesService} modified registration properties.
+     * Called when a known {@link PreferencesService} modified registration
+     * properties.
      * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(ServiceReference, Object)
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(ServiceReference,
+     *      Object)
      */
-    public void modifiedService(ServiceReference reference, Object service) {
+    public void modifiedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {
         // no-op
     }
 
     /**
      * Called when a known {@link PreferencesService} unregisters.
      * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(ServiceReference, Object)
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(ServiceReference,
+     *      Object)
      */
-    public void removedService(ServiceReference reference, Object service) {
-        unregisterStorageProvider(reference);
+    public void removedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {
+        //unget whatever happens...
+        context.ungetService(reference);
+        service.unregister();
+        LOG.info("PreferencesStorageProvider (PreferencesService service.id = {}) is now removed and no longer active.", reference.getProperty(Constants.SERVICE_ID));
     }
 
-    /**
-     * @see org.osgi.service.log.LogService#log(int, String)
-     */
-    public void log(int level, String message) {
-        log(null, level, message, null);
-    }
-
-    /**
-     * @see org.osgi.service.log.LogService#log(int, String, Throwable)
-     */
-    public void log(int level, String message, Throwable exception) {
-        log(null, level, message, exception);
-    }
-
-    /**
-     * @see org.osgi.service.log.LogService#log(ServiceReference, int, String)
-     */
-    public void log(ServiceReference sr, int level, String message) {
-        log(sr, level, message, null);
-    }
-
-    /**
-     * @see org.osgi.service.log.LogService#log(ServiceReference, int, String, Throwable)
-     */
-    public void log(ServiceReference sr, int level, String message, Throwable exception) {
-        LogService logService = (LogService) m_logServiceTracker.getService();
-        if (null != logService) {
-            logService.log(sr, level, message, exception);
-        }
-    }
 }
