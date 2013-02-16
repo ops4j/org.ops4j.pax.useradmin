@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ops4j.pax.useradmin.service.internal;
 
 import java.security.MessageDigest;
@@ -22,10 +21,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- * A class to encrypt and verify values based on the <code>java.security</code> API.
+ * A class to encrypt and verify values based on the <code>java.security</code>
+ * API.
  * 
- * @see <a href="http://java.sun.com/javase/6/docs/technotes/guides/security/index.html"/>
- * 
+ * @see <a href=
+ *      "http://java.sun.com/javase/6/docs/technotes/guides/security/index.html"
+ *      />
  * @author Matthias Kuespert
  * @since 25.11.2009
  */
@@ -40,14 +41,16 @@ public class EncryptorImpl {
     /**
      * Initializing constructor.
      * 
-     * @param algorithm The name of the encryption algorithm to use.
-     * @param rngAlgorithm The random-number generator algorithm to use.
-     * @param saltLength The length of the salt.
-     * @throws NoSuchAlgorithmException Thrown if a specified algorithm is not available.
+     * @param algorithm
+     *            The name of the encryption algorithm to use.
+     * @param rngAlgorithm
+     *            The random-number generator algorithm to use.
+     * @param saltLength
+     *            The length of the salt.
+     * @throws NoSuchAlgorithmException
+     *             Thrown if a specified algorithm is not available.
      */
-    protected EncryptorImpl(String algorithm,
-                            String rngAlgorithm,
-                            String saltLength) throws NoSuchAlgorithmException {
+    protected EncryptorImpl(String algorithm, String rngAlgorithm, String saltLength) throws NoSuchAlgorithmException {
         if (null == algorithm || "".equals(algorithm)) {
             throw new IllegalArgumentException("Error: parameter algorithm must no be null or empty.");
         }
@@ -77,12 +80,13 @@ public class EncryptorImpl {
     /**
      * Encrypts a value using the given salt.
      * 
-     * @param value The value to encrypt.
-     * @param salt The salt to use for encryption.
+     * @param value
+     *            The value to encrypt.
+     * @param salt
+     *            The salt to use for encryption.
      * @return A byte[] containing salt and encrypted value.
      */
-    private byte[] encrypt(byte[] value,
-                           byte[] salt) {
+    private byte[] encrypt(byte[] value, byte[] salt) {
         m_messageDigest.reset();
         m_messageDigest.update(salt);
         m_messageDigest.update(value);
@@ -104,11 +108,12 @@ public class EncryptorImpl {
     }
 
     // public interface
-    
+
     /**
      * Encrypts the given value. Creates a new salt on each call.
      * 
-     * @param value The value to encrypt.
+     * @param value
+     *            The value to encrypt.
      * @return A byte[] containing salt and encrypted value.
      */
     public byte[] encrypt(byte[] value) {
@@ -124,12 +129,13 @@ public class EncryptorImpl {
      * the salt stored in the encrypted value to encrypt the input value and
      * compares the result to the data part of the encrypted value.
      * 
-     * @param inputValue The plain-text input value.
-     * @param encryptedValue The encrypted value.
+     * @param inputValue
+     *            The plain-text input value.
+     * @param encryptedValue
+     *            The encrypted value.
      * @return True if the encrypted input value equals the stored value.
      */
-    public boolean compare(byte[] inputValue,
-                           byte[] encryptedValue) {
+    public boolean compare(byte[] inputValue, byte[] encryptedValue) {
         if (null == inputValue) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }

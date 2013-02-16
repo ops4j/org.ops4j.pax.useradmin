@@ -43,9 +43,9 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * Constructor.
      * 
-     * @see UserImpl#UserImpl(String, UserAdminImpl, Map, Map)
+     * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Map)
      */
-    protected GroupImpl(String name, UserAdminImpl admin, Map<String, Object> properties, Map<String, Object> credentials) {
+    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Map<String, Object> credentials) {
         super(name, admin, properties, credentials);
     }
 

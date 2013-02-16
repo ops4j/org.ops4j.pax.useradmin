@@ -33,6 +33,8 @@ public interface UserAdminConstants {
      */
     final static String STORAGEPROVIDER_TYPE                 = "org.ops4j.pax.useradmin.storageprovider.type";
 
+    final static String STORAGEPROVIDER_SPI_SERVICE_ID       = "org.ops4j.pax.useradmin.storageprovider.spi_service_id";
+
     /**
      * The prefix used for events sent by the UserAdmin service.
      */
@@ -41,18 +43,20 @@ public interface UserAdminConstants {
     // property names
 
     /**
-     * Property that controls which encryption algorithm is used. Defaults to ENCRYPTION_ALGORITHM_NONE.
+     * Property that controls which encryption algorithm is used. Defaults to
+     * ENCRYPTION_ALGORITHM_NONE.
      */
     final static String PROP_ENCRYPTION_ALGORITHM            = "org.ops4j.pax.useradmin.encryption.algorithm";
 
     /**
-     * Property that controls which random number algorithm is used for encryption. Defaults to DEFAULT_ENCRYPTION_RANDOM_ALGORITHM.
+     * Property that controls which random number algorithm is used for
+     * encryption. Defaults to DEFAULT_ENCRYPTION_RANDOM_ALGORITHM.
      */
     final static String PROP_ENCRYPTION_RANDOM_ALGORITHM     = "org.ops4j.pax.useradmin.encryption.random.algorithm";
-    
-    
+
     /**
-     * Property that controls which salt-length is used by the random number algorithm. Defaults to DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH.
+     * Property that controls which salt-length is used by the random number
+     * algorithm. Defaults to DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH.
      */
     final static String PROP_ENCRYPTION_RANDOM_SALTLENGTH    = "org.ops4j.pax.useradmin.encryption.random.saltlength";
 
@@ -69,7 +73,7 @@ public interface UserAdminConstants {
     final static String DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH = "32";
 
     // special values
-    
+
     final static String ENCRYPTION_ALGORITHM_NONE            = "none";
 
     /**

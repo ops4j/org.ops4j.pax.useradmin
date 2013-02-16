@@ -46,7 +46,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * The <code>UserAdmin</code> service used.
      */
-    private UserAdminImpl m_userAdmin = null;
+    private PaxUserAdmin m_userAdmin = null;
 
     /**
      * Initializing constructor.
@@ -56,7 +56,7 @@ public class AuthorizationImpl implements Authorization {
      * @param user
      *            The <code>User</code> instance whose authorization is managed.
      */
-    protected AuthorizationImpl(UserAdminImpl userAdmin, User user) {
+    protected AuthorizationImpl(PaxUserAdmin userAdmin, User user) {
         m_userAdmin = userAdmin;
         m_user = user;
     }
@@ -71,7 +71,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * @return the current value of m_userAdmin
      */
-    public UserAdminImpl getAdmin() {
+    public PaxUserAdmin getAdmin() {
         return m_userAdmin;
     }
 

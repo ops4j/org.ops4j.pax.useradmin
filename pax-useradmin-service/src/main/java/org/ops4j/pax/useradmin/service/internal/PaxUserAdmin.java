@@ -33,8 +33,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
@@ -58,44 +58,35 @@ import org.osgi.util.tracker.ServiceTracker;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, UserAdminFactory {
-
-    /**
-     * The context of the OSGi bundle containing this service.
-     */
-    private BundleContext       m_context         = null;
+public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory {
 
     /**
      * The administrative permission used to verify access to restricted
      * functionality.
      */
-    private UserAdminPermission m_adminPermission = null;
-
-    /**
-     * The ServiceTracker which monitors the service used to store data.
-     */
-    private ServiceTracker      m_storageService  = null;
+    private UserAdminPermission                                        m_adminPermission = null;
 
     /**
      * The ServiceTracker which monitors the service used for logging.
      */
-    private ServiceTracker      m_logService      = null;
+    private final ServiceTracker<LogService, LogService>               m_logService;
 
     /**
      * The ServiceTracker which monitors the service used for firing events.
      */
-    private ServiceTracker      m_eventService    = null;
-
-    /**
-     * The ServiceTracker which tracks the registered UserAdminListeners.
-     */
-    private ServiceTracker      m_eventListeners  = null;
+    private final ServiceTracker<EventAdmin, EventAdmin>               m_eventService;
 
     /**
      * The encryptor that is used for encrypting sensible data (e.g. user
      * credentials).
      */
-    private EncryptorImpl       m_encryptor       = null;
+    private EncryptorImpl                                              m_encryptor;
+
+    private final StorageProvider                                      storageProvider;
+
+    private ServiceRegistration<?>                                     userAdminRegistration;
+
+    private final ServiceTracker<UserAdminListener, UserAdminListener> listenerService;
 
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code>
@@ -113,8 +104,9 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      *            A <code>ServiceTracker</code> to locate the
      *            <code>EventAdmin</code> service to use.
      */
-    protected UserAdminImpl(BundleContext context, ServiceTracker storageService, ServiceTracker logService, ServiceTracker eventService) {
-        if (null == storageService) {
+    protected PaxUserAdmin(StorageProvider storageProvider, ServiceTracker<LogService, LogService> logService,
+            ServiceTracker<EventAdmin, EventAdmin> eventService, ServiceTracker<UserAdminListener, UserAdminListener> listenerService) {
+        if (null == storageProvider) {
             throw new IllegalArgumentException("No StorageProvider ServiceTracker specified.");
         }
         if (null == logService) {
@@ -123,18 +115,10 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == eventService) {
             throw new IllegalArgumentException("No EventAdmin ServiceTracker specified.");
         }
-        m_storageService = storageService;
-        m_storageService.open();
+        this.storageProvider = storageProvider;
+        this.listenerService = listenerService;
         m_logService = logService;
-        m_logService.open();
         m_eventService = eventService;
-        m_eventService.open();
-        m_context = context;
-        //
-        m_eventListeners = new ServiceTracker(context, UserAdminListener.class.getName(), null);
-        m_eventListeners.open();
-        //
-        m_encryptor = null;
     }
 
     /**
@@ -194,27 +178,18 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @throws ConfigurationException
      *             if the given algorithm doesn't exist
      */
-    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength)
-            throws ConfigurationException {
-        EncryptorImpl encryptor;
+    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength) {
         try {
-            encryptor = new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
+            return new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfigurationException(UserAdminConstants.PROP_ENCRYPTION_ALGORITHM + " or " + UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, "Encryption algorithm not supported: "
-                    + e.getMessage(), e);
+            String msg = encryptionAlgorithm + " or " + encryptionRandomAlgorithm + " Encryption algorithm not supported: " + e.getMessage();
+            throw new IllegalArgumentException(msg, e);
         }
-        return encryptor;
     }
 
     // ManagedService interface
 
-    /**
-     * Copies all properties to an internal Map.
-     * 
-     * @see ManagedService#updated(Dictionary)
-     */
-    @SuppressWarnings(value = "unchecked")
-    public void updated(Dictionary properties) throws ConfigurationException {
+    public void configurationUpdated(Map<String, ?> properties) {
         if (null == properties) {
             // ignore empty properties
             return;
@@ -379,10 +354,6 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      * @see UserAdminUtil#getStorageProvider()
      */
     public StorageProvider getStorageProvider() throws StorageException {
-        StorageProvider storageProvider = (StorageProvider) m_storageService.getService();
-        if (null == storageProvider) {
-            throw new StorageException(UserAdminMessages.MSG_MISSING_STORAGE_SERVICE);
-        }
         return storageProvider;
     }
 
@@ -391,7 +362,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      *      check for valid levels? What to do then: exception or ignore?
      */
     public void logMessage(Object source, int level, String message) {
-        LogService log = (LogService) m_logService.getService();
+        LogService log = m_logService.getService();
         if (null != log) {
             log.log(level, "[" + (source != null ? source.getClass().getName() : "none") + "] " + message);
         }
@@ -404,13 +375,14 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null == role) {
             throw new IllegalArgumentException("parameter role must not be null");
         }
-        ServiceReference ref = m_context.getServiceReference(UserAdmin.class.getName());
-        final UserAdminEvent uaEvent = new UserAdminEvent(ref, type, role);
+        ServiceReference<?> reference = userAdminRegistration.getReference();
+        final UserAdminEvent uaEvent = new UserAdminEvent(reference, type, role);
         //
         // send event to all listeners, asynchronously - in a separate thread!!
         //
-        Object[] eventListeners = m_eventListeners.getServices();
+        UserAdminListener[] eventListeners = listenerService.getServices(new UserAdminListener[0]);
         if (null != eventListeners) {
+            //FIXME dont you a thread for each listener!
             for (Object listenerObject : eventListeners) {
                 final UserAdminListener listener = (UserAdminListener) listenerObject;
                 Thread notifyThread = new Thread() {
@@ -425,17 +397,17 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         //
         // send event to EventAdmin if present
         //
-        EventAdmin eventAdmin = (EventAdmin) m_eventService.getService();
+        EventAdmin eventAdmin = m_eventService.getService();
         if (null != eventAdmin) {
             Dictionary<String, Object> properties = new Hashtable<String, Object>();
             properties.put("event", uaEvent);
             properties.put("role", role);
             properties.put("role.name", role.getName());
             properties.put("role.type", role.getType());
-            properties.put("service", ref);
-            properties.put("service.id", ref.getProperty(Constants.SERVICE_ID));
-            properties.put("service.objectClass", ref.getProperty(Constants.OBJECTCLASS));
-            properties.put("service.pid", ref.getProperty(Constants.SERVICE_PID));
+            properties.put("service", reference);
+            properties.put("service.id", reference.getProperty(Constants.SERVICE_ID));
+            properties.put("service.objectClass", reference.getProperty(Constants.OBJECTCLASS));
+            properties.put("service.pid", reference.getProperty(Constants.SERVICE_PID));
             //
             Event event = new Event(UserAdminConstants.EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
             eventAdmin.postEvent(event);
@@ -462,6 +434,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         if (null != m_encryptor) {
             byte[] valueBytes;
             if (value instanceof String) {
+                //FIXME: This relies on platform encoding!
                 valueBytes = ((String) value).getBytes();
             } else if (value instanceof byte[]) {
                 valueBytes = (byte[]) value;
@@ -486,7 +459,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         } else {
             throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
         }
-        
+
         byte[] storedValueBytes;
         if (storedValue instanceof String) {
             storedValueBytes = ((String) storedValue).getBytes();
@@ -495,7 +468,7 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
         } else {
             throw new IllegalArgumentException("Illegal value type: " + storedValue.getClass().getName());
         }
-        
+
         if (null != m_encryptor) {
             return m_encryptor.compare(inputValueBytes, storedValueBytes);
         }
@@ -516,5 +489,29 @@ public class UserAdminImpl implements UserAdmin, ManagedService, UserAdminUtil, 
      */
     public Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials) {
         return new GroupImpl(name, this, properties, credentials);
+    }
+
+    /**
+     * @param context
+     */
+    public synchronized void register(BundleContext context, String type, Long spi_service_id) {
+        if (userAdminRegistration != null) {
+            throw new IllegalStateException("This object is already registered under another bundle context!");
+        }
+        Dictionary<String, Object> properties = new Hashtable<String, Object>();
+        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
+        properties.put(UserAdminConstants.STORAGEPROVIDER_SPI_SERVICE_ID, spi_service_id);
+        userAdminRegistration = context.registerService(UserAdmin.class, this, properties);
+    }
+
+    /**
+     * 
+     */
+    public synchronized void unregister() {
+        if (userAdminRegistration == null) {
+            throw new IllegalStateException("This object is not registered!");
+        }
+        userAdminRegistration.unregister();
+
     }
 }

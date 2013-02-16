@@ -17,6 +17,7 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -32,151 +33,107 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
-import org.osgi.service.useradmin.UserAdmin;
+import org.osgi.service.useradmin.UserAdminListener;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Activator which starts a ServiceTracker for StorageProvider services.
  * UserAdmin services are started/stopped on adding/removing providers.
  * 
- * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/framework/BundleActivator.html" />
- * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/util/tracker/ServiceTrackerCustomizer.html" />
- * 
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public class Activator implements BundleActivator, ServiceTrackerCustomizer {
+public class Activator implements BundleActivator, ServiceTrackerCustomizer<StorageProvider, PaxUserAdmin> {
 
-    private ServiceTracker m_providerTracker = null;
-    private ServiceTracker m_logServiceTracker = null;
-    private BundleContext m_context = null;
-    
-    private Map<String, ServiceRegistration> m_services = new HashMap<String, ServiceRegistration>();
-    
-    private StorageProvider startUserAdminService(String type, ServiceReference storageProvider) {
-        if (null == type || "".equals(type)) {
-             throw new IllegalArgumentException("Internal error: parameter 'type' must not be null or empty.");
-        }
-        StorageProvider provider = (StorageProvider) m_context.getService(storageProvider);
-        if (null == provider) {
-            // TODO: what to do?
-            throw new IllegalStateException("Internal error: StorageProvider service implementation not available.");
-        }
-        if (!m_services.containsKey(type)) {
-        	logMessage(LogService.LOG_INFO, " -- starting new UserAdmin service for provider: " + type);
-            Dictionary<String, String> properties = new Hashtable<String, String>();
-            properties.put(Constants.SERVICE_PID, UserAdminConstants.SERVICE_PID + "." + type);
-            properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
-            UserAdminImpl userAdmin = new UserAdminImpl(m_context,
-                                                        new ServiceTracker(m_context,
-                                                                           storageProvider,
-                                                                           null),
-                                                        new ServiceTracker(m_context,
-                                                                           LogService.class.getName(),
-                                                                           null),
-                                                        new ServiceTracker(m_context,
-                                                                           EventAdmin.class.getName(),
-                                                                           null));
-            ServiceRegistration userAdminRegistration = m_context.registerService(new String[] {
-                                                                                                 UserAdmin.class.getName(),
-                                                                                                 ManagedService.class.getName()
-                                                                                               },
-                                                                                  userAdmin, properties);
-            m_services.put(type, userAdminRegistration);
-        }
-        return provider;
-    }
-    
-    private void stopUserAdminService(String type) {
-        if (null == type || "".equals(type)) {
-            throw new IllegalArgumentException("Internal error: parameter 'type' must not be null or empty.");
-        }
-        if (m_services.containsKey(type)) {
-            ServiceRegistration registration = m_services.get(type);
-            registration.unregister();
-            m_services.remove(type);
-        }
-    }
+    private static final Logger                                    LOG               = LoggerFactory.getLogger(Activator.class);
 
-    private void logMessage(int level, String message) {
-        LogService log = (LogService) m_logServiceTracker.getService();
-        if (null != log) {
-            log.log(level, "[" + Activator.class.getName() + "] " + message);
-        }
-    }
+    private ServiceTracker<StorageProvider, PaxUserAdmin>          providerTracker;
 
-    // BundleActivator interface
-    /**
-     * @see BundleActivator#start(BundleContext)
-     */
+    private BundleContext                                          context;
+
+    private ServiceTracker<EventAdmin, EventAdmin>                 eventAdminTracker;
+
+    private ServiceTracker<LogService, LogService>                 logServiceTracker;
+
+    private ServiceTracker<UserAdminListener, UserAdminListener>   listenerTracker;
+
+    private final Map<String, ServiceRegistration<ManagedService>> managedServiceMap = new HashMap<String, ServiceRegistration<ManagedService>>();
+
     public void start(BundleContext context) throws Exception {
-        
-        m_context = context;
-        
-        m_logServiceTracker = new ServiceTracker(context, 
-                                                 LogService.class.getName(),
-                                                 null);
-        m_logServiceTracker.open();
-        
-        // install a service tracker to track StorageProvider services and
-        // configure ourselves as event handler
-        m_providerTracker = new ServiceTracker(context,
-                                               StorageProvider.class.getName(),
-                                               this);
-        m_providerTracker.open();
+        this.context = context;
+        LOG.info("Start PaxUserAdmin service bundle {} (version {}) and wait for StorageProvider...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
+        //Create all tracker
+        providerTracker = new ServiceTracker<StorageProvider, PaxUserAdmin>(context, StorageProvider.class.getName(), this);
+        eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(context, EventAdmin.class, null);
+        logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
+        listenerTracker = new ServiceTracker<UserAdminListener, UserAdminListener>(context, UserAdminListener.class, null);
+        //and open them...
+        logServiceTracker.open();
+        eventAdminTracker.open();
+        providerTracker.open();
     }
 
-    /**
-     * @see BundleActivator#stop(BundleContext)
-     */
     public void stop(BundleContext context) throws Exception {
-    	m_logServiceTracker.close();
-    	m_logServiceTracker = null;
-    	
-        m_providerTracker.close();
-        // unregister all UserAdmin services we created
-        for (ServiceRegistration registration : m_services.values()) {
-            registration.unregister();
+        LOG.info("Shutdown PaxUserAdmin service bundle {} (version {})...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
+        providerTracker.close();
+        eventAdminTracker.close();
+        logServiceTracker.close();
+        listenerTracker.close();
+        synchronized (managedServiceMap) {
+            Collection<ServiceRegistration<ManagedService>> values = managedServiceMap.values();
+            for (ServiceRegistration<ManagedService> serviceRegistration : values) {
+                serviceRegistration.unregister();
+            }
+            managedServiceMap.clear();
         }
-        m_providerTracker = null;
     }
-    
-    // ServiceTrackerCustomizer interface
-    
-    /**
-     * A new StorageProvider service was detected ...
-     * 
-     * @see ServiceTrackerCustomizer#addingService(ServiceReference)
-     */
-    public Object addingService(ServiceReference reference) {
 
+    public PaxUserAdmin addingService(ServiceReference<StorageProvider> reference) {
         String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
         if (null == type) {
-            // ignore if property not set: it's not a useable provider
+            LOG.error("Ignoring provider without storage provider type");
             return null;
         }
-        return startUserAdminService(type, reference);
-    }
-    
-    /**
-     * @see ServiceTrackerCustomizer#modifiedService(ServiceReference, Object)
-     */
-    public void modifiedService(ServiceReference reference, Object service) {
-        // TODO Auto-generated method stub
-    	logMessage(LogService.LOG_DEBUG, "modified service: " + reference.getProperty(Constants.BUNDLE_SYMBOLICNAME));
-    	logMessage(LogService.LOG_DEBUG, "modified service: " + reference.getProperty(Constants.SERVICE_PID));
-    }
-    
-    /**
-     * @see ServiceTrackerCustomizer#removedService(ServiceReference, Object)
-     */
-    public void removedService(ServiceReference reference, Object service) {
-        String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
-        if (null == type) {
-            // ignore if property not set: it's not a useable provider
-            return;
+        StorageProvider storageProvider = context.getService(reference);
+        if (storageProvider != null) {
+            try {
+                PaxUserAdmin userAdminImpl = new PaxUserAdmin(storageProvider, logServiceTracker, eventAdminTracker, listenerTracker);
+                userAdminImpl.register(context, type, (Long) reference.getProperty(Constants.SERVICE_ID));
+                LOG.info("New UserAdmin for StorageProvider {} (service.id = {}) is now available.", type, reference.getProperty(Constants.SERVICE_ID));
+                synchronized (managedServiceMap) {
+                    String pid = UserAdminConstants.SERVICE_PID + "." + type;
+                    if (!managedServiceMap.containsKey(pid)) {
+                        Dictionary<String, Object> properties = new Hashtable<String, Object>();
+                        properties.put(Constants.SERVICE_PID, pid);
+                        ConfigurationListener listener = new ConfigurationListener(type, providerTracker);
+                        ServiceRegistration<ManagedService> registerService = context.registerService(ManagedService.class, listener, properties);
+                        managedServiceMap.put(pid, registerService);
+                    }
+                }
+                return userAdminImpl;
+            } catch (RuntimeException e) {
+                //unget the service
+                context.ungetService(reference);
+                LOG.warn("registration of UserAdmin failed!", e);
+                return null;
+            }
+        } else {
+            return null;
         }
-        stopUserAdminService(type);
+    }
+
+    public void modifiedService(ServiceReference<StorageProvider> reference, PaxUserAdmin service) {
+        // we not support modifications yet
+    }
+
+    public void removedService(ServiceReference<StorageProvider> reference, PaxUserAdmin service) {
+        String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
+        //unget whatever happens
+        context.ungetService(reference);
+        service.unregister();
+        LOG.info("UserAdmin for StorageProvider {} (service.id = {}) is now removed and no longer available.", type, reference.getProperty(Constants.SERVICE_ID));
     }
 }

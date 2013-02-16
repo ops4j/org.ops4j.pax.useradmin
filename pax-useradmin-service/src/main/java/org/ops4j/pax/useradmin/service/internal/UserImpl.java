@@ -43,11 +43,11 @@ public class UserImpl extends RoleImpl implements User {
     /**
      * Constructor.
      * 
-     * @see RoleImpl#RoleImpl(String, UserAdminImpl, Map)
+     * @see RoleImpl#RoleImpl(String, PaxUserAdmin, Map)
      * @param credentials
      *            The credentials of this user.
      */
-    protected UserImpl(String name, UserAdminImpl admin, Map<String, Object> properties, Map<String, Object> credentials) {
+    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Map<String, Object> credentials) {
         super(name, admin, properties);
         //
         m_credentials = new UserCredentials(this, admin, credentials);

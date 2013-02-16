@@ -41,7 +41,7 @@ public abstract class RoleImpl implements Role, SPIRole {
     /**
      * The UserAdmin that uses this role.
      */
-    private UserAdminImpl  m_admin      = null;
+    private PaxUserAdmin  m_admin      = null;
 
     /**
      * The properties of this role. Note: changing properties is detected and
@@ -60,7 +60,7 @@ public abstract class RoleImpl implements Role, SPIRole {
      *            A map containing the raw properties of this role as read by
      *            the StorageProvider.
      */
-    protected RoleImpl(String name, UserAdminImpl userAdmin, Map<String, Object> properties) {
+    protected RoleImpl(String name, PaxUserAdmin userAdmin, Map<String, Object> properties) {
         if (name == null) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
         }
@@ -96,7 +96,7 @@ public abstract class RoleImpl implements Role, SPIRole {
     /**
      * @return The <code>UserAdminImpl</code> object that created this role.
      */
-    protected UserAdminImpl getAdmin() {
+    protected PaxUserAdmin getAdmin() {
         return m_admin;
     }
 

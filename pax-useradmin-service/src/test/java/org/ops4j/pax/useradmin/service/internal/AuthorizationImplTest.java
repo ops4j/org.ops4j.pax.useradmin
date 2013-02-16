@@ -44,7 +44,7 @@ public class AuthorizationImplTest {
 
     @Test
     public void getNameOk() {
-        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
         
@@ -60,7 +60,7 @@ public class AuthorizationImplTest {
     
     @Test
     public void getRolesInvalidSyntaxException() {
-        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
         UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
@@ -84,7 +84,7 @@ public class AuthorizationImplTest {
     
     @Test
     public void getRolesOk() {
-        UserAdminImpl userAdmin = EasyMock.createMock(UserAdminImpl.class);
+        PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
         UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
         UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
         UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
