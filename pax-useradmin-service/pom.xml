@@ -13,7 +13,7 @@
        since they are set for each module independently.
     -->
     <groupId>org.ops4j.pax.useradmin</groupId>
-    <artifactId>pax-useradmin-service</artifactId>
+    <artifactId>org.ops4j.pax.useradmin.service</artifactId>
     <!-- Note:
        - modules do not have a version entry to simplify maintainance.
        - internal cross-referencing of versions is done using ${project.version}
@@ -24,7 +24,7 @@
        can be overridden via commandline or profile
     -->
     <properties>
-        <bundle.symbolicName>${project.groupId}.${project.artifactId}</bundle.symbolicName>
+        <bundle.symbolicName>${project.artifactId}</bundle.symbolicName>
         <bundle.namespace>${project.groupId}.service</bundle.namespace>
         <bundle.description>An extendible implementation of the OSGi UserAdmin service.</bundle.description>
     </properties>
