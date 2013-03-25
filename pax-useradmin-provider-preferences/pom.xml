@@ -47,7 +47,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>pax-useradmin-service</artifactId>
+            <artifactId>org.ops4j.pax.useradmin.service</artifactId>
             <groupId>org.ops4j.pax.useradmin</groupId>
             <version>${project.version}</version>
             <scope>provided</scope>
