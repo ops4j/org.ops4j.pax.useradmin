@@ -17,6 +17,8 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.service.useradmin.Role;
@@ -75,5 +77,15 @@ public interface UserAdminUtil {
      *            The role which is related to the event.
      */
     void fireEvent(int type, Role role);
+
+    /**
+     * @returnthe {@link Decryptor} to use
+     */
+    Decryptor getDecryptor();
+
+    /**
+     * @return {@link Encryptor} to use
+     */
+    Encryptor getEncryptor();
 
 }

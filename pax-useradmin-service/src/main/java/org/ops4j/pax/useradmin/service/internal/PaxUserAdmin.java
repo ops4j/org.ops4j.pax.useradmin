@@ -17,13 +17,20 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
-import org.ops4j.pax.useradmin.service.UserAdminTools;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
+import org.ops4j.pax.useradmin.service.internal.encryption.EncryptorContext;
+import org.ops4j.pax.useradmin.service.internal.encryption.PaxUserAdminDecryptor;
+import org.ops4j.pax.useradmin.service.internal.encryption.PaxUserAdminEncryptor;
+import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -79,6 +86,14 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     private final ServiceTracker<UserAdminListener, UserAdminListener> listenerService;
 
+    private Map<String, ?>                                             properties;
+
+    private Encryptor                                                  encryptor;
+
+    private final PaxUserAdminDecryptor                                decryptor = new PaxUserAdminDecryptor();
+
+    private final ExecutorService                                      eventExecutor;
+
     /**
      * Constructor - creates and initializes a <code>UserAdminImpl</code>
      * instance.
@@ -96,7 +111,9 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      *            <code>EventAdmin</code> service to use.
      */
     protected PaxUserAdmin(StorageProvider storageProvider, ServiceTracker<LogService, LogService> logService,
-            ServiceTracker<EventAdmin, EventAdmin> eventService, ServiceTracker<UserAdminListener, UserAdminListener> listenerService) {
+            ServiceTracker<EventAdmin, EventAdmin> eventService, ServiceTracker<UserAdminListener, UserAdminListener> listenerService,
+            ExecutorService eventExecutor) {
+        this.eventExecutor = eventExecutor;
         if (null == storageProvider) {
             throw new IllegalArgumentException("No StorageProvider ServiceTracker specified.");
         }
@@ -120,22 +137,15 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * @return The event code as string
      */
     private String getEventTypeName(int type) {
-        String typeName;
         switch (type) {
             case UserAdminEvent.ROLE_CHANGED:
-                typeName = "ROLE_CHANGED";
-                break;
+                return "ROLE_CHANGED";
             case UserAdminEvent.ROLE_CREATED:
-                typeName = "ROLE_CREATED";
-                break;
+                return "ROLE_CREATED";
             case UserAdminEvent.ROLE_REMOVED:
-                typeName = "ROLE_REMOVED";
-                break;
-            default:
-                // TODO: shouldn't that result in an exception?
-                typeName = "Event" + type;
+                return "ROLE_REMOVED";
         }
-        return typeName;
+        return null;
     }
 
     /**
@@ -160,43 +170,12 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
     }
 
-    //    /**
-    //     * Creates an appropriate encryptor.
-    //     * 
-    //     * @param encryptionAlgorithm
-    //     *            The encryption algorithm to use.
-    //     * @param encryptionRandomAlgorithm
-    //     *            The random number algorithm to use.
-    //     * @param encryptionRandomAlgorithmSaltLength
-    //     *            The klength of the salt to use for random number generation.
-    //     * @return An implementation of the encryptor.
-    //     * @throws ConfigurationException
-    //     *             if the given algorithm doesn't exist
-    //     */
-    //    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength) {
-    //        try {
-    //            return new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
-    //        } catch (NoSuchAlgorithmException e) {
-    //            String msg = encryptionAlgorithm + " or " + encryptionRandomAlgorithm + " Encryption algorithm not supported: " + e.getMessage();
-    //            throw new IllegalArgumentException(msg, e);
-    //        }
-    //    }
-
     // ManagedService interface
 
     public void configurationUpdated(Map<String, ?> properties) {
-        if (null == properties) {
-            // ignore empty properties
-            return;
-        }
-        String encryptionAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_ALGORITHM, UserAdminConstants.ENCRYPTION_ALGORITHM_NONE);
-        if (UserAdminConstants.ENCRYPTION_ALGORITHM_NONE.equals(encryptionAlgorithm)) {
-            // set no encryption
-        } else {
-            //            // create encryptor ...
-            //            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
-            //            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-            //            m_encryptor = createEncryptor(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
+        synchronized (this) {
+            this.properties = properties;
+            encryptor = null;
         }
     }
 
@@ -210,7 +189,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         checkAdminPermission();
         //
         if (null == name || name.trim().length() == 0) {
-            // logMessage(this, LogService.LOG_ERROR, UserAdminMessages.MSG_INVALID_NAME); // TODO: check if necessary/useful
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME);
         }
         if (!((type == Role.GROUP) || (type == Role.USER))) {
@@ -359,8 +337,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     }
 
     /**
-     * @see UserAdminUtil#logMessage(Object, int, String) TODO: do we need a
-     *      check for valid levels? What to do then: exception or ignore?
+     * @see UserAdminUtil#logMessage(Object, int, String)
      */
     @Override
     public void logMessage(Object source, int level, String message) {
@@ -385,23 +362,23 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         //
         UserAdminListener[] eventListeners = listenerService.getServices(new UserAdminListener[0]);
         if (null != eventListeners) {
-            //FIXME dont you a thread for each listener!
             for (Object listenerObject : eventListeners) {
                 final UserAdminListener listener = (UserAdminListener) listenerObject;
-                Thread notifyThread = new Thread() {
+                eventExecutor.execute(new Runnable() {
+
                     @Override
                     public void run() {
                         listener.roleChanged(uaEvent);
                     }
-                };
-                notifyThread.start();
+                });
             }
         }
         //
         // send event to EventAdmin if present
         //
         EventAdmin eventAdmin = m_eventService.getService();
-        if (null != eventAdmin) {
+        String name = getEventTypeName(type);
+        if (null != eventAdmin && name != null) {
             Dictionary<String, Object> properties = new Hashtable<String, Object>();
             properties.put("event", uaEvent);
             properties.put("role", role);
@@ -412,10 +389,10 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
             properties.put("service.objectClass", reference.getProperty(Constants.OBJECTCLASS));
             properties.put("service.pid", reference.getProperty(Constants.SERVICE_PID));
             //
-            Event event = new Event(UserAdminConstants.EVENT_TOPIC_PREFIX + getEventTypeName(type), properties);
+            Event event = new Event(PaxUserAdminConstants.EVENT_TOPIC_PREFIX + name, properties);
             eventAdmin.postEvent(event);
         } else {
-            String message = "No event service available - cannot send event of type '" + getEventTypeName(type) + "' for role '" + role.getName() + "'";
+            String message = "No event service available or incompatible type - cannot send event of type '" + name + "' for role '" + role.getName() + "'";
             logMessage(this, LogService.LOG_DEBUG, message);
         }
     }
@@ -430,56 +407,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
             sm.checkPermission(new UserAdminPermission(name, action));
         }
     }
-
-    //    /**
-    //     * @see UserAdminUtil#encrypt(Object)
-    //     */
-    //    @Override
-    //    public Object encrypt(Object value) {
-    //        if (null != m_encryptor) {
-    //            byte[] valueBytes;
-    //            if (value instanceof String) {
-    //                //FIXME: This relies on platform encoding!
-    //                valueBytes = ((String) value).getBytes();
-    //            } else if (value instanceof byte[]) {
-    //                valueBytes = (byte[]) value;
-    //            } else {
-    //                throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
-    //            }
-    //            //
-    //            return m_encryptor.encrypt(valueBytes);
-    //        }
-    //        return value;
-    //    }
-
-    //    /**
-    //     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
-    //     */
-    //    @Override
-    //    public boolean compareToEncryptedValue(Object inputValue, Object storedValue) {
-    //        byte[] inputValueBytes;
-    //        if (inputValue instanceof String) {
-    //            inputValueBytes = ((String) inputValue).getBytes();
-    //        } else if (inputValue instanceof byte[]) {
-    //            inputValueBytes = (byte[]) inputValue;
-    //        } else {
-    //            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
-    //        }
-    //
-    //        byte[] storedValueBytes;
-    //        if (storedValue instanceof String) {
-    //            storedValueBytes = ((String) storedValue).getBytes();
-    //        } else if (storedValue instanceof byte[]) {
-    //            storedValueBytes = (byte[]) storedValue;
-    //        } else {
-    //            throw new IllegalArgumentException("Illegal value type: " + storedValue.getClass().getName());
-    //        }
-    //
-    //        if (null != m_encryptor) {
-    //            return m_encryptor.compare(inputValueBytes, storedValueBytes);
-    //        }
-    //        return Arrays.equals(inputValueBytes, storedValueBytes);
-    //    }
 
     // UserAdminFactory interface
 
@@ -507,8 +434,8 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
             throw new IllegalStateException("This object is already registered under another bundle context!");
         }
         Dictionary<String, Object> properties = new Hashtable<String, Object>();
-        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, type);
-        properties.put(UserAdminConstants.STORAGEPROVIDER_SPI_SERVICE_ID, spi_service_id);
+        properties.put(PaxUserAdminConstants.STORAGEPROVIDER_TYPE, type);
+        properties.put(PaxUserAdminConstants.STORAGEPROVIDER_SPI_SERVICE_ID, spi_service_id);
         userAdminRegistration = context.registerService(UserAdmin.class, this, properties);
     }
 
@@ -521,5 +448,28 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
         userAdminRegistration.unregister();
 
+    }
+
+    @Override
+    public Decryptor getDecryptor() {
+        return decryptor;
+    }
+
+    @Override
+    public Encryptor getEncryptor() {
+        synchronized (this) {
+            if (encryptor == null) {
+                Map<String, ?> p = properties;
+                if (p == null) {
+                    p = new HashMap<String, Object>();
+                }
+                try {
+                    encryptor = new PaxUserAdminEncryptor(new EncryptorContext(p));
+                } catch (NoSuchAlgorithmException e) {
+                    throw new IllegalStateException("an algorithm needed for encryption is not avaiable", e);
+                }
+            }
+            return encryptor;
+        }
     }
 }

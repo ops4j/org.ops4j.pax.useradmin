@@ -17,6 +17,8 @@
 
 package org.ops4j.pax.useradmin.service;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
@@ -100,5 +102,37 @@ public final class UserAdminTools {
             throw new IllegalArgumentException("getOptionalProperty() argument 'properties' must not be null");
         }
         return getOptionalProperty((Dictionary<String, ?>) new Hashtable<String, Object>(properties), name, defaultValue);
+    }
+
+    public static byte[] stringToBytes(String input) {
+        if (input == null) {
+            return null;
+        }
+        if (Charset.isSupported("UTF-8")) {
+            try {
+                return input.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                //this should never happen!
+                throw new AssertionError("Encoding UTF-8 not found even if it was advertised as supported!");
+            }
+        } else {
+            return input.getBytes(Charset.defaultCharset());
+        }
+    }
+
+    public static String bytesToString(byte[] input) {
+        if (input == null) {
+            return null;
+        }
+        if (Charset.isSupported("UTF-8")) {
+            try {
+                return new String(input, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                //this should never happen!
+                throw new AssertionError("Encoding UTF-8 not found even if it was advertised as supported!");
+            }
+        } else {
+            return new String(input, Charset.defaultCharset());
+        }
     }
 }

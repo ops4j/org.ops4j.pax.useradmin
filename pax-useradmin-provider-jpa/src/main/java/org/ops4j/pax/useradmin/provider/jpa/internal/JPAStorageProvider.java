@@ -40,7 +40,7 @@ import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBProperty;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBRole;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBUser;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBVersionedObject;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
@@ -517,13 +517,13 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
 
     /**
      * Sets a <code>String</code> credential to a user.
+     * 
      * @param user
      *            The <code>User</code> to set the credential to.
      * @param key
      *            The key of the credential.
      * @param value
      *            The value of the credential.
-     * 
      * @throws StorageException
      */
     @Override
@@ -916,7 +916,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
         //Set service PID
         properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
         //Set stoarage provider type
-        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        properties.put(PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //set the service id of the underlying service
         properties.put(ConfigurationConstants.TRACKED_SERVICE_ID, trackedServiceID);
         serviceRegistration = context.registerService(StorageProvider.class, this, properties);

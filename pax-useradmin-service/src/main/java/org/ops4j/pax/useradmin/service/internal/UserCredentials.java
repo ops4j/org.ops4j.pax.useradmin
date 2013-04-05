@@ -51,8 +51,9 @@ public class UserCredentials extends AbstractProperties<User> {
 
     @Override
     protected synchronized Object store(StorageProvider storageProvider, String key, Object plainValue) throws StorageException {
-        getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-        storageProvider.getCredentialProvider().setUserCredential(null, getRole(), key, plainValue);
+        UserAdminUtil util = getUtil();
+        util.checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
+        storageProvider.getCredentialProvider().setUserCredential(util.getEncryptor(), getRole(), key, plainValue);
         return plainValue;
     }
 
@@ -66,7 +67,8 @@ public class UserCredentials extends AbstractProperties<User> {
     public synchronized Object get(Object key) {
         //call super for security and param checks...
         super.get(key);
-        return getUtil().getStorageProvider().getCredentialProvider().getUserCredential(null, getRole(), (String) key);
+        UserAdminUtil util = getUtil();
+        return util.getStorageProvider().getCredentialProvider().getUserCredential(util.getDecryptor(), getRole(), (String) key);
     }
 
     @Override
@@ -82,6 +84,7 @@ public class UserCredentials extends AbstractProperties<User> {
     public boolean hasCredential(String key, Object value) {
         checkKeyValid(key);
         checkGetPermission(key);
-        return getUtil().getStorageProvider().getCredentialProvider().hasUserCredential(null, getRole(), key, value);
+        UserAdminUtil util = getUtil();
+        return util.getStorageProvider().getCredentialProvider().hasUserCredential(util.getDecryptor(), getRole(), key, value);
     }
 }

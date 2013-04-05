@@ -44,7 +44,6 @@ public interface CredentialProvider {
 
     /**
      * Check a <code>String</code> credential to a user.
-     * 
      * @param decryptor
      *            The {@link Decryptor} to validate and decrypt values
      * @param user
@@ -53,6 +52,7 @@ public interface CredentialProvider {
      *            The key of the credential.
      * @param value
      *            The value of the credential.
+     * 
      * @throws StorageException
      */
     boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException;

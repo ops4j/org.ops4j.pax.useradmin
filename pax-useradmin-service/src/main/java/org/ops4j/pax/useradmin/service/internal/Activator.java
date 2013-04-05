@@ -22,8 +22,12 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -48,6 +52,11 @@ import org.slf4j.LoggerFactory;
  */
 public class Activator implements BundleActivator, ServiceTrackerCustomizer<StorageProvider, PaxUserAdmin> {
 
+    /**
+     * Maximum number of parralllel event threads
+     */
+    private static final int                                       MAXIMUM_POOL_SIZE = 10;
+
     private static final Logger                                    LOG               = LoggerFactory.getLogger(Activator.class);
 
     private ServiceTracker<StorageProvider, PaxUserAdmin>          providerTracker;
@@ -61,6 +70,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
     private ServiceTracker<UserAdminListener, UserAdminListener>   listenerTracker;
 
     private final Map<String, ServiceRegistration<ManagedService>> managedServiceMap = new HashMap<String, ServiceRegistration<ManagedService>>();
+
+    private final ExecutorService                                  eventExecutor     = new ThreadPoolExecutor(0, MAXIMUM_POOL_SIZE, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     @Override
     public void start(BundleContext context) throws Exception {
@@ -95,7 +106,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
 
     @Override
     public PaxUserAdmin addingService(ServiceReference<StorageProvider> reference) {
-        String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
+        String type = (String) reference.getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE);
         if (null == type) {
             LOG.error("Ignoring provider without storage provider type");
             return null;
@@ -103,11 +114,11 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
         StorageProvider storageProvider = context.getService(reference);
         if (storageProvider != null) {
             try {
-                PaxUserAdmin userAdminImpl = new PaxUserAdmin(storageProvider, logServiceTracker, eventAdminTracker, listenerTracker);
+                PaxUserAdmin userAdminImpl = new PaxUserAdmin(storageProvider, logServiceTracker, eventAdminTracker, listenerTracker, eventExecutor);
                 userAdminImpl.register(context, type, (Long) reference.getProperty(Constants.SERVICE_ID));
                 LOG.info("New UserAdmin for StorageProvider {} (service.id = {}) is now available.", type, reference.getProperty(Constants.SERVICE_ID));
                 synchronized (managedServiceMap) {
-                    String pid = UserAdminConstants.SERVICE_PID + "." + type;
+                    String pid = PaxUserAdminConstants.SERVICE_PID + "." + type;
                     if (!managedServiceMap.containsKey(pid)) {
                         Dictionary<String, Object> properties = new Hashtable<String, Object>();
                         properties.put(Constants.SERVICE_PID, pid);
@@ -135,7 +146,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
 
     @Override
     public void removedService(ServiceReference<StorageProvider> reference, PaxUserAdmin service) {
-        String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
+        String type = (String) reference.getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE);
         //unget whatever happens
         context.ungetService(reference);
         service.unregister();

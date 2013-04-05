@@ -25,7 +25,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
@@ -469,7 +469,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         //Set service PID
         properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
         //Set stoarage provider type
-        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        properties.put(PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //set the service id of the underlying service
         properties.put(ConfigurationConstants.TRACKED_SERVICE_ID, trackedServiceID);
         serviceRegistration = context.registerService(StorageProvider.class, this, properties);

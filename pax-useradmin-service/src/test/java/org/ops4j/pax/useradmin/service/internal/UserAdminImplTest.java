@@ -19,11 +19,12 @@ package org.ops4j.pax.useradmin.service.internal;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.concurrent.Executors;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleContext;
@@ -52,17 +53,17 @@ public class UserAdminImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void createNoStorageProviderTracker() {
-        new PaxUserAdmin(null, EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class));
+        new PaxUserAdmin(null, EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class), Executors.newCachedThreadPool());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createNoLogServiceTracker() {
-        new PaxUserAdmin(EasyMock.createMock(StorageProvider.class), null, EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class));
+        new PaxUserAdmin(EasyMock.createMock(StorageProvider.class), null, EasyMock.createMock(ServiceTracker.class), EasyMock.createMock(ServiceTracker.class), Executors.newCachedThreadPool());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createNoEventAdminTracker() {
-        new PaxUserAdmin(EasyMock.createMock(StorageProvider.class), EasyMock.createMock(ServiceTracker.class), null, EasyMock.createMock(ServiceTracker.class));
+        new PaxUserAdmin(EasyMock.createMock(StorageProvider.class), EasyMock.createMock(ServiceTracker.class), null, EasyMock.createMock(ServiceTracker.class), Executors.newCachedThreadPool());
     }
 
     @Test
@@ -474,7 +475,7 @@ public class UserAdminImplTest {
         ServiceTracker<LogService, LogService> logServiceTracker = createTracker(logService);
         //Create a reference to the Eventadmin
         ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker = createTracker(eventAdmin);
-        PaxUserAdmin userAdmin = new PaxUserAdmin(storageProvider, logServiceTracker, eventAdminTracker, listenerTracker);
+        PaxUserAdmin userAdmin = new PaxUserAdmin(storageProvider, logServiceTracker, eventAdminTracker, listenerTracker, Executors.newCachedThreadPool());
         //register it!
         BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
         ServiceRegistration serviceRegistration = EasyMock.createNiceMock(ServiceRegistration.class);
@@ -482,7 +483,7 @@ public class UserAdminImplTest {
         EasyMock.expect(serviceRegistration.getReference()).andReturn(serviceReference);
         EasyMock.expect(serviceReference.getProperty(Constants.SERVICE_ID)).andReturn("1");
         EasyMock.expect(serviceReference.getProperty(Constants.OBJECTCLASS)).andReturn(UserAdmin.class.getName());
-        EasyMock.expect(serviceReference.getProperty(Constants.SERVICE_PID)).andReturn(UserAdminConstants.SERVICE_PID);
+        EasyMock.expect(serviceReference.getProperty(Constants.SERVICE_PID)).andReturn(PaxUserAdminConstants.SERVICE_PID);
         EasyMock.expect(bundleContext.registerService(EasyMock.eq(UserAdmin.class), EasyMock.eq(userAdmin), EasyMock.<Dictionary<String, Object>> anyObject())).andReturn(serviceRegistration);
         EasyMock.replay(listenerTracker, logServiceTracker, eventAdminTracker, bundleContext, serviceRegistration, serviceReference);
         userAdmin.register(bundleContext, "junit", 0l);

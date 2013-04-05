@@ -21,7 +21,6 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -34,7 +33,7 @@ import com.novell.ldap.LDAPConnection;
  * Activator of the Pax UserAdmin LDAP StorageProvider bundle.
  * 
  * @author Matthias Kuespert
- * @since  08.07.2009
+ * @since 08.07.2009
  */
 public class Activator implements BundleActivator {
 
@@ -43,6 +42,7 @@ public class Activator implements BundleActivator {
      * 
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
+    @Override
     public void start(BundleContext context) throws Exception {
         //
         // create LDAP connection access object
@@ -52,22 +52,18 @@ public class Activator implements BundleActivator {
         // set service properties
         //
         Dictionary<String, String> properties = new Hashtable<String, String>();
-        properties.put(Constants.SERVICE_PID,
-                       ConfigurationConstants.SERVICE_PID);
-        properties.put(UserAdminConstants.STORAGEPROVIDER_TYPE,
-                       ConfigurationConstants.STORAGEPROVIDER_TYPE);
+        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
+        properties.put(org.ops4j.pax.useradmin.service.PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //
         // create & register service implementation
         //
-        context.registerService(new String[] { StorageProvider.class.getName(),
-                                               ManagedService.class.getName() },
-                                new StorageProviderImpl(connection),
-                                properties);
+        context.registerService(new String[] { StorageProvider.class.getName(), ManagedService.class.getName() }, new StorageProviderImpl(connection), properties);
     }
 
     /**
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
+    @Override
     public void stop(BundleContext context) throws Exception {
     }
 }

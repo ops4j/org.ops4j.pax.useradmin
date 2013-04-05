@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -62,7 +62,7 @@ public class ConfigurationListener implements ManagedService {
         }
         SortedMap<ServiceReference<StorageProvider>, PaxUserAdmin> tracked = providerTracker.getTracked();
         for (Entry<ServiceReference<StorageProvider>, PaxUserAdmin> entry : tracked.entrySet()) {
-            if (type.equals(entry.getKey().getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE))) {
+            if (type.equals(entry.getKey().getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE))) {
                 try {
                     entry.getValue().configurationUpdated(config);
                 } catch (RuntimeException e) {

@@ -24,4 +24,18 @@ package org.ops4j.pax.useradmin.service.spi;
  */
 public interface Decryptor {
 
+    /**
+     * Decrypts a previously encrypted value
+     * 
+     * @param encryptedBytes
+     * @param verificationBytes
+     * @param salt
+     * @param algorithmParameter
+     * @return the encrypted value
+     */
+    Object decrypt(byte[] encryptedBytes, byte[] verificationBytes, byte[] salt, byte[] algorithmParameter);
+
+    boolean verify(String key, String value, byte[] verificationBytes, byte[] salt, byte[] algorithmParameter);
+
+    boolean verify(String key, byte[] value, byte[] verificationBytes, byte[] salt, byte[] algorithmParameter);
 }
