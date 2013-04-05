@@ -68,7 +68,7 @@ public class UserImplTest {
     @Test
     public void constructNullCredentials() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         Assert.assertNotNull("Could not create UserImpl instance", user);
         Assert.assertEquals("Mismatching name", USER_NAME1, user.getName());
         Assert.assertEquals("Invalid type", Role.USER, user.getType());
@@ -80,7 +80,7 @@ public class UserImplTest {
     @Test
     public void constructEmptyCredentials() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         Assert.assertNotNull("Could not create UserImpl instance", user);
         Assert.assertEquals("Mismatching name", USER_NAME1, user.getName());
         Assert.assertEquals("Invalid type", Role.USER, user.getType());
@@ -92,7 +92,7 @@ public class UserImplTest {
     @Test
     public void constructOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         Assert.assertNotNull("Could not create RoleImpl instance", user);
         Assert.assertEquals("Mismatching name", USER_NAME1, user.getName());
         Assert.assertEquals("Invalid type", Role.USER, user.getType());
@@ -106,7 +106,7 @@ public class UserImplTest {
     @Test
     public void getCredentialOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         userAdmin.checkPermission("testCredential1", "getCredential");
         userAdmin.checkPermission("testCredential2", "getCredential");
 
@@ -122,7 +122,7 @@ public class UserImplTest {
     @Test
     public void addCredentialStorageException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         StorageException exception = new StorageException("");
@@ -158,7 +158,7 @@ public class UserImplTest {
     @Test
     public void addCredentialOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         try {
@@ -190,7 +190,7 @@ public class UserImplTest {
     @Test
     public void removeCredentialStorageException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         StorageException exception = new StorageException("");
@@ -221,7 +221,7 @@ public class UserImplTest {
     @Test
     public void removeCredentialOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         try {
@@ -262,7 +262,7 @@ public class UserImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void hasCredentialNullKey() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         userAdmin.checkAdminPermission();
@@ -277,7 +277,7 @@ public class UserImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void hasCredentialNullValue() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = createStorageProvider();
         //
         userAdmin.checkAdminPermission();
@@ -292,7 +292,7 @@ public class UserImplTest {
     @Test
     public void hasCredentialWrongValueType() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         EasyMock.replay(userAdmin);
         Assert.assertFalse(user.hasCredential(KEY1, 666));
         EasyMock.verify(userAdmin);
@@ -301,7 +301,7 @@ public class UserImplTest {
     @Test
     public void hasCredentialOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
         userAdmin.checkAdminPermission();
         userAdmin.checkPermission(KEY1, UserAdminPermission.GET_CREDENTIAL);
         //        EasyMock.expect(userAdmin.compareToEncryptedValue(EasyMock.isA(byte[].class), EasyMock.isA(byte[].class))).andReturn(true);
@@ -319,8 +319,8 @@ public class UserImplTest {
     @Test
     public void impliedByOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null);
-        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null);
+        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         //
         EasyMock.replay(userAdmin);
         //

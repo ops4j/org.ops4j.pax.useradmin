@@ -46,7 +46,7 @@ public class GroupImplTest {
     @Test
     public void constructOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         Assert.assertNotNull("Could not create GroupImpl instance", group);
         Assert.assertEquals("Mismatching name", GROUP_NAME1, group.getName());
         Assert.assertEquals("Invalid type", Role.GROUP, group.getType());
@@ -56,9 +56,9 @@ public class GroupImplTest {
     @Test
     public void addAndRemoveMember() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null);
-        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
         try {
@@ -96,7 +96,7 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberNull() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         EasyMock.replay(userAdmin);
         //
         Assert.assertFalse("Null member added", group.addMember(null));
@@ -107,8 +107,8 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberStorageException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
         try {
@@ -129,8 +129,8 @@ public class GroupImplTest {
     @Test
     public void addBasicMemberOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             userAdmin.checkAdminPermission();
@@ -149,7 +149,7 @@ public class GroupImplTest {
     @Test
     public void getNoBasicMembers() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
@@ -167,9 +167,9 @@ public class GroupImplTest {
     @Test
     public void addAndGetSomeBasicMembers() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null);
-        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
         try {
@@ -207,7 +207,7 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberNull() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         //
         EasyMock.replay(userAdmin);
         //
@@ -219,8 +219,8 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberStorageException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
         try {
@@ -241,8 +241,8 @@ public class GroupImplTest {
     @Test
     public void addRequiredMemberOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role = new UserImpl(USER_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             userAdmin.checkAdminPermission();
@@ -261,7 +261,7 @@ public class GroupImplTest {
     @Test
     public void getNoRequiredMembers() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(userAdmin.getStorageProvider()).andReturn(sp);
@@ -279,9 +279,9 @@ public class GroupImplTest {
     @Test
     public void addAndGetSomeRequiredMembers() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null);
-        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null);
+        GroupImpl group = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        RoleImpl role1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        RoleImpl role2 = new UserImpl(USER_NAME2, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         StorageException exception = new StorageException("");
         try {
@@ -331,11 +331,11 @@ public class GroupImplTest {
     @Test
     public void impliedByOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null);
-        RoleImpl user1 = new UserImpl(USER_NAME1, userAdmin, null);
-        RoleImpl user2 = new UserImpl(USER_NAME2, userAdmin, null);
-        RoleImpl user3 = new UserImpl(USER_NAME3, userAdmin, null);
+        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null, null);
+        RoleImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        RoleImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
+        RoleImpl user3 = new UserImpl(USER_NAME3, userAdmin, null, null);
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         //
         try {

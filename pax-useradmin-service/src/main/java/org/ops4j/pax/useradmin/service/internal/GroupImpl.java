@@ -20,6 +20,7 @@ package org.ops4j.pax.useradmin.service.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.ops4j.pax.useradmin.service.spi.SPIRole;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
@@ -43,10 +44,11 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * Constructor.
      * 
+     * @param initialCredentialKeys
      * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Map)
      */
-    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties) {
-        super(name, admin, properties);
+    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
+        super(name, admin, properties, initialCredentialKeys);
     }
 
     /**

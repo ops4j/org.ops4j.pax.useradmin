@@ -17,7 +17,12 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -34,14 +39,21 @@ import org.osgi.service.useradmin.UserAdminPermission;
 public class UserCredentials extends AbstractProperties<User> {
 
     private static final long serialVersionUID = 1L;
+    private final Set<String> credentialKeys;
 
     /**
      * Initializing constructor.
      * 
+     * @param initialCredentialKeys
      * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
-    protected UserCredentials(User user, UserAdminUtil util) {
+    protected UserCredentials(User user, UserAdminUtil util, Set<String> initialCredentialKeys) {
         super(user, util, null);
+        if (initialCredentialKeys != null) {
+            this.credentialKeys = new HashSet<String>(initialCredentialKeys);
+        } else {
+            this.credentialKeys = new HashSet<String>();
+        }
     }
 
     @Override
@@ -54,6 +66,7 @@ public class UserCredentials extends AbstractProperties<User> {
         UserAdminUtil util = getUtil();
         util.checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
         storageProvider.getCredentialProvider().setUserCredential(util.getEncryptor(), getRole(), key, plainValue);
+        credentialKeys.add(key);
         return plainValue;
     }
 
@@ -61,6 +74,7 @@ public class UserCredentials extends AbstractProperties<User> {
     protected synchronized void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
         storageProvider.getCredentialProvider().removeUserCredential(getRole(), key);
+        credentialKeys.remove(key);
     }
 
     @Override
@@ -74,6 +88,31 @@ public class UserCredentials extends AbstractProperties<User> {
     @Override
     protected Object putInternal(String key, Object storedValue, Object oldValue) {
         return oldValue;
+    }
+
+    @Override
+    public Enumeration<String> keys() {
+        return Collections.enumeration(credentialKeys);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return credentialKeys.isEmpty();
+    }
+
+    @Override
+    public int size() {
+        return credentialKeys.size();
+    }
+
+    @Override
+    public Enumeration<Object> elements() {
+        ArrayList<Object> list = new ArrayList<Object>();
+        String[] keys = credentialKeys.toArray(new String[0]);
+        for (String key : keys) {
+            list.add(get(key));
+        }
+        return Collections.enumeration(list);
     }
 
     /**

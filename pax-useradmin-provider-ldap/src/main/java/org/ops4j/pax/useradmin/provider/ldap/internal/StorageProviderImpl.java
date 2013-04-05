@@ -361,9 +361,9 @@ public class StorageProviderImpl implements StorageProvider, ManagedService, Cre
         }
         switch (type) {
             case Role.USER:
-                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(), properties);
+                return factory.createUser(entry.getAttribute(m_userIdAttr).getStringValue(), properties, credentials.keySet());
             case Role.GROUP:
-                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(), properties);
+                return factory.createGroup(entry.getAttribute(m_groupIdAttr).getStringValue(), properties, credentials.keySet());
             default:
                 // should never happen: getRoleType() throws on this
                 throw new StorageException("Unexpected role type '" + type + "' (0==Role) detected.");
@@ -614,7 +614,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService, Cre
         //
         try {
             connection.add(entry);
-            return factory.createUser(name, properties);
+            return factory.createUser(name, properties, null);
         } catch (LDAPException e) {
             throw new StorageException("Error creating user '" + name + "' " + entry + ": " + e.getMessage() + " / " + e.getLDAPErrorMessage());
         } finally {
@@ -653,7 +653,7 @@ public class StorageProviderImpl implements StorageProvider, ManagedService, Cre
             connection.add(entry);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put(m_groupIdAttr, name);
-            return factory.createGroup(name, properties);
+            return factory.createGroup(name, properties, null);
         } catch (LDAPException e) {
             throw new StorageException("Error creating group '" + name + "' " + entry + ": " + e.getMessage() + " / " + e.getLDAPErrorMessage());
         } finally {

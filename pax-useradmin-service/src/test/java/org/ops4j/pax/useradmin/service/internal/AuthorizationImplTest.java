@@ -45,8 +45,8 @@ public class AuthorizationImplTest {
     @Test
     public void getNameOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
-        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
+        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
 
         Authorization authorization = new AuthorizationImpl(userAdmin, user);
         Assert.assertEquals("Name mismatch", USER_NAME1, authorization.getName());
@@ -61,7 +61,7 @@ public class AuthorizationImplTest {
     @Test
     public void getRolesInvalidSyntaxException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
 
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
@@ -85,14 +85,14 @@ public class AuthorizationImplTest {
     @Test
     public void getRolesOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null);
-        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null);
-        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null);
+        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
+        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
+        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
 
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
-        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null);
-        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null);
-        GroupImpl group3 = new GroupImpl(GROUP_NAME3, userAdmin, null);
+        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
+        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null, null);
+        GroupImpl group3 = new GroupImpl(GROUP_NAME3, userAdmin, null, null);
         try {
             // 1st addMember()
             userAdmin.checkAdminPermission();

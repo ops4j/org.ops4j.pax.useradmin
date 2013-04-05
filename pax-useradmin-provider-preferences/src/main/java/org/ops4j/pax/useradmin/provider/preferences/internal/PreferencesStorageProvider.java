@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
@@ -145,19 +146,19 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
             }
         }
         //
-        Map<String, Object> credentials = null;
+        Set<String> credentials = null;
         if (node.nodeExists(CREDENTIALS_NODE)) {
-            credentials = loadAttributes(node.node(CREDENTIALS_NODE));
+            credentials = loadAttributes(node.node(CREDENTIALS_NODE)).keySet();
         }
         //
         int type = new Integer(node.get(NODE_TYPE, "666"));
         Role role = null;
         switch (type) {
             case User.USER:
-                role = factory.createUser(name, properties);
+                role = factory.createUser(name, properties, credentials);
                 break;
             case User.GROUP:
-                role = factory.createGroup(name, properties);
+                role = factory.createGroup(name, properties, credentials);
                 break;
             default:
                 throw new StorageException("Invalid role type for role '" + name + " / " + node.name() + "': " + type);
@@ -218,7 +219,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     public User createUser(UserAdminFactory factory, String name) throws StorageException {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.USER);
-        User user = factory.createUser(name, null);
+        User user = factory.createUser(name, null, null);
         try {
             node.flush();
         } catch (BackingStoreException e) {
@@ -231,7 +232,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.GROUP);
-        Group group = factory.createGroup(name, null);
+        Group group = factory.createGroup(name, null, null);
         try {
             node.flush();
         } catch (BackingStoreException e) {

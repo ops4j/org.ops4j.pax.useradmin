@@ -18,6 +18,7 @@
 package org.ops4j.pax.useradmin.service.spi;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
@@ -44,7 +45,7 @@ public interface UserAdminFactory {
      *            The credentials of the user.
      * @return A new <code>User</code> instance.
      */
-    User createUser(String name, Map<String, Object> properties);
+    User createUser(String name, Map<String, Object> properties, Set<String> initialCredentialKeys);
 
     /**
      * Create a <code>Group</code> instance.
@@ -57,7 +58,7 @@ public interface UserAdminFactory {
      *            The credentials of the group.
      * @return A new <code>Group</code> instance.
      */
-    Group createGroup(String name, Map<String, Object> properties);
+    Group createGroup(String name, Map<String, Object> properties, Set<String> initialCredentialKeys);
 
     /**
      * Publish an event of the given type related to the role specified.

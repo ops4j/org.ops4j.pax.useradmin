@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
@@ -414,16 +415,16 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * @see UserAdminFactory#createUser(String, Map)
      */
     @Override
-    public User createUser(String name, Map<String, Object> properties) {
-        return new UserImpl(name, this, properties);
+    public User createUser(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
+        return new UserImpl(name, this, properties, initialCredentialKeys);
     }
 
     /**
      * @see UserAdminFactory#createGroup(String, Map)
      */
     @Override
-    public Group createGroup(String name, Map<String, Object> properties) {
-        return new GroupImpl(name, this, properties);
+    public Group createGroup(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
+        return new GroupImpl(name, this, properties, initialCredentialKeys);
     }
 
     /**

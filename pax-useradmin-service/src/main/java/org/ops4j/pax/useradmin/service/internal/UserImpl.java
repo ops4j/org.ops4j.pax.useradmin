@@ -20,6 +20,7 @@ package org.ops4j.pax.useradmin.service.internal;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Set;
 
 import org.ops4j.pax.useradmin.service.spi.SPIRole;
 import org.osgi.service.useradmin.Role;
@@ -43,13 +44,14 @@ public class UserImpl extends RoleImpl implements User {
     /**
      * Constructor.
      * 
+     * @param initialCredentialKeys
      * @see RoleImpl#RoleImpl(String, PaxUserAdmin, Map)
      * @param credentialKeys
      *            The credentials of this user.
      */
-    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties) {
+    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         super(name, admin, properties);
-        m_credentials = new UserCredentials(this, admin);
+        m_credentials = new UserCredentials(this, admin, initialCredentialKeys);
     }
 
     /**

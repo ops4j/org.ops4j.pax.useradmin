@@ -121,7 +121,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                 manager.persist(user);
                 transaction.commit();
                 map.put(name, user);
-                return factory.createUser(name, null);
+                return factory.createUser(name, null, null);
             }
 
             @Override
@@ -161,7 +161,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                 manager.persist(group);
                 transaction.commit();
                 map.put(name, group);
-                return factory.createGroup(name, null);
+                return factory.createGroup(name, null, null);
             }
 
             @Override
@@ -730,12 +730,19 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
             }
         }
         Role role = null;
+        Set<String> keySet = null;
+        if (dbRole instanceof DBUser) {
+            Map<String, DBCredential> credentials = ((DBUser) dbRole).getCredentials();
+            if (credentials != null) {
+                keySet = credentials.keySet();
+            }
+        }
         switch (dbRole.getType()) {
             case User.USER:
-                role = factory.createUser(name, properties);
+                role = factory.createUser(name, properties, keySet);
                 break;
             case User.GROUP:
-                role = factory.createGroup(name, properties);
+                role = factory.createGroup(name, properties, keySet);
                 break;
             default:
                 throw new StorageException("Invalid role type for role '" + name + "': " + dbRole.getType() + " only USER and GROUP are allowed!");

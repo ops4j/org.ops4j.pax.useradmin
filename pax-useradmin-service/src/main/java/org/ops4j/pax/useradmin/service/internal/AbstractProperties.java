@@ -17,6 +17,8 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -33,19 +35,21 @@ import org.osgi.service.useradmin.UserAdminEvent;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public abstract class AbstractProperties<R extends Role> extends Hashtable<String, Object> {
+public abstract class AbstractProperties<R extends Role> extends Dictionary<String, Object> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long               serialVersionUID = 1L;
 
     /**
      * The role these properties belong to.
      */
-    private R                 m_role           = null;
+    private final R                         m_role;
 
     /**
      * The interface used to connect to the UserAdmin service.
      */
-    private UserAdminUtil     m_util           = null;
+    private final UserAdminUtil             m_util;
+
+    private final Hashtable<String, Object> hashtable;
 
     /**
      * @return The role these properties belong to.
@@ -103,13 +107,10 @@ public abstract class AbstractProperties<R extends Role> extends Hashtable<Strin
     protected AbstractProperties(R role, UserAdminUtil util, Map<String, Object> properties) {
         m_role = role;
         m_util = util;
-        //
-        // initialize from storage
-        //
-        if (null != properties) {
-            for (String key : properties.keySet()) {
-                super.put(key, properties.get(key));
-            }
+        if (properties != null) {
+            hashtable = new Hashtable<String, Object>(properties);
+        } else {
+            hashtable = new Hashtable<String, Object>();
         }
     }
 
@@ -129,7 +130,7 @@ public abstract class AbstractProperties<R extends Role> extends Hashtable<Strin
     public synchronized Object get(Object key) {
         checkKeyValid(key);
         checkGetPermission((String) key);
-        return super.get(key);
+        return hashtable.get(key);
     }
 
     protected void checkKeyValid(Object key) throws IllegalArgumentException {
@@ -166,7 +167,7 @@ public abstract class AbstractProperties<R extends Role> extends Hashtable<Strin
     }
 
     protected Object putInternal(String key, Object storedValue, Object oldValue) {
-        return super.put(key, storedValue);
+        return hashtable.put(key, storedValue);
     }
 
     @Override
@@ -176,7 +177,7 @@ public abstract class AbstractProperties<R extends Role> extends Hashtable<Strin
             StorageProvider storageProvider = m_util.getStorageProvider();
             remove(storageProvider, (String) key);
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
-            return super.remove(key);
+            return hashtable.remove(key);
         } catch (StorageException e) {
             m_util.logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
@@ -184,7 +185,23 @@ public abstract class AbstractProperties<R extends Role> extends Hashtable<Strin
     }
 
     @Override
-    public synchronized void clear() {
-        throw new UnsupportedOperationException();
+    public boolean isEmpty() {
+        return hashtable.isEmpty();
     }
+
+    @Override
+    public Enumeration<Object> elements() {
+        return hashtable.elements();
+    }
+
+    @Override
+    public Enumeration<String> keys() {
+        return hashtable.keys();
+    }
+
+    @Override
+    public int size() {
+        return hashtable.size();
+    }
+
 }
