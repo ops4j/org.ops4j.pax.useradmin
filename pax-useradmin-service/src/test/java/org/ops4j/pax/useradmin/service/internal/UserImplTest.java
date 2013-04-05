@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.HashSet;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
@@ -54,16 +53,6 @@ public class UserImplTest {
     private static final String VALUE1     = "someCredentialValue1";
     private static final String KEY2       = "testCredential2";
     private static final byte[] VALUE2     = "someCredentialValue2".getBytes();
-
-    private HashSet<String> getCredentials() {
-        //        Map<String, Object> properties = new HashMap<String, Object>();
-        //        properties.put(KEY1, VALUE1.getBytes());
-        //        properties.put(KEY2, VALUE2);
-        HashSet<String> set = new HashSet<String>();
-        set.add(KEY1);
-        set.add(KEY2);
-        return set;
-    }
 
     @Test
     public void constructNullCredentials() {
