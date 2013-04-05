@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ops4j.pax.useradmin.service;
+package org.ops4j.pax.useradmin.service.spi;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -33,11 +33,7 @@ import org.osgi.service.cm.ConfigurationException;
  */
 public final class UserAdminTools {
 
-    /**
-     * Protected constructor - this class must not be instanciated outside of
-     * tests!
-     */
-    protected UserAdminTools() {
+    private UserAdminTools() {
     }
 
     /**

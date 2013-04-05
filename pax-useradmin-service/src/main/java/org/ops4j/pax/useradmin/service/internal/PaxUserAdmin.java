@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import javax.crypto.NoSuchPaddingException;
+
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.internal.encryption.EncryptorContext;
 import org.ops4j.pax.useradmin.service.internal.encryption.PaxUserAdminDecryptor;
@@ -468,6 +470,10 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
                     encryptor = new PaxUserAdminEncryptor(new EncryptorContext(p));
                 } catch (NoSuchAlgorithmException e) {
                     throw new IllegalStateException("an algorithm needed for encryption is not avaiable", e);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("a number parameter can't be parsed", e);
+                } catch (NoSuchPaddingException e) {
+                    throw new IllegalStateException("a padding algorithm needed for encryption is not avaiable", e);
                 }
             }
             return encryptor;

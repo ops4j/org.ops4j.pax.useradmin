@@ -47,6 +47,14 @@ public interface PaxUserAdminConstants {
     final static String PROPERTY_ENCRYPTION_HASH_ALGORITHM          = "org.ops4j.pax.useradmin.encryption.hash.algorithm";
 
     /**
+     * (optional) Property that controls which cipher algorithm is used, if not
+     * given, the values won't be stored and can't be retrived again, the same
+     * can be archived by specify the spceial value PAX_EMPTY. To store values
+     * in plain text use the special value PAX_PLAIN
+     */
+    final static String PROPERTY_ENCRYPTION_CIPHER_ALGORITHM        = "org.ops4j.pax.useradmin.encryption.cipher.algorithm";
+
+    /**
      * (optional) property that controls which random number algorithm is used,
      * if not given, an internal default is used for encryption.
      */

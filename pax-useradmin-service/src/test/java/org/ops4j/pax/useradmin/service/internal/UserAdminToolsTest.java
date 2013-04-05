@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ops4j.pax.useradmin.service;
+package org.ops4j.pax.useradmin.service.internal;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -23,6 +23,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 import org.osgi.service.cm.ConfigurationException;
 
 /**
@@ -49,12 +50,6 @@ public class UserAdminToolsTest {
         m_properties = new Hashtable<String, Object>();
         m_properties.put(MANDATORY_SPECIFIED, VALUE);
         m_properties.put(OPTIONAL_SPECIFIED, VALUE);
-    }
-
-    @Test
-    public void createUserAdminTools() {
-        UserAdminTools uat = new UserAdminTools();
-        Assert.assertNotNull("No UserAdminTools object created", uat);
     }
 
     @Test(expected = IllegalArgumentException.class)

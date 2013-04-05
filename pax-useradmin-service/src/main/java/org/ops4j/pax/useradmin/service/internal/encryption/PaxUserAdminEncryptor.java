@@ -16,8 +16,8 @@
  */
 package org.ops4j.pax.useradmin.service.internal.encryption;
 
-import org.ops4j.pax.useradmin.service.UserAdminTools;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
 /**
  * @author Christoph Läubrich

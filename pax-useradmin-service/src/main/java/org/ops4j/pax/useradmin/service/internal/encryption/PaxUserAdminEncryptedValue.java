@@ -16,8 +16,12 @@
  */
 package org.ops4j.pax.useradmin.service.internal.encryption;
 
-import org.ops4j.pax.useradmin.service.UserAdminTools;
+import java.security.GeneralSecurityException;
+
+import javax.crypto.Cipher;
+
 import org.ops4j.pax.useradmin.service.spi.EncryptedValue;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
 /**
  * Most work is delegated to the {@link EncryptorContext}, this class just
@@ -28,6 +32,14 @@ import org.ops4j.pax.useradmin.service.spi.EncryptedValue;
  */
 public class PaxUserAdminEncryptedValue implements EncryptedValue {
 
+    /**
+     * indicated, that the encrypted value was a byte[]
+     */
+    public static final byte       BYTE_INDICATOR   = (byte) 'b';
+    /**
+     * indicates, that the encrypted value was a String
+     */
+    public static final byte       STRING_INDICATOR = (byte) 's';
     private final String           key;
     private final byte[]           bytes;
     private final boolean          isString;
@@ -35,6 +47,7 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
     private byte[]                 algorithmBytes;
     private byte[]                 salt;
     private byte[]                 hash;
+    private byte[]                 encrypted;
 
     /**
      * @param key
@@ -51,8 +64,22 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
 
     @Override
     public synchronized byte[] getEncryptedBytes() {
-        // TODO We currently do not support encryption of data!
-        return null;
+        if (encrypted == null) {
+            Cipher cipher = context.getCipher(Cipher.ENCRYPT_MODE);
+            if (cipher == null) {
+                return null;
+            } else {
+                try {
+                    byte[] toEncrypt = new byte[bytes.length + 1];
+                    System.arraycopy(bytes, 0, toEncrypt, 1, bytes.length);
+                    toEncrypt[0] = isString ? STRING_INDICATOR : BYTE_INDICATOR;
+                    encrypted = cipher.doFinal(toEncrypt);
+                } catch (GeneralSecurityException e) {
+                    throw new IllegalStateException("cipher value failed", e);
+                }
+            }
+        }
+        return encrypted;
     }
 
     @Override
@@ -75,7 +102,7 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
     @Override
     public synchronized byte[] getAlgorithmParameter() {
         if (algorithmBytes == null) {
-            algorithmBytes = UserAdminTools.stringToBytes(context.toStringValue() + "##" + isString);
+            algorithmBytes = UserAdminTools.stringToBytes(context.toStringValue());
         }
         return algorithmBytes;
     }

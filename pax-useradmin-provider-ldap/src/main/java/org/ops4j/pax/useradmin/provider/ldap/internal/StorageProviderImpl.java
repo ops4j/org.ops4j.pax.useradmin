@@ -26,13 +26,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
-import org.ops4j.pax.useradmin.service.UserAdminTools;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.useradmin.Group;

@@ -61,12 +61,15 @@ public class ConfigurationListener implements ManagedService {
             }
         }
         SortedMap<ServiceReference<StorageProvider>, PaxUserAdmin> tracked = providerTracker.getTracked();
-        for (Entry<ServiceReference<StorageProvider>, PaxUserAdmin> entry : tracked.entrySet()) {
-            if (type.equals(entry.getKey().getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE))) {
-                try {
-                    entry.getValue().configurationUpdated(config);
-                } catch (RuntimeException e) {
-                    LOG.error("Configurationupdate failed for type {}", type, e);
+        if (!tracked.isEmpty()) {
+            LOG.info("Update Konfiguration for {} PaxUserAdmins of type {}...", tracked.size(), type);
+            for (Entry<ServiceReference<StorageProvider>, PaxUserAdmin> entry : tracked.entrySet()) {
+                if (type.equals(entry.getKey().getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE))) {
+                    try {
+                        entry.getValue().configurationUpdated(config);
+                    } catch (RuntimeException e) {
+                        LOG.error("Configurationupdate failed for type {}", type, e);
+                    }
                 }
             }
         }

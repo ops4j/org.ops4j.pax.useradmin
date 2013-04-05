@@ -21,19 +21,32 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.NullCipher;
+
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
-import org.ops4j.pax.useradmin.service.UserAdminTools;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
 /**
  * @author Christoph Läubrich
  */
 public class EncryptorContext {
     /**
+     * 
+     */
+    private static final String CIPHER_PAX_EMPTY                     = "PAX_EMPTY";
+
+    private static final String CIPHER_PAX_PLAIN                     = "PAX_PLAIN";
+
+    /**
      * The default algorithm to use for random number generation.
      */
     final static String         DEFAULT_ENCRYPTION_RANDOM_ALGORITHM  = "SHA1PRNG";
 
     final static String         DEFAULT_ENCRYPTION_HASH_ALGORITHM    = "MD5";
+
+    final static String         DEFAULT_ENCRYPTION_CIPHER_ALGORITHM  = CIPHER_PAX_EMPTY;
 
     /**
      * The default salt length to use by the random number algorithm.
@@ -46,26 +59,62 @@ public class EncryptorContext {
 
     private final MessageDigest messageDigest;
 
+    private final Cipher        cipher;
+
     /**
      * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws NumberFormatException
      */
-    public EncryptorContext(Map<String, ?> properties) throws NoSuchAlgorithmException {
+    public EncryptorContext(Map<String, ?> properties) throws NoSuchAlgorithmException, NumberFormatException, NoSuchPaddingException {
         this(UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_HASH_ALGORITHM, DEFAULT_ENCRYPTION_HASH_ALGORITHM),//
         UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_SECURERANDOM_ALGORITHM, DEFAULT_ENCRYPTION_RANDOM_ALGORITHM), //
-        Integer.parseInt(UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_SECURERANDOM_SALTLENGTH, DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH)));
+        Integer.parseInt(UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_SECURERANDOM_SALTLENGTH, DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH)),//
+        UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_CIPHER_ALGORITHM, DEFAULT_ENCRYPTION_CIPHER_ALGORITHM));
     }
 
-    public EncryptorContext(String hashAlgorith, String secureRandomAlgorith, int saltLength) throws NoSuchAlgorithmException {
+    public EncryptorContext(String hashAlgorith, String secureRandomAlgorith, int saltLength, String cipherAlgorithm) throws NoSuchAlgorithmException,
+            NoSuchPaddingException {
         this.saltLength = saltLength;
         secureRandom = SecureRandom.getInstance(secureRandomAlgorith);
         messageDigest = MessageDigest.getInstance(hashAlgorith);
+        if (!CIPHER_PAX_EMPTY.equals(cipherAlgorithm)) {
+            if (CIPHER_PAX_PLAIN.equals(cipherAlgorithm) || new NullCipher().getAlgorithm().equals(cipherAlgorithm)) {
+                cipher = new NullCipher();
+            } else {
+                //Fetch a default one
+                cipher = Cipher.getInstance(cipherAlgorithm);
+            }
+        } else {
+            cipher = null;
+        }
+    }
+
+    /**
+     * @return the current value of cipher
+     */
+    public Cipher getCipher(int encryptMode) {
+        //FIXME: we need to init the cypher!
+        //This depend on the choosen algorithm...
+        //        SecretKeySpec key = new SecretKeySpec(keyBytes, "DES");
+        //        IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+        //        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+        return cipher;
     }
 
     /**
      * @return a String representation of this {@link EncryptorContext}
      */
     public String toStringValue() {
-        return messageDigest.getAlgorithm() + "##" + secureRandom.getAlgorithm() + "##" + saltLength;
+        StringBuilder sb = new StringBuilder();
+        sb.append(messageDigest.getAlgorithm());
+        sb.append("##");
+        sb.append(secureRandom.getAlgorithm());
+        sb.append("##");
+        sb.append(saltLength);
+        sb.append("##");
+        sb.append(cipher == null ? CIPHER_PAX_EMPTY : cipher.getAlgorithm());
+        return sb.toString();
     }
 
     /**
@@ -89,7 +138,8 @@ public class EncryptorContext {
         return messageDigest.digest();
     }
 
-    public static EncryptorContext fromParams(String[] params) throws NumberFormatException, NoSuchAlgorithmException {
-        return new EncryptorContext(params[0], params[1], Integer.parseInt(params[2]));
+    public static EncryptorContext fromParams(String[] params) throws NumberFormatException, NoSuchAlgorithmException, NoSuchPaddingException {
+        return new EncryptorContext(params[0], params[1], Integer.parseInt(params[2]), params[3]);
     }
+
 }

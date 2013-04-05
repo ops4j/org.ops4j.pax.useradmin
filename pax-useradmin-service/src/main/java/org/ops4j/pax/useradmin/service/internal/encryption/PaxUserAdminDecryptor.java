@@ -19,8 +19,13 @@ package org.ops4j.pax.useradmin.service.internal.encryption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.ops4j.pax.useradmin.service.UserAdminTools;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
 /**
  * @author Christoph Läubrich
@@ -29,8 +34,27 @@ public class PaxUserAdminDecryptor implements Decryptor {
 
     @Override
     public Object decrypt(byte[] encryptedBytes, byte[] verificationBytes, byte[] salt, byte[] algorithmParameter) {
-        //TODO
-        throw new UnsupportedOperationException();
+        EncryptorContext context = createContext(algorithmParameter);
+        Cipher cipher = context.getCipher(Cipher.DECRYPT_MODE);
+        if (cipher == null) {
+            throw new UnsupportedOperationException("credential can't be decrypted, it was not stored for retrival");
+        }
+        try {
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            byte[] finalBytes = new byte[decryptedBytes.length - 1];
+            System.arraycopy(decryptedBytes, 1, finalBytes, 0, finalBytes.length);
+            boolean isString = decryptedBytes[0] == PaxUserAdminEncryptedValue.STRING_INDICATOR;
+            if (isString) {
+                return UserAdminTools.bytesToString(finalBytes);
+            } else {
+                return finalBytes;
+            }
+        } catch (IllegalBlockSizeException e) {
+            throw new IllegalStateException("An illegal blocksize was detected while decrypting the value", e);
+        } catch (BadPaddingException e) {
+            throw new IllegalStateException("bad padding was detected while decrypting the value", e);
+        }
+
     }
 
     @Override
@@ -46,14 +70,23 @@ public class PaxUserAdminDecryptor implements Decryptor {
     }
 
     protected PaxUserAdminEncryptor createEncryptor(byte[] algorithmParameter) {
+        EncryptorContext context = createContext(algorithmParameter);
+        return new PaxUserAdminEncryptor(context);
+    }
+
+    protected EncryptorContext createContext(byte[] algorithmParameter) {
         String[] param = UserAdminTools.bytesToString(algorithmParameter).split("##");
         EncryptorContext context;
         try {
             context = EncryptorContext.fromParams(param);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("one of the algorithms used to encrypt the value can't be recovered", e);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("a number can't be decoded", e);
+        } catch (NoSuchPaddingException e) {
+            throw new IllegalStateException("one of the padding algorithms used to encrypt the value can't be recovered", e);
         }
-        return new PaxUserAdminEncryptor(context);
+        return context;
     }
 
 }
