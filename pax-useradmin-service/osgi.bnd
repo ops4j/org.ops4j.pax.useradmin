@@ -12,3 +12,4 @@ Bundle-Activator: \
 #Export-Package: \
 #  !${bundle.namespace}.internal.*,\
 #  ${bundle.namespace}.*;version="${pom.version}"
+Private-Package: org.ops4j.pax.useradmin.service.internal

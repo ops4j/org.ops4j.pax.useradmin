@@ -17,8 +17,8 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.util.Map;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -33,15 +33,14 @@ import org.osgi.service.useradmin.UserAdminEvent;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-@SuppressWarnings(value = "unchecked")
-public abstract class AbstractProperties extends Hashtable {
+public abstract class AbstractProperties<R extends Role> extends Hashtable<String, Object> {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * The role these properties belong to.
      */
-    private Role              m_role           = null;
+    private R                 m_role           = null;
 
     /**
      * The interface used to connect to the UserAdmin service.
@@ -51,7 +50,7 @@ public abstract class AbstractProperties extends Hashtable {
     /**
      * @return The role these properties belong to.
      */
-    protected Role getRole() {
+    protected R getRole() {
         return m_role;
     }
 
@@ -67,38 +66,41 @@ public abstract class AbstractProperties extends Hashtable {
     /**
      * Stores a String value.
      * 
-     * @param storageProvider The StorageProvider to use.
-     * @param key The key to access the value.
-     * @param value The value to store with the given key.
+     * @param storageProvider
+     *            The StorageProvider to use.
+     * @param key
+     *            The key to access the value.
+     * @param value
+     *            The value to store with the given key.
      * @return The value that was stored.
-     * @throws StorageException if an error occurs when storing the data
+     * @throws StorageException
+     *             if an error occurs when storing the data
      */
     protected abstract Object store(StorageProvider storageProvider, String key, Object value) throws StorageException;
 
     /**
      * Removes an entry.
      * 
-     * @param storageProvider The StorageProvider to use.
-     * @param key The key to remove.
-     * @throws StorageException if an error occurs when deleting the data
+     * @param storageProvider
+     *            The StorageProvider to use.
+     * @param key
+     *            The key to remove.
+     * @throws StorageException
+     *             if an error occurs when deleting the data
      */
-    protected abstract void remove(StorageProvider storageProvider, String key)
-    throws StorageException;
-
-    /*
-     * Activate when OSGi finally moves to Map
-     * 
-    protected abstract void clear(StorageProvider storageProvider) throws StorageException;
-     */
+    protected abstract void remove(StorageProvider storageProvider, String key) throws StorageException;
 
     /**
      * Initializing constructor.
-     *  
-     * @param role The role these properties belong to.
-     * @param util A UserAdmin utility interface.
-     * @param properties Initial data - maybe null
+     * 
+     * @param role
+     *            The role these properties belong to.
+     * @param util
+     *            A UserAdmin utility interface.
+     * @param properties
+     *            Initial data - maybe null
      */
-    protected AbstractProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
+    protected AbstractProperties(R role, UserAdminUtil util, Map<String, Object> properties) {
         m_role = role;
         m_util = util;
         //
@@ -110,38 +112,27 @@ public abstract class AbstractProperties extends Hashtable {
             }
         }
     }
-    
+
     /**
-     * Optionally overridden by implementations that need security checks on the get
-     * method(s), e.g. for access to credentials.
+     * Optionally overridden by implementations that need security checks on the
+     * get method(s), e.g. for access to credentials.
      * 
-     * @param key The key for permission checks.
+     * @param key
+     *            The key for permission checks.
      */
-    protected void checkGetPermission(String key) {}
+    protected abstract void checkGetPermission(String key);
 
     /**
      * @see Hashtable#get(Object)
      */
     @Override
     public synchronized Object get(Object key) {
-        if (null == key) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
-        }
-        if (!(key instanceof String)) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
-        }
-        if ("".equals(key)) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
-        }
+        checkKeyValid(key);
         checkGetPermission((String) key);
         return super.get(key);
     }
 
-    /**
-     * @see Hashtable#put(Object, Object)
-     */
-    @Override
-    public synchronized Object put(Object key, Object value) {
+    protected void checkKeyValid(Object key) throws IllegalArgumentException {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
         }
@@ -151,6 +142,11 @@ public abstract class AbstractProperties extends Hashtable {
         if ("".equals(key)) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
         }
+    }
+
+    @Override
+    public synchronized Object put(String key, Object value) {
+        checkKeyValid(key);
         if (null == value) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
@@ -159,29 +155,23 @@ public abstract class AbstractProperties extends Hashtable {
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
-            Object storedValue = store(storageProvider, (String) key, value);
+            Object oldValue = get(key);
+            Object storedValue = store(storageProvider, key, value);
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
-            return super.put(key, storedValue);
+            return putInternal(key, storedValue, oldValue);
         } catch (StorageException e) {
             m_util.logMessage(this, LogService.LOG_ERROR, e.getMessage());
         }
         return null;
     }
 
-    /**
-     * @see Hashtable#remove(Object)
-     */
+    protected Object putInternal(String key, Object storedValue, Object oldValue) {
+        return super.put(key, storedValue);
+    }
+
     @Override
     public synchronized Object remove(Object key) {
-        if (key == null) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
-        }
-        if (!(key instanceof String)) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY_TYPE);
-        }
-        if ("".equals(key)) {
-            throw new IllegalArgumentException(UserAdminMessages.MSG_EMPTY_KEY);
-        }
+        checkKeyValid(key);
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
             remove(storageProvider, (String) key);
@@ -193,21 +183,8 @@ public abstract class AbstractProperties extends Hashtable {
         return null;
     }
 
-    /**
-     * @see Hashtable#clear()
-     */
     @Override
     public synchronized void clear() {
-        throw new IllegalStateException("AbstractProperties.clear() not yet implemented");
-//        * Activate when OSGi finally moves to Map
-//        * 
-//        try {
-//            StorageProvider storageProvider = m_util.getStorageProvider();
-//            clear(storageProvider);
-//            m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
-//            super.clear();
-//        } catch (StorageException e) {
-//            m_util.logMessage(this, e.getMessage(), LogService.LOG_ERROR);
-//        }
+        throw new UnsupportedOperationException();
     }
 }

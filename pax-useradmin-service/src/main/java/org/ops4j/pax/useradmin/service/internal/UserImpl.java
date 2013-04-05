@@ -44,26 +44,26 @@ public class UserImpl extends RoleImpl implements User {
      * Constructor.
      * 
      * @see RoleImpl#RoleImpl(String, PaxUserAdmin, Map)
-     * @param credentials
+     * @param credentialKeys
      *            The credentials of this user.
      */
-    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Map<String, Object> credentials) {
+    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties) {
         super(name, admin, properties);
-        //
-        m_credentials = new UserCredentials(this, admin, credentials);
+        m_credentials = new UserCredentials(this, admin);
     }
 
     /**
      * @see User#getCredentials()
      */
-    @SuppressWarnings(value = "unchecked")
-    public Dictionary getCredentials() {
+    @Override
+    public Dictionary<String, Object> getCredentials() {
         return m_credentials;
     }
 
     /**
      * @see User#hasCredential(String, Object)
      */
+    @Override
     public boolean hasCredential(String key, Object value) {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
@@ -75,14 +75,7 @@ public class UserImpl extends RoleImpl implements User {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
         if (value instanceof String || value instanceof byte[]) {
-            getAdmin().checkAdminPermission();
-            for (Object credentialKey : m_credentials.keySet()) {
-                if (credentialKey.equals(key)) {
-                    // check this credential
-                    Object credentialValue = m_credentials.get(key);
-                    return null != credentialValue && getAdmin().compareToEncryptedValue(value, credentialValue);
-                }
-            }
+            return m_credentials.hasCredential(key, value);
         }
         return false;
     }
@@ -105,6 +98,7 @@ public class UserImpl extends RoleImpl implements User {
      *            Used for loop detection.
      * @return True if this role is implied by the given one, false otherwise.
      */
+    @Override
     public ImplicationResult isImpliedBy(SPIRole role, Collection<String> checkedRoles) {
         if (checkedRoles.contains(getName())) {
             return ImplicationResult.IMPLIEDBY_LOOPDETECTED;
@@ -112,5 +106,10 @@ public class UserImpl extends RoleImpl implements User {
         checkedRoles.add(getName());
         return getName().equals(Role.USER_ANYONE) || getName().equals(role.getName()) ? ImplicationResult.IMPLIEDBY_YES : ImplicationResult.IMPLIEDBY_NO;
         // TODO check if we need that: || Role.USER_ANYONE.equals(role.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "User-" + getName();
     }
 }

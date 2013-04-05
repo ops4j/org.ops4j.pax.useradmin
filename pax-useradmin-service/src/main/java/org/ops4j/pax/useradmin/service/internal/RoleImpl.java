@@ -36,18 +36,18 @@ public abstract class RoleImpl implements Role, SPIRole {
     /**
      * The name of the role.
      */
-    private String         m_name       = "";
+    private final String         m_name;
 
     /**
      * The UserAdmin that uses this role.
      */
-    private PaxUserAdmin  m_admin      = null;
+    private final PaxUserAdmin   m_admin;
 
     /**
      * The properties of this role. Note: changing properties is detected and
      * leads to storage update and notification events.
      */
-    private RoleProperties m_properties = null;
+    private final RoleProperties m_properties;
 
     /**
      * Constructor.
@@ -76,28 +76,26 @@ public abstract class RoleImpl implements Role, SPIRole {
     /**
      * @see Role#getName()
      */
+    @Override
     public String getName() {
         return m_name;
     }
 
-    /**
-     * @see Role#getProperties()
-     */
-    @SuppressWarnings(value = "unchecked")
-    public Dictionary getProperties() {
+    @Override
+    public Dictionary<String, Object> getProperties() {
         return m_properties;
     }
 
-    /**
-     * @see Role#getType()
-     */
+    @Override
     public abstract int getType();
 
-    /**
-     * @return The <code>UserAdminImpl</code> object that created this role.
-     */
     protected PaxUserAdmin getAdmin() {
         return m_admin;
+    }
+
+    @Override
+    public String toString() {
+        return "Role-" + getName();
     }
 
 }

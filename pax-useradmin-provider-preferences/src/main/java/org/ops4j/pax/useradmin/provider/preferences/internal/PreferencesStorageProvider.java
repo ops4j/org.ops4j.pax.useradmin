@@ -26,6 +26,9 @@ import java.util.Map;
 
 import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
+import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -48,7 +51,7 @@ import org.osgi.service.useradmin.User;
  * @author Matthias Kuespert
  * @since 08.07.2009
  */
-public class PreferencesStorageProvider implements StorageProvider {
+public class PreferencesStorageProvider implements StorageProvider, CredentialProvider {
 
     private static final String                  PATH_SEPARATOR         = "/";
 
@@ -86,7 +89,7 @@ public class PreferencesStorageProvider implements StorageProvider {
                 anyoneNode.putInt(NODE_TYPE, Role.USER);
             }
         } catch (BackingStoreException e) {
-            throw new StorageException("Error creating anonymous role '" + Role.USER_ANYONE + "': " + e.getMessage());
+            throw new StorageException("Error creating anonymous role '" + Role.USER_ANYONE, e);
         }
     }
 
@@ -151,10 +154,10 @@ public class PreferencesStorageProvider implements StorageProvider {
         Role role = null;
         switch (type) {
             case User.USER:
-                role = factory.createUser(name, properties, credentials);
+                role = factory.createUser(name, properties);
                 break;
             case User.GROUP:
-                role = factory.createGroup(name, properties, credentials);
+                role = factory.createGroup(name, properties);
                 break;
             default:
                 throw new StorageException("Invalid role type for role '" + name + " / " + node.name() + "': " + type);
@@ -211,30 +214,33 @@ public class PreferencesStorageProvider implements StorageProvider {
         return m_rootNode;
     }
 
+    @Override
     public User createUser(UserAdminFactory factory, String name) throws StorageException {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.USER);
-        User user = factory.createUser(name, null, null);
+        User user = factory.createUser(name, null);
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name(), e);
         }
         return user;
     }
 
+    @Override
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         Preferences node = getRootNode().node(name);
         node.putInt(NODE_TYPE, Role.GROUP);
-        Group group = factory.createGroup(name, null, null);
+        Group group = factory.createGroup(name, null);
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name(), e);
         }
         return group;
     }
 
+    @Override
     public boolean deleteRole(Role role) throws StorageException {
         try {
             if (getRootNode().nodeExists(role.getName())) {
@@ -244,27 +250,30 @@ public class PreferencesStorageProvider implements StorageProvider {
                 return true;
             }
         } catch (BackingStoreException e) {
-            throw new StorageException("Error removing node '" + role.getName() + "': " + e.getMessage());
+            throw new StorageException("Error removing node '" + role.getName(), e);
         }
         return false;
     }
 
+    @Override
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
         try {
             return loadMembers(factory, group, BASIC_MEMBER_STRING);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error retrieving basic members of group '" + group.getName() + "': " + e.getMessage());
+            throw new StorageException("Error retrieving basic members of group '" + group.getName(), e);
         }
     }
 
+    @Override
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
         try {
             return loadMembers(factory, group, REQUIRED_MEMBER_STRING);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error retrieving required members of group '" + group.getName() + "': " + e.getMessage());
+            throw new StorageException("Error retrieving required members of group '" + group.getName(), e);
         }
     }
 
+    @Override
     public boolean addMember(Group group, Role role) throws StorageException {
         Preferences node = getRootNode().node(group.getName() + PATH_SEPARATOR + MEMBERS_NODE);
         if (!"".equals(node.get(role.getName(), ""))) {
@@ -275,11 +284,12 @@ public class PreferencesStorageProvider implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name(), e);
         }
         return true;
     }
 
+    @Override
     public boolean addRequiredMember(Group group, Role role) throws StorageException {
         Preferences node = getRootNode().node(group.getName() + PATH_SEPARATOR + MEMBERS_NODE);
         if (!"".equals(node.get(role.getName(), ""))) {
@@ -290,11 +300,12 @@ public class PreferencesStorageProvider implements StorageProvider {
         try {
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name(), e);
         }
         return true;
     }
 
+    @Override
     public boolean removeMember(Group group, Role role) throws StorageException {
         Preferences node = getRootNode().node(group.getName() + PATH_SEPARATOR + MEMBERS_NODE);
         if ("".equals(node.get(role.getName(), ""))) {
@@ -305,11 +316,12 @@ public class PreferencesStorageProvider implements StorageProvider {
         try {
             getRootNode().flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name() + "': " + e.getMessage());
+            throw new StorageException("Error flush()ing node '" + node.name(), e);
         }
         return true;
     }
 
+    @Override
     public void setRoleAttribute(Role role, String key, Object value) throws StorageException {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
@@ -322,22 +334,24 @@ public class PreferencesStorageProvider implements StorageProvider {
             }
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error storing attribute '" + key + "' = '" + value + "' for role '" + role.getName() + "': " + e.getMessage());
+            throw new StorageException("Error storing attribute '" + key + "' = '" + value + "' for role '" + role.getName(), e);
         }
     }
 
+    @Override
     public void removeRoleAttribute(Role role, String key) throws StorageException {
         try {
             Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             node.remove(key);
             getRootNode().flush();
         } catch (IllegalStateException e) {
-            throw new StorageException("Error removing attribute from role '" + role.getName() + "': " + e.getMessage());
+            throw new StorageException("Error removing attribute from role '" + role.getName(), e);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error removing attribute from role '" + role.getName() + "': " + e.getMessage());
+            throw new StorageException("Error removing attribute from role '" + role.getName(), e);
         }
     }
 
+    @Override
     public void clearRoleAttributes(Role role) throws StorageException {
         try {
             Preferences node = getRootNode().node(role.getName());
@@ -346,11 +360,12 @@ public class PreferencesStorageProvider implements StorageProvider {
                 node.flush();
             }
         } catch (BackingStoreException e) {
-            throw new StorageException("Error clearing attributes of role '" + role.getName() + "': " + e.getMessage());
+            throw new StorageException("Error clearing attributes of role '" + role.getName(), e);
         }
     }
 
-    public void setUserCredential(User user, String key, Object value) throws StorageException {
+    @Override
+    public void setUserCredential(Encryptor encryptor, User user, String key, Object value) throws StorageException {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             if (value instanceof String) {
@@ -362,22 +377,24 @@ public class PreferencesStorageProvider implements StorageProvider {
             }
             node.flush();
         } catch (BackingStoreException e) {
-            throw new StorageException("Error storing credential for user '" + user.getName() + "': " + e.getMessage());
+            throw new StorageException("Error storing credential for user '" + user.getName(), e);
         }
     }
 
+    @Override
     public void removeUserCredential(User user, String key) throws StorageException {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
             node.remove(key);
             getRootNode().flush();
         } catch (IllegalStateException e) {
-            throw new StorageException("Error removing credential from user '" + user.getName() + "': " + e.getMessage());
+            throw new StorageException("Error removing credential from user '" + user.getName(), e);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error removing credential from user '" + user.getName() + "': " + e.getMessage());
+            throw new StorageException("Error removing credential from user '" + user.getName(), e);
         }
     }
 
+    @Override
     public void clearUserCredentials(User user) throws StorageException {
         try {
             Preferences node = getRootNode().node(user.getName());
@@ -386,18 +403,20 @@ public class PreferencesStorageProvider implements StorageProvider {
                 node.flush();
             }
         } catch (BackingStoreException e) {
-            throw new StorageException("Error clearing credentials of user '" + user.getName() + "': " + e.getMessage());
+            throw new StorageException("Error clearing credentials of user '" + user.getName(), e);
         }
     }
 
+    @Override
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
         try {
             return loadRole(factory, name, null);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error loading role '" + name + "': " + e.getMessage());
+            throw new StorageException("Error loading role '" + name, e);
         }
     }
 
+    @Override
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
         try {
             Filter filter = FrameworkUtil.createFilter("(" + key + "=" + value + ")");
@@ -413,15 +432,16 @@ public class PreferencesStorageProvider implements StorageProvider {
                 return users.iterator().next();
             }
         } catch (InvalidSyntaxException e) {
-            throw new StorageException("Invalid filter '" + e.getFilter() + "': " + e.getMessage());
+            throw new StorageException("Invalid filter '" + e.getFilter(), e);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error retrieving user with attribute '" + key + " = " + value + "': " + e.getMessage());
+            throw new StorageException("Error retrieving user with attribute '" + key + " = " + value, e);
         } catch (StorageException e) {
             throw e;
         }
         return null;
     }
 
+    @Override
     public Collection<Role> findRoles(UserAdminFactory factory, String filterString) throws StorageException {
         try {
             Filter filter = null;
@@ -431,9 +451,9 @@ public class PreferencesStorageProvider implements StorageProvider {
             Collection<Role> roles = loadRoles(factory, filter);
             return roles;
         } catch (InvalidSyntaxException e) {
-            throw new StorageException("Invalid filter '" + e.getFilter() + "': " + e.getMessage());
+            throw new StorageException("Invalid filter '" + e.getFilter(), e);
         } catch (BackingStoreException e) {
-            throw new StorageException("Error retrieving roles for filter '" + filterString + "': " + e.getMessage());
+            throw new StorageException("Error retrieving roles for filter '" + filterString + "'", e);
         }
     }
 
@@ -460,5 +480,29 @@ public class PreferencesStorageProvider implements StorageProvider {
             throw new IllegalStateException("This object is not registered!");
         }
         serviceRegistration.unregister();
+    }
+
+    @Override
+    public Object getUserCredential(Decryptor decryptor, User user, String key) throws StorageException {
+        Preferences node = getRootNode().node(user.getName());
+        try {
+            if (node.nodeExists(CREDENTIALS_NODE)) {
+                //TODO: Just load the mentioned property
+                return loadAttributes(node.node(CREDENTIALS_NODE)).get(key);
+            }
+        } catch (BackingStoreException e) {
+            throw new StorageException("loading credentials failed", e);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException {
+        return value.equals(getUserCredential(null, user, key));
+    }
+
+    @Override
+    public CredentialProvider getCredentialProvider() {
+        return this;
     }
 }

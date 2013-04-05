@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 OPS4J
+ * Copyright 2012 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ops4j.pax.useradmin.service.spi;
 
 /**
- * The exception thrown by the StrorageProvider implementations.
+ * The {@link Encryptor} provides methods to encrypt sensitive informations for
+ * credentials
  * 
- * @author Matthias Kuespert
- * @since 02.07.2009
+ * @author Christoph Läubrich
  */
-public class StorageException extends RuntimeException {
+public interface Encryptor {
 
-    static final long serialVersionUID = 1L;
-
-    public StorageException() {
-        super();
-    }
-
-    public StorageException(String message) {
-        super(message);
-    }
-
-    public StorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public StorageException(Throwable cause) {
-        super(cause);
-    }
 }

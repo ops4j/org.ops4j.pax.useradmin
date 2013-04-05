@@ -136,7 +136,7 @@ public class UserAdminImplTest {
     @Test
     public void createUserOk() {
         PaxUserAdmin userAdmin = createUserAdmin();
-        User user = userAdmin.createUser("some name", null, null);
+        User user = userAdmin.createUser("some name", null);
         Assert.assertNotNull("No user created", user);
         Assert.assertEquals("Type mismatch", user.getType(), Role.USER);
     }
@@ -144,7 +144,7 @@ public class UserAdminImplTest {
     @Test
     public void createGroupOk() {
         PaxUserAdmin userAdmin = createUserAdmin();
-        Group group = userAdmin.createGroup("some name", null, null);
+        Group group = userAdmin.createGroup("some name", null);
         Assert.assertNotNull("No user created", group);
         Assert.assertEquals("Type mismatch", group.getType(), Role.GROUP);
     }
@@ -176,7 +176,7 @@ public class UserAdminImplTest {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         LogService log = EasyMock.createMock(LogService.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, log);
-        UserImpl role1 = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl role1 = new UserImpl(NAME1, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(role1);
         log.log(LogService.LOG_INFO, "[" + PaxUserAdmin.class.getName() + "] createRole() - role already exists: " + NAME1);
         EasyMock.replay(sp, log);
@@ -204,7 +204,7 @@ public class UserAdminImplTest {
         EventAdmin eventAdmin = EasyMock.createMock(EventAdmin.class);
         LogService log = EasyMock.createMock(LogService.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, log, eventAdmin);
-        UserImpl role = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl role = new UserImpl(NAME1, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(null);
         EasyMock.expect(sp.createUser(userAdmin, NAME1)).andReturn(role);
         eventAdmin.postEvent(EasyMock.isA(Event.class));
@@ -220,7 +220,7 @@ public class UserAdminImplTest {
         EventAdmin eventAdmin = EasyMock.createMock(EventAdmin.class);
         LogService log = EasyMock.createMock(LogService.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, log, eventAdmin);
-        GroupImpl group = new GroupImpl(NAME1, userAdmin, null, null);
+        GroupImpl group = new GroupImpl(NAME1, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(null);
         EasyMock.expect(sp.createGroup(userAdmin, NAME1)).andReturn(group);
         eventAdmin.postEvent(EasyMock.isA(Event.class));
@@ -268,7 +268,7 @@ public class UserAdminImplTest {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         LogService log = EasyMock.createMock(LogService.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, log);
-        UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl user = new UserImpl(NAME1, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(user);
         EasyMock.expect(sp.deleteRole(user)).andReturn(false);
         log.log(EasyMock.eq(LogService.LOG_ERROR), EasyMock.isA(String.class));
@@ -284,7 +284,7 @@ public class UserAdminImplTest {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         LogService log = EasyMock.createMock(LogService.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, log);
-        UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl user = new UserImpl(NAME1, userAdmin, null);
         StorageException exception = new StorageException("");
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(user);
         EasyMock.expect(sp.deleteRole(user)).andThrow(exception);
@@ -303,7 +303,7 @@ public class UserAdminImplTest {
         EventAdmin eventAdmin = EasyMock.createMock(EventAdmin.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp, eventAdmin);
 
-        UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl user = new UserImpl(NAME1, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, NAME1)).andReturn(user);
         EasyMock.expect(sp.deleteRole(user)).andReturn(true);
         eventAdmin.postEvent(EasyMock.isA(Event.class));
@@ -328,7 +328,7 @@ public class UserAdminImplTest {
         // variant 2: one role found
         //
         EasyMock.reset(sp);
-        UserImpl role = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl role = new UserImpl(NAME1, userAdmin, null);
         ArrayList<Role> roles = new ArrayList<Role>();
         roles.add(role);
         EasyMock.expect(sp.findRoles(userAdmin, null)).andReturn(roles);
@@ -362,7 +362,7 @@ public class UserAdminImplTest {
     public void getRoleEmptyName() throws StorageException {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp);
-        UserImpl user = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
+        UserImpl user = new UserImpl(Role.USER_ANYONE, userAdmin, null);
         EasyMock.expect(sp.getRole(userAdmin, Role.USER_ANYONE)).andReturn(user);
         EasyMock.replay(sp);
         User result = (User) userAdmin.getRole("");
@@ -415,7 +415,7 @@ public class UserAdminImplTest {
     public void getUserOk() throws StorageException {
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         PaxUserAdmin userAdmin = createUserAdmin(sp);
-        UserImpl user = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
+        UserImpl user = new UserImpl(Role.USER_ANYONE, userAdmin, null);
         EasyMock.expect(sp.getUser(userAdmin, "", "")).andReturn(user);
         EasyMock.replay(sp);
         User result = null;
@@ -433,7 +433,7 @@ public class UserAdminImplTest {
     @Test
     public void getAuthorizationOk() {
         PaxUserAdmin userAdmin = createUserAdmin();
-        UserImpl user = new UserImpl(NAME1, userAdmin, null, null);
+        UserImpl user = new UserImpl(NAME1, userAdmin, null);
         //TODO: shoudl it really be possible to create any user??
         Assert.assertNotNull("No authorization created for dummy user", userAdmin.getAuthorization(user));
     }

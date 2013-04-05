@@ -17,8 +17,6 @@
 
 package org.ops4j.pax.useradmin.service.internal;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -34,7 +32,6 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
@@ -64,7 +61,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * The administrative permission used to verify access to restricted
      * functionality.
      */
-    private UserAdminPermission                                        m_adminPermission = null;
+    private UserAdminPermission                                        m_adminPermission;
 
     /**
      * The ServiceTracker which monitors the service used for logging.
@@ -75,12 +72,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * The ServiceTracker which monitors the service used for firing events.
      */
     private final ServiceTracker<EventAdmin, EventAdmin>               m_eventService;
-
-    /**
-     * The encryptor that is used for encrypting sensible data (e.g. user
-     * credentials).
-     */
-    private EncryptorImpl                                              m_encryptor;
 
     private final StorageProvider                                      storageProvider;
 
@@ -157,35 +148,39 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      */
     protected void checkAdminPermission() {
         SecurityManager sm = System.getSecurityManager();
-        if (null != sm) {
-            if (null == m_adminPermission) {
-                m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
+        if (sm != null) {
+            UserAdminPermission pm;
+            synchronized (PaxUserAdmin.this) {
+                if (m_adminPermission == null) {
+                    m_adminPermission = new UserAdminPermission(UserAdminPermission.ADMIN, null);
+                }
+                pm = m_adminPermission;
             }
-            sm.checkPermission(m_adminPermission);
+            sm.checkPermission(pm);
         }
     }
 
-    /**
-     * Creates an appropriate encryptor.
-     * 
-     * @param encryptionAlgorithm
-     *            The encryption algorithm to use.
-     * @param encryptionRandomAlgorithm
-     *            The random number algorithm to use.
-     * @param encryptionRandomAlgorithmSaltLength
-     *            The klength of the salt to use for random number generation.
-     * @return An implementation of the encryptor.
-     * @throws ConfigurationException
-     *             if the given algorithm doesn't exist
-     */
-    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength) {
-        try {
-            return new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
-        } catch (NoSuchAlgorithmException e) {
-            String msg = encryptionAlgorithm + " or " + encryptionRandomAlgorithm + " Encryption algorithm not supported: " + e.getMessage();
-            throw new IllegalArgumentException(msg, e);
-        }
-    }
+    //    /**
+    //     * Creates an appropriate encryptor.
+    //     * 
+    //     * @param encryptionAlgorithm
+    //     *            The encryption algorithm to use.
+    //     * @param encryptionRandomAlgorithm
+    //     *            The random number algorithm to use.
+    //     * @param encryptionRandomAlgorithmSaltLength
+    //     *            The klength of the salt to use for random number generation.
+    //     * @return An implementation of the encryptor.
+    //     * @throws ConfigurationException
+    //     *             if the given algorithm doesn't exist
+    //     */
+    //    private EncryptorImpl createEncryptor(String encryptionAlgorithm, String encryptionRandomAlgorithm, String encryptionRandomAlgorithmSaltLength) {
+    //        try {
+    //            return new EncryptorImpl(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
+    //        } catch (NoSuchAlgorithmException e) {
+    //            String msg = encryptionAlgorithm + " or " + encryptionRandomAlgorithm + " Encryption algorithm not supported: " + e.getMessage();
+    //            throw new IllegalArgumentException(msg, e);
+    //        }
+    //    }
 
     // ManagedService interface
 
@@ -197,12 +192,11 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         String encryptionAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_ALGORITHM, UserAdminConstants.ENCRYPTION_ALGORITHM_NONE);
         if (UserAdminConstants.ENCRYPTION_ALGORITHM_NONE.equals(encryptionAlgorithm)) {
             // set no encryption
-            m_encryptor = null;
         } else {
-            // create encryptor ...
-            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
-            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
-            m_encryptor = createEncryptor(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
+            //            // create encryptor ...
+            //            String encryptionRandomAlgorithm = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_ALGORITHM, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_ALGORITHM);
+            //            String encryptionRandomAlgorithmSaltLength = UserAdminTools.getOptionalProperty(properties, UserAdminConstants.PROP_ENCRYPTION_RANDOM_SALTLENGTH, UserAdminConstants.DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH);
+            //            m_encryptor = createEncryptor(encryptionAlgorithm, encryptionRandomAlgorithm, encryptionRandomAlgorithmSaltLength);
         }
     }
 
@@ -211,6 +205,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#createRole(String, int)
      */
+    @Override
     public Role createRole(String name, int type) {
         checkAdminPermission();
         //
@@ -255,6 +250,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#getAuthorization(User)
      */
+    @Override
     public Authorization getAuthorization(User user) {
         if (null == user) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_USER));
@@ -265,6 +261,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#getRole(String)
      */
+    @Override
     public Role getRole(String name) {
         if (null == name) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
@@ -285,6 +282,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#getRoles(String)
      */
+    @Override
     public Role[] getRoles(String filter) throws InvalidSyntaxException {
         try {
             StorageProvider storage = getStorageProvider();
@@ -301,6 +299,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#getUser(String, String)
      */
+    @Override
     public User getUser(String key, String value) {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
@@ -320,6 +319,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdmin#removeRole(String)
      */
+    @Override
     public boolean removeRole(String name) {
         if (null == name) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
@@ -353,6 +353,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdminUtil#getStorageProvider()
      */
+    @Override
     public StorageProvider getStorageProvider() throws StorageException {
         return storageProvider;
     }
@@ -361,6 +362,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * @see UserAdminUtil#logMessage(Object, int, String) TODO: do we need a
      *      check for valid levels? What to do then: exception or ignore?
      */
+    @Override
     public void logMessage(Object source, int level, String message) {
         LogService log = m_logService.getService();
         if (null != log) {
@@ -371,6 +373,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdminUtil#fireEvent(int, Role)
      */
+    @Override
     public void fireEvent(int type, Role role) {
         if (null == role) {
             throw new IllegalArgumentException("parameter role must not be null");
@@ -420,6 +423,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * @see UserAdminUtil#checkPermission(String, String)
      */
+    @Override
     public void checkPermission(String name, String action) {
         SecurityManager sm = System.getSecurityManager();
         if (null != sm) {
@@ -427,68 +431,72 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
     }
 
-    /**
-     * @see UserAdminUtil#encrypt(Object)
-     */
-    public Object encrypt(Object value) {
-        if (null != m_encryptor) {
-            byte[] valueBytes;
-            if (value instanceof String) {
-                //FIXME: This relies on platform encoding!
-                valueBytes = ((String) value).getBytes();
-            } else if (value instanceof byte[]) {
-                valueBytes = (byte[]) value;
-            } else {
-                throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
-            }
-            //
-            return m_encryptor.encrypt(valueBytes);
-        }
-        return value;
-    }
+    //    /**
+    //     * @see UserAdminUtil#encrypt(Object)
+    //     */
+    //    @Override
+    //    public Object encrypt(Object value) {
+    //        if (null != m_encryptor) {
+    //            byte[] valueBytes;
+    //            if (value instanceof String) {
+    //                //FIXME: This relies on platform encoding!
+    //                valueBytes = ((String) value).getBytes();
+    //            } else if (value instanceof byte[]) {
+    //                valueBytes = (byte[]) value;
+    //            } else {
+    //                throw new IllegalArgumentException("Illegal value type: " + value.getClass().getName());
+    //            }
+    //            //
+    //            return m_encryptor.encrypt(valueBytes);
+    //        }
+    //        return value;
+    //    }
 
-    /**
-     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
-     */
-    public boolean compareToEncryptedValue(Object inputValue, Object storedValue) {
-        byte[] inputValueBytes;
-        if (inputValue instanceof String) {
-            inputValueBytes = ((String) inputValue).getBytes();
-        } else if (inputValue instanceof byte[]) {
-            inputValueBytes = (byte[]) inputValue;
-        } else {
-            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
-        }
-
-        byte[] storedValueBytes;
-        if (storedValue instanceof String) {
-            storedValueBytes = ((String) storedValue).getBytes();
-        } else if (storedValue instanceof byte[]) {
-            storedValueBytes = (byte[]) storedValue;
-        } else {
-            throw new IllegalArgumentException("Illegal value type: " + storedValue.getClass().getName());
-        }
-
-        if (null != m_encryptor) {
-            return m_encryptor.compare(inputValueBytes, storedValueBytes);
-        }
-        return Arrays.equals(inputValueBytes, storedValueBytes);
-    }
+    //    /**
+    //     * @see UserAdminUtil#compareToEncryptedValue(Object, byte[])
+    //     */
+    //    @Override
+    //    public boolean compareToEncryptedValue(Object inputValue, Object storedValue) {
+    //        byte[] inputValueBytes;
+    //        if (inputValue instanceof String) {
+    //            inputValueBytes = ((String) inputValue).getBytes();
+    //        } else if (inputValue instanceof byte[]) {
+    //            inputValueBytes = (byte[]) inputValue;
+    //        } else {
+    //            throw new IllegalArgumentException("Illegal value type: " + inputValue.getClass().getName());
+    //        }
+    //
+    //        byte[] storedValueBytes;
+    //        if (storedValue instanceof String) {
+    //            storedValueBytes = ((String) storedValue).getBytes();
+    //        } else if (storedValue instanceof byte[]) {
+    //            storedValueBytes = (byte[]) storedValue;
+    //        } else {
+    //            throw new IllegalArgumentException("Illegal value type: " + storedValue.getClass().getName());
+    //        }
+    //
+    //        if (null != m_encryptor) {
+    //            return m_encryptor.compare(inputValueBytes, storedValueBytes);
+    //        }
+    //        return Arrays.equals(inputValueBytes, storedValueBytes);
+    //    }
 
     // UserAdminFactory interface
 
     /**
-     * @see UserAdminFactory#createUser(String, Map, Map)
+     * @see UserAdminFactory#createUser(String, Map)
      */
-    public User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials) {
-        return new UserImpl(name, this, properties, credentials);
+    @Override
+    public User createUser(String name, Map<String, Object> properties) {
+        return new UserImpl(name, this, properties);
     }
 
     /**
-     * @see UserAdminFactory#createGroup(String, Map, Map)
+     * @see UserAdminFactory#createGroup(String, Map)
      */
-    public Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials) {
-        return new GroupImpl(name, this, properties, credentials);
+    @Override
+    public Group createGroup(String name, Map<String, Object> properties) {
+        return new GroupImpl(name, this, properties);
     }
 
     /**

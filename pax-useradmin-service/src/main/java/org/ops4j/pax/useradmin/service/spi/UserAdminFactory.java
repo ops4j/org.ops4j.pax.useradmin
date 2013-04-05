@@ -44,7 +44,7 @@ public interface UserAdminFactory {
      *            The credentials of the user.
      * @return A new <code>User</code> instance.
      */
-    User createUser(String name, Map<String, Object> properties, Map<String, Object> credentials);
+    User createUser(String name, Map<String, Object> properties);
 
     /**
      * Create a <code>Group</code> instance.
@@ -57,7 +57,7 @@ public interface UserAdminFactory {
      *            The credentials of the group.
      * @return A new <code>Group</code> instance.
      */
-    Group createGroup(String name, Map<String, Object> properties, Map<String, Object> credentials);
+    Group createGroup(String name, Map<String, Object> properties);
 
     /**
      * Publish an event of the given type related to the role specified.

@@ -26,7 +26,7 @@ import java.security.SecureRandom;
  * 
  * @see <a href=
  *      "http://java.sun.com/javase/6/docs/technotes/guides/security/index.html"
- *      />
+ *      >http://java.sun.com/javase/6/docs/technotes/guides/security/index.html</a>
  * @author Matthias Kuespert
  * @since 25.11.2009
  */

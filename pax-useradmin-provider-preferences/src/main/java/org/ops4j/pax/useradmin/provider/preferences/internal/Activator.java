@@ -17,7 +17,6 @@
 
 package org.ops4j.pax.useradmin.provider.preferences.internal;
 
-import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -47,6 +46,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
      * 
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
+    @Override
     public void start(BundleContext context) throws Exception {
         this.context = context;
         LOG.info("Startup storage provider bundle {} (version {}), waiting for coresponding service...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
@@ -59,6 +59,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
      * 
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
+    @Override
     public void stop(BundleContext context) throws Exception {
         LOG.info("Shutdown storage provider bundle {} (version {})...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
         preferencesTracker.close();
@@ -69,6 +70,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
      * 
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(ServiceReference)
      */
+    @Override
     public PreferencesStorageProvider addingService(ServiceReference<PreferencesService> reference) {
         PreferencesService preferences = context.getService(reference);
         if (preferences != null) {
@@ -79,10 +81,6 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
                 return provider;
             } catch (RuntimeException e) {
                 //unget the service
-                context.ungetService(reference);
-                LOG.warn("registration of storage provider failed!", e);
-                return null;
-            } catch (StorageException e) {
                 context.ungetService(reference);
                 LOG.warn("registration of storage provider failed!", e);
                 return null;
@@ -100,6 +98,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(ServiceReference,
      *      Object)
      */
+    @Override
     public void modifiedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {
         // no-op
     }
@@ -110,6 +109,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Pref
      * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(ServiceReference,
      *      Object)
      */
+    @Override
     public void removedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {
         //unget whatever happens...
         context.ungetService(reference);

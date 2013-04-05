@@ -32,12 +32,12 @@ import org.osgi.service.useradmin.Role;
 
 /**
  * @author Matthias Kuespert
- * @since  28.07.2009
+ * @since 28.07.2009
  */
 public class AuthorizationImplTest {
 
-    private static final String USER_NAME1 = "someRole1";
-    private static final String USER_NAME2 = "someRole2";
+    private static final String USER_NAME1  = "someRole1";
+    private static final String USER_NAME2  = "someRole2";
     private static final String GROUP_NAME1 = "someGroup1";
     private static final String GROUP_NAME2 = "someGroup2";
     private static final String GROUP_NAME3 = "someGroup3";
@@ -45,9 +45,9 @@ public class AuthorizationImplTest {
     @Test
     public void getNameOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
-        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
-        
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null);
+
         Authorization authorization = new AuthorizationImpl(userAdmin, user);
         Assert.assertEquals("Name mismatch", USER_NAME1, authorization.getName());
         //
@@ -57,12 +57,12 @@ public class AuthorizationImplTest {
         authorization = new AuthorizationImpl(userAdmin, userAnyone);
         Assert.assertEquals("Name mismatch", Role.USER_ANYONE, authorization.getName());
     }
-    
+
     @Test
     public void getRolesInvalidSyntaxException() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null, null);
-        
+        UserImpl user = new UserImpl(USER_NAME1, userAdmin, null);
+
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
         try {
             EasyMock.expect(userAdmin.getRoles(null)).andThrow(new InvalidSyntaxException("", null));
@@ -81,18 +81,18 @@ public class AuthorizationImplTest {
         //
         EasyMock.verify(userAdmin, sp);
     }
-    
+
     @Test
     public void getRolesOk() {
         PaxUserAdmin userAdmin = EasyMock.createMock(PaxUserAdmin.class);
-        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null, null);
-        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null, null);
-        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null, null);
-        
+        UserImpl userAnyone = new UserImpl(Role.USER_ANYONE, userAdmin, null);
+        UserImpl user1 = new UserImpl(USER_NAME1, userAdmin, null);
+        UserImpl user2 = new UserImpl(USER_NAME2, userAdmin, null);
+
         StorageProvider sp = EasyMock.createMock(StorageProvider.class);
-        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null, null);
-        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null, null);
-        GroupImpl group3 = new GroupImpl(GROUP_NAME3, userAdmin, null, null);
+        GroupImpl group1 = new GroupImpl(GROUP_NAME1, userAdmin, null);
+        GroupImpl group2 = new GroupImpl(GROUP_NAME2, userAdmin, null);
+        GroupImpl group3 = new GroupImpl(GROUP_NAME3, userAdmin, null);
         try {
             // 1st addMember()
             userAdmin.checkAdminPermission();
@@ -150,7 +150,7 @@ public class AuthorizationImplTest {
         //
         EasyMock.verify(userAdmin, sp);
     }
-    
+
     @Test
     public void hasRoleOk() {
         // TODO: implement test

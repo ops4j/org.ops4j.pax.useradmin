@@ -30,7 +30,7 @@ import org.osgi.service.useradmin.UserAdminPermission;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public class RoleProperties extends AbstractProperties {
+public class RoleProperties extends AbstractProperties<Role> {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,14 +62,9 @@ public class RoleProperties extends AbstractProperties {
         storageProvider.removeRoleAttribute(getRole(), key);
     }
 
-/*
- * Activate when OSGi finally moves to Map
- * 
     @Override
-    protected void clear(StorageProvider storageProvider) throws StorageException {
-        for (Object key : keySet()) {
-            getUtil().checkPermission((String) key, UserAdminPermission.CHANGE_PROPERTY);
-        }
-        storageProvider.clearRoleAttributes(getRole());
+    protected void checkGetPermission(String key) {
+        //Nothing to do
     }
-*/}
+
+}

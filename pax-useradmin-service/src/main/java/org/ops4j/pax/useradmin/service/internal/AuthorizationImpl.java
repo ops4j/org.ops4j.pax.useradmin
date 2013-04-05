@@ -64,6 +64,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * @see Authorization#getName()
      */
+    @Override
     public String getName() {
         return null != m_user ? m_user.getName() : null;
     }
@@ -78,6 +79,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * @see Authorization#getRoles()
      */
+    @Override
     public String[] getRoles() {
         if (m_user instanceof SPIRole) {
             SPIRole spiRoleUser = (SPIRole) m_user;
@@ -120,6 +122,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * @see Authorization#hasRole(String)
      */
+    @Override
     public boolean hasRole(String name) {
         Role roleToCheck = getAdmin().getRole(name);
         if (null != roleToCheck) {

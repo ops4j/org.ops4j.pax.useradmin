@@ -62,6 +62,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
 
     private final Map<String, ServiceRegistration<ManagedService>> managedServiceMap = new HashMap<String, ServiceRegistration<ManagedService>>();
 
+    @Override
     public void start(BundleContext context) throws Exception {
         this.context = context;
         LOG.info("Start PaxUserAdmin service bundle {} (version {}) and wait for StorageProvider...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
@@ -76,6 +77,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
         providerTracker.open();
     }
 
+    @Override
     public void stop(BundleContext context) throws Exception {
         LOG.info("Shutdown PaxUserAdmin service bundle {} (version {})...", context.getBundle().getSymbolicName(), context.getBundle().getVersion());
         providerTracker.close();
@@ -91,6 +93,7 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
         }
     }
 
+    @Override
     public PaxUserAdmin addingService(ServiceReference<StorageProvider> reference) {
         String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
         if (null == type) {
@@ -125,10 +128,12 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
         }
     }
 
+    @Override
     public void modifiedService(ServiceReference<StorageProvider> reference, PaxUserAdmin service) {
         // we not support modifications yet
     }
 
+    @Override
     public void removedService(ServiceReference<StorageProvider> reference, PaxUserAdmin service) {
         String type = (String) reference.getProperty(UserAdminConstants.STORAGEPROVIDER_TYPE);
         //unget whatever happens

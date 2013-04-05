@@ -23,7 +23,7 @@ import org.osgi.service.useradmin.Role;
 
 /**
  * Collection of utility methods.
- *
+ * 
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
@@ -32,61 +32,48 @@ public interface UserAdminUtil {
     /**
      * Checks if the caller has the specified permission when security is
      * enabled. If security is not enabled nothing happens here.
-     *
-     * @param permission The name of the permission, e.g. the name of a property
-     *            to change.
-     * @param credential The <code>UserAdminPermission</code> code.
-     *
-     * @throws SecurityException if security is enabled, a security
-     *         manager exists and the caller does not have the specified
-     *         permission.
+     * 
+     * @param permission
+     *            The name of the permission, e.g. the name of a property to
+     *            change.
+     * @param credential
+     *            The <code>UserAdminPermission</code> code.
+     * @throws SecurityException
+     *             if security is enabled, a security manager exists and the
+     *             caller does not have the specified permission.
      */
     void checkPermission(String permission, String credential);
 
     /**
      * Provides access to the <code>StorageProvider</code> used to persist data.
-     *
+     * 
      * @return An instance of the <code>StorageProvider</code> service.
-     * @throws StorageException If the <code>StorageProvider</code> service is
-     *             not available.
+     * @throws StorageException
+     *             If the <code>StorageProvider</code> service is not available.
      */
     StorageProvider getStorageProvider() throws StorageException;
 
     /**
      * Prints the given message to the logger. If no logging service is
      * available the call is silently ignored.
-     *
-     * @param source The object which sends the message.
-     * @param level The log level.
-     * @param message The message text.
+     * 
+     * @param source
+     *            The object which sends the message.
+     * @param level
+     *            The log level.
+     * @param message
+     *            The message text.
      */
     void logMessage(Object source, int level, String message);
 
     /**
      * Publish an event of the given type related to the role specified.
-     *
-     * @param type The type of event - see <code>UserAdminEvent</code>.
-     * @param role The role which is related to the event.
+     * 
+     * @param type
+     *            The type of event - see <code>UserAdminEvent</code>.
+     * @param role
+     *            The role which is related to the event.
      */
     void fireEvent(int type, Role role);
 
-    /**
-     * Encrypts the given value if encryption is enabled.
-     *
-     * @param value The value to encrypt. May be either a <code>String</code> or
-     *            a <code>byte[]</code> - otherwise an
-     *            <code>IllegalArgumentException</code> is thrown.
-     * @return An object containing the encrypted value. If encryption
-     *         is disabled the given parameter is returned unchanged.
-     */
-    Object encrypt(Object value);
-
-    /**
-     * Checks if the given (plain) input value equals the (encrypted) stored value.
-     *
-     * @param inputValue The plain input value.
-     * @param storedValue The encrypted stored value.
-     * @return True if the encrypted input value equals the stored value.
-     */
-    boolean compareToEncryptedValue(Object inputValue, Object storedValue);
 }

@@ -41,6 +41,9 @@ import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBRole;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBUser;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBVersionedObject;
 import org.ops4j.pax.useradmin.service.UserAdminConstants;
+import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
+import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
@@ -64,7 +67,7 @@ import org.slf4j.LoggerFactory;
  * long network delay and heavy use scenarios. A caching JPA Provider like
  * EclipseLink would help here in increasing performance.
  */
-public class JPAStorageProvider implements StorageProvider {
+public class JPAStorageProvider implements StorageProvider, CredentialProvider {
 
     private static final Logger                  LOG = LoggerFactory.getLogger(JPAStorageProvider.class);
 
@@ -101,6 +104,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @throws StorageException
      *             if the user could not be created
      */
+    @Override
     public synchronized User createUser(final UserAdminFactory factory, final String name) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         if (map.containsKey(name)) {
@@ -108,15 +112,17 @@ public class JPAStorageProvider implements StorageProvider {
         }
         return accessTransaction(new TransactionAccess<User>() {
 
+            @Override
             public User doWork(EntityManager manager, EntityTransaction transaction) {
                 DBUser user = new DBUser();
                 user.setName(name);
                 manager.persist(user);
                 transaction.commit();
                 map.put(name, user);
-                return factory.createUser(name, null, null);
+                return factory.createUser(name, null);
             }
 
+            @Override
             public String getProblemString() {
                 return "the user '" + name + "' can't be created";
             }
@@ -138,6 +144,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @throws StorageException
      *             if the user could not be created
      */
+    @Override
     public synchronized Group createGroup(final UserAdminFactory factory, final String name) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         if (map.containsKey(name)) {
@@ -145,15 +152,17 @@ public class JPAStorageProvider implements StorageProvider {
         }
         return accessTransaction(new TransactionAccess<Group>() {
 
+            @Override
             public Group doWork(EntityManager manager, EntityTransaction transaction) {
                 DBGroup group = new DBGroup();
                 group.setName(name);
                 manager.persist(group);
                 transaction.commit();
                 map.put(name, group);
-                return factory.createGroup(name, null, null);
+                return factory.createGroup(name, null);
             }
 
+            @Override
             public String getProblemString() {
                 return "the group '" + name + "' can't be created";
             }
@@ -170,12 +179,14 @@ public class JPAStorageProvider implements StorageProvider {
      * @throws StorageException
      *             if the role could not be deleted.
      */
+    @Override
     public synchronized boolean deleteRole(final Role role) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         final DBRole removedRole = map.remove(role.getName());
         if (removedRole != null) {
             return accessTransaction(new TransactionAccess<Boolean>() {
 
+                @Override
                 public Boolean doWork(EntityManager manager, EntityTransaction transaction) {
                     DBRole find = refreshItem(manager, removedRole);
                     // remove from groups
@@ -196,6 +207,7 @@ public class JPAStorageProvider implements StorageProvider {
                     return true;
                 }
 
+                @Override
                 public String getProblemString() {
                     return "the role '" + role.getName() + "' can't be deleted";
                 }
@@ -218,6 +230,7 @@ public class JPAStorageProvider implements StorageProvider {
      *         of the given group.
      * @throws StorageException
      */
+    @Override
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
         return loadMembers(factory, group, MemberType.BASIC);
     }
@@ -235,6 +248,7 @@ public class JPAStorageProvider implements StorageProvider {
      *         members of the given group.
      * @throws StorageException
      */
+    @Override
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
         return loadMembers(factory, group, MemberType.REQUIRED);
     }
@@ -251,6 +265,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return True if the given role was added - false otherwise.
      * @throws StorageException
      */
+    @Override
     public synchronized boolean addMember(final Group group, final Role role) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         DBRole dbGroupRole = map.get(group.getName());
@@ -264,6 +279,7 @@ public class JPAStorageProvider implements StorageProvider {
                 }
                 return accessTransaction(new TransactionAccess<Boolean>() {
 
+                    @Override
                     public Boolean doWork(EntityManager manager, EntityTransaction transaction) {
                         DBGroup findGroup = refreshItem(manager, dbGroup);
                         DBRole findRole = refreshItem(manager, dbRole);
@@ -275,6 +291,7 @@ public class JPAStorageProvider implements StorageProvider {
                         return true;
                     }
 
+                    @Override
                     public String getProblemString() {
                         return "The role " + role.getName() + " can't be added to the group " + group.getName();
                     }
@@ -299,6 +316,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return True if the given role was added - false otherwise.
      * @throws StorageException
      */
+    @Override
     public synchronized boolean addRequiredMember(final Group group, final Role role) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         DBRole dbGroupRole = map.get(group.getName());
@@ -312,6 +330,7 @@ public class JPAStorageProvider implements StorageProvider {
                 }
                 return accessTransaction(new TransactionAccess<Boolean>() {
 
+                    @Override
                     public Boolean doWork(EntityManager manager, EntityTransaction transaction) {
                         DBGroup findGroup = refreshItem(manager, dbGroup);
                         DBRole findRole = refreshItem(manager, dbRole);
@@ -323,6 +342,7 @@ public class JPAStorageProvider implements StorageProvider {
                         return true;
                     }
 
+                    @Override
                     public String getProblemString() {
                         return "The role " + role.getName() + " can't be added to the group " + group.getName();
                     }
@@ -345,6 +365,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return
      * @throws StorageException
      */
+    @Override
     public synchronized boolean removeMember(final Group group, final Role role) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         DBRole dbGroupRole = map.get(group.getName());
@@ -358,6 +379,7 @@ public class JPAStorageProvider implements StorageProvider {
                 }
                 return accessTransaction(new TransactionAccess<Boolean>() {
 
+                    @Override
                     public Boolean doWork(EntityManager manager, EntityTransaction transaction) {
                         DBGroup findGroup = refreshItem(manager, dbGroup);
                         DBRole findRole = refreshItem(manager, dbRole);
@@ -370,6 +392,7 @@ public class JPAStorageProvider implements StorageProvider {
                         return true;
                     }
 
+                    @Override
                     public String getProblemString() {
                         return "The role " + role.getName() + " can't be added to the group " + group.getName();
                     }
@@ -393,6 +416,7 @@ public class JPAStorageProvider implements StorageProvider {
      *            The value of the attribute.
      * @throws StorageException
      */
+    @Override
     public synchronized void setRoleAttribute(final Role role, final String key, final Object value) throws StorageException {
         if (value == null) {
             removeRoleAttribute(role, key);
@@ -403,6 +427,7 @@ public class JPAStorageProvider implements StorageProvider {
             final DBRole dbRole = map.get(role.getName());
             accessTransaction(new TransactionAccess<Void>() {
 
+                @Override
                 public Void doWork(EntityManager manager, EntityTransaction transaction) {
                     DBProperty dbvalue = new DBProperty();
                     dbvalue.setKey(key);
@@ -418,6 +443,7 @@ public class JPAStorageProvider implements StorageProvider {
                     return null;
                 }
 
+                @Override
                 public String getProblemString() {
                     return "the attribute '" + key + "' of role " + role.getName() + " can't be set";
                 }
@@ -436,11 +462,13 @@ public class JPAStorageProvider implements StorageProvider {
      *            The key of the attribute.
      * @throws StorageException
      */
+    @Override
     public synchronized void removeRoleAttribute(final Role role, final String key) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         final DBRole dbRole = map.get(role.getName());
         accessTransaction(new TransactionAccess<Void>() {
 
+            @Override
             public Void doWork(EntityManager manager, EntityTransaction transaction) {
                 DBRole refreshItem = refreshItem(manager, dbRole);
                 refreshItem.getProperties().remove(key);
@@ -449,6 +477,7 @@ public class JPAStorageProvider implements StorageProvider {
                 return null;
             }
 
+            @Override
             public String getProblemString() {
                 return "the attribute of role " + role.getName() + " can't be removed";
             }
@@ -463,11 +492,13 @@ public class JPAStorageProvider implements StorageProvider {
      *            The <code>Role</code> to remove the attribute(s) from.
      * @throws StorageException
      */
+    @Override
     public synchronized void clearRoleAttributes(final Role role) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         final DBRole dbRole = map.get(role.getName());
         accessTransaction(new TransactionAccess<Void>() {
 
+            @Override
             public Void doWork(EntityManager manager, EntityTransaction transaction) {
                 DBRole refreshItem = refreshItem(manager, dbRole);
                 refreshItem.getProperties().clear();
@@ -476,6 +507,7 @@ public class JPAStorageProvider implements StorageProvider {
                 return null;
             }
 
+            @Override
             public String getProblemString() {
                 return "the properties of role " + role.getName() + " can't be cleared";
             }
@@ -485,16 +517,17 @@ public class JPAStorageProvider implements StorageProvider {
 
     /**
      * Sets a <code>String</code> credential to a user.
-     * 
      * @param user
      *            The <code>User</code> to set the credential to.
      * @param key
      *            The key of the credential.
      * @param value
      *            The value of the credential.
+     * 
      * @throws StorageException
      */
-    public synchronized void setUserCredential(final User user, final String key, final Object value) throws StorageException {
+    @Override
+    public synchronized void setUserCredential(Encryptor encryptor, final User user, final String key, final Object value) throws StorageException {
         if (value == null) {
             removeUserCredential(user, key);
             return;
@@ -506,6 +539,7 @@ public class JPAStorageProvider implements StorageProvider {
                 final DBUser dbUser = (DBUser) dbRole;
                 accessTransaction(new TransactionAccess<Void>() {
 
+                    @Override
                     public Void doWork(EntityManager manager, EntityTransaction transaction) {
                         DBProperty dbvalue = new DBProperty();
                         dbvalue.setKey(key);
@@ -521,6 +555,7 @@ public class JPAStorageProvider implements StorageProvider {
                         return null;
                     }
 
+                    @Override
                     public String getProblemString() {
                         return "the credential of user " + user.getName() + " can't be set";
                     }
@@ -533,6 +568,7 @@ public class JPAStorageProvider implements StorageProvider {
         }
     }
 
+    @Override
     public synchronized void removeUserCredential(final User user, final String key) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         final DBRole dbRole = map.get(user.getName());
@@ -540,6 +576,7 @@ public class JPAStorageProvider implements StorageProvider {
             final DBUser dbUser = (DBUser) dbRole;
             accessTransaction(new TransactionAccess<Void>() {
 
+                @Override
                 public Void doWork(EntityManager manager, EntityTransaction transaction) {
                     DBUser refreshItem = refreshItem(manager, dbUser);
                     refreshItem.getCredentials().remove(key);
@@ -548,6 +585,7 @@ public class JPAStorageProvider implements StorageProvider {
                     return null;
                 }
 
+                @Override
                 public String getProblemString() {
                     return "the credential of user " + user.getName() + " can't be removed";
                 }
@@ -564,6 +602,7 @@ public class JPAStorageProvider implements StorageProvider {
      *            The <code>User</code> to remove the credentials for.
      * @throws StorageException
      */
+    @Override
     public synchronized void clearUserCredentials(final User user) throws StorageException {
         final Map<String, DBRole> map = getRoleNamesMap();
         final DBRole dbRole = map.get(user.getName());
@@ -571,6 +610,7 @@ public class JPAStorageProvider implements StorageProvider {
             final DBUser dbUser = (DBUser) dbRole;
             accessTransaction(new TransactionAccess<Void>() {
 
+                @Override
                 public Void doWork(EntityManager manager, EntityTransaction transaction) {
                     DBUser refreshItem = refreshItem(manager, dbUser);
                     refreshItem.getCredentials().clear();
@@ -579,6 +619,7 @@ public class JPAStorageProvider implements StorageProvider {
                     return null;
                 }
 
+                @Override
                 public String getProblemString() {
                     return "the properties of role " + user.getName() + " can't be cleared";
                 }
@@ -601,6 +642,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return A <code>Role</code> implementation.
      * @throws StorageException
      */
+    @Override
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
         return loadRole(factory, name, null);
     }
@@ -619,6 +661,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return The <code>User</code> object matching the query.
      * @throws StorageException
      */
+    @Override
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
         try {
             Filter filter = createFilter("(" + key + "=" + value + ")");
@@ -649,6 +692,7 @@ public class JPAStorageProvider implements StorageProvider {
      * @return
      * @throws StorageException
      */
+    @Override
     public Collection<Role> findRoles(UserAdminFactory factory, String filterString) throws StorageException {
         try {
             Filter filter = null;
@@ -691,10 +735,10 @@ public class JPAStorageProvider implements StorageProvider {
         Role role = null;
         switch (dbRole.getType()) {
             case User.USER:
-                role = factory.createUser(name, properties, credentials);
+                role = factory.createUser(name, properties);
                 break;
             case User.GROUP:
-                role = factory.createGroup(name, properties, credentials);
+                role = factory.createGroup(name, properties);
                 break;
             default:
                 throw new StorageException("Invalid role type for role '" + name + "': " + dbRole.getType() + " only USER and GROUP are allowed!");
@@ -759,6 +803,7 @@ public class JPAStorageProvider implements StorageProvider {
             //Initial load from the DB...
             roleNames = accessTransaction(new TransactionAccess<Map<String, DBRole>>() {
 
+                @Override
                 public Map<String, DBRole> doWork(EntityManager manager, EntityTransaction transaction) {
                     Map<String, DBRole> loadedRoles = new HashMap<String, DBRole>();
                     addRoles(listItems(DBGroup.class, manager), loadedRoles);
@@ -788,6 +833,7 @@ public class JPAStorageProvider implements StorageProvider {
                     }
                 }
 
+                @Override
                 public String getProblemString() {
                     return "reading roles from the database failed!";
                 }
@@ -905,5 +951,26 @@ public class JPAStorageProvider implements StorageProvider {
         StorageException exception = new StorageException(message);
         exception.initCause(throwable);
         throw exception;
+    }
+
+    @Override
+    public synchronized Object getUserCredential(Decryptor decryptor, User user, String key) throws StorageException {
+        final Map<String, DBRole> map = getRoleNamesMap();
+        DBRole role = map.get(user.getName());
+        if (role instanceof DBUser) {
+            DBUser dbuser = (DBUser) role;
+            return dbuser.getCredentials().get(key);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException {
+        return value.equals(getUserCredential(null, user, key));
+    }
+
+    @Override
+    public CredentialProvider getCredentialProvider() {
+        return this;
     }
 }

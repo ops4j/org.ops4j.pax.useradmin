@@ -34,7 +34,7 @@ import org.osgi.service.useradmin.Role;
  * 
  * @see <a href=
  *      "http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html"
- *      />
+ *      >Group</a>
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
@@ -45,13 +45,14 @@ public class GroupImpl extends UserImpl implements Group {
      * 
      * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Map)
      */
-    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Map<String, Object> credentials) {
-        super(name, admin, properties, credentials);
+    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties) {
+        super(name, admin, properties);
     }
 
     /**
      * @see Group#addMember(Role)
      */
+    @Override
     public boolean addMember(Role role) {
         if (role != null) {
             try {
@@ -70,6 +71,7 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * @see Group#addRequiredMember(Role)
      */
+    @Override
     public boolean addRequiredMember(Role role) {
         if (role != null) {
             try {
@@ -86,6 +88,7 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * @see Group#removeMember(Role)
      */
+    @Override
     public boolean removeMember(Role role) {
         if (role != null) {
             try {
@@ -102,6 +105,7 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * @see Group#getMembers()
      */
+    @Override
     public Role[] getMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
@@ -118,6 +122,7 @@ public class GroupImpl extends UserImpl implements Group {
     /**
      * @see Group#getRequiredMembers()
      */
+    @Override
     public Role[] getRequiredMembers() {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
@@ -195,5 +200,10 @@ public class GroupImpl extends UserImpl implements Group {
             }
         }
         return ImplicationResult.IMPLIEDBY_NO;
+    }
+
+    @Override
+    public String toString() {
+        return "Group-" + getName();
     }
 }

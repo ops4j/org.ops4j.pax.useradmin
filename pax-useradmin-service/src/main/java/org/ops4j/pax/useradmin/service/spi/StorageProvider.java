@@ -27,28 +27,26 @@ import org.osgi.service.useradmin.UserAdmin;
 /**
  * The StorageProvider interface defines the methods needed by a UserAdmin
  * implementation to maintain persistent UserAdmin data.
- *
+ * 
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
 public interface StorageProvider {
-
-    // private enum GroupType { BASIC, REQUIRED };
-
-    // role management
 
     /**
      * Create a new user with the given name. The user initially has no
      * properties or credentials assigned.
      * 
      * @see UserAdmin#createRole(String, int)
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to create the
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to create the
      *            implementation object.
-     * @param name The user name.
+     * @param name
+     *            The user name.
      * @return An object implementing the <code>User</code> interface or null if
      *         a role with the given name already exists.
-     * @throws StorageException if the user could not be created
+     * @throws StorageException
+     *             if the user could not be created
      */
     User createUser(UserAdminFactory factory, String name) throws StorageException;
 
@@ -57,13 +55,15 @@ public interface StorageProvider {
      * properties or credentials assigned.
      * 
      * @see UserAdmin#createRole(String, int)
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to create the
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to create the
      *            implementation object.
-     * @param name The group name.
+     * @param name
+     *            The group name.
      * @return An object implementing the <code>Group</code> interface or null
      *         if a role with the given name already exists.
-     * @throws StorageException if the user could not be created
+     * @throws StorageException
+     *             if the user could not be created
      */
     Group createGroup(UserAdminFactory factory, String name) throws StorageException;
 
@@ -72,10 +72,11 @@ public interface StorageProvider {
      * groups it is a member of.
      * 
      * @see UserAdmin#removeRole(String)
-     * 
-     * @param role The <code>Role</code> to delete.
+     * @param role
+     *            The <code>Role</code> to delete.
      * @return True if the role could be deleted.
-     * @throws StorageException if an error occured while storing the role
+     * @throws StorageException
+     *             if an error occured while storing the role
      */
     boolean deleteRole(Role role) throws StorageException;
 
@@ -86,10 +87,10 @@ public interface StorageProvider {
      * objects via the given factory.
      * 
      * @see Group#getMembers()
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to create member
-     *                roles.
-     * @param group The <code>Group</code> whose members are retrieved.
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to create member roles.
+     * @param group
+     *            The <code>Group</code> whose members are retrieved.
      * @return A collection of <code>Role</code> objects that are basic members
      *         of the given group.
      * @throws StorageException
@@ -101,12 +102,12 @@ public interface StorageProvider {
      * objects via the given factory.
      * 
      * @see Group#getRequiredMembers()
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to create member
-     *                roles.
-     * @param group The <code>Group</code> whose members are retrieved.
-     * @return A collection of <code>Role</code> objects that are required members
-     *         of the given group.
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to create member roles.
+     * @param group
+     *            The <code>Group</code> whose members are retrieved.
+     * @return A collection of <code>Role</code> objects that are required
+     *         members of the given group.
      * @throws StorageException
      */
     Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException;
@@ -115,9 +116,11 @@ public interface StorageProvider {
      * Adds a role as a basic member to a group.
      * 
      * @see Group#addMember(Role)
-     * 
-     * @param group The <code>Group</code> to add the <code>Role</code> as basic member.
-     * @param role The <code>Role</code> to add.
+     * @param group
+     *            The <code>Group</code> to add the <code>Role</code> as basic
+     *            member.
+     * @param role
+     *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
      * @throws StorageException
      */
@@ -127,9 +130,11 @@ public interface StorageProvider {
      * Adds a role as a required member to a group.
      * 
      * @see Group#addRequiredMember(Role)
-     * 
-     * @param group The <code>Group</code> to add the <code>Role</code> as required member.
-     * @param role The <code>Role</code> to add.
+     * @param group
+     *            The <code>Group</code> to add the <code>Role</code> as
+     *            required member.
+     * @param role
+     *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
      * @throws StorageException
      */
@@ -139,7 +144,6 @@ public interface StorageProvider {
      * Removes a member from the given group.
      * 
      * @see Group#removeMember(Role)
-     * 
      * @param group
      * @param role
      * @return
@@ -152,9 +156,12 @@ public interface StorageProvider {
     /**
      * Sets a <code>String</code> attribute to a role.
      * 
-     * @param role The <code>Role</code> to set the attribute to.
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
+     * @param role
+     *            The <code>Role</code> to set the attribute to.
+     * @param key
+     *            The key of the attribute.
+     * @param value
+     *            The value of the attribute.
      * @throws StorageException
      */
     void setRoleAttribute(Role role, String key, Object value) throws StorageException;
@@ -162,8 +169,10 @@ public interface StorageProvider {
     /**
      * Removes an attribute from a role.
      * 
-     * @param role The <code>Role</code> to remove the attribute from.
-     * @param key The key of the attribute.
+     * @param role
+     *            The <code>Role</code> to remove the attribute from.
+     * @param key
+     *            The key of the attribute.
      * @throws StorageException
      */
     void removeRoleAttribute(Role role, String key) throws StorageException;
@@ -171,7 +180,8 @@ public interface StorageProvider {
     /**
      * Removes all attributes from the given role.
      * 
-     * @param role The <code>Role</code> to remove the attribute(s) from.
+     * @param role
+     *            The <code>Role</code> to remove the attribute(s) from.
      * @throws StorageException
      */
     void clearRoleAttributes(Role role) throws StorageException;
@@ -179,31 +189,9 @@ public interface StorageProvider {
     // credential management
 
     /**
-     * Sets a <code>String</code> credential to a user.
-     * 
-     * @param user The <code>User</code> to set the credential to.
-     * @param key The key of the credential.
-     * @param value The value of the credential.
-     * @throws StorageException
+     * @return the provider that gives acces to credential information
      */
-    void setUserCredential(User user, String key, Object value) throws StorageException;
-
-    /**
-     * Removes a credential from a role.
-     * 
-     * @param user The <code>User</code> to remove the credential from.
-     * @param key The key of the credential.
-     * @throws StorageException
-     */
-    void removeUserCredential(User user, String key) throws StorageException;
-
-    /**
-     * Removes all credentials for a user.
-     * 
-     * @param user The <code>User</code> to remove the credentials for.
-     * @throws StorageException
-     */
-    void clearUserCredentials(User user) throws StorageException;
+    CredentialProvider getCredentialProvider();
 
     // role getters & finders
 
@@ -211,10 +199,11 @@ public interface StorageProvider {
      * Returns the role with the given name.
      * 
      * @see UserAdmin#getRole(String)
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to eventually create the
-     *                implementation object.
-     * @param name The role to find.
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to eventually create
+     *            the implementation object.
+     * @param name
+     *            The role to find.
      * @return A <code>Role</code> implementation.
      * @throws StorageException
      */
@@ -224,11 +213,13 @@ public interface StorageProvider {
      * Retrieves the user with the given attributes.
      * 
      * @see UserAdmin#getUser(String, String)
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to eventually create the
-     *                implementation object.
-     * @param key The attribute key to search for.
-     * @param value The attribute value to search for.
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to eventually create
+     *            the implementation object.
+     * @param key
+     *            The attribute key to search for.
+     * @param value
+     *            The attribute value to search for.
      * @return The <code>User</code> object matching the query.
      * @throws StorageException
      */
@@ -238,10 +229,10 @@ public interface StorageProvider {
      * Returns the roles that match the given filter.
      * 
      * @see UserAdmin#getRoles(String)
-     * 
-     * @param factory The <code>UserAdminFactory</code> used to eventually create the
-     *                implementation object.
-     * @param filter 
+     * @param factory
+     *            The <code>UserAdminFactory</code> used to eventually create
+     *            the implementation object.
+     * @param filter
      * @return
      * @throws StorageException
      */

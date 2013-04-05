@@ -50,6 +50,7 @@ public class ConfigurationListener implements ManagedService {
         this.providerTracker = providerTracker;
     }
 
+    @Override
     public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
         Map<String, Object> config = new HashMap<String, Object>();
         if (properties != null) {

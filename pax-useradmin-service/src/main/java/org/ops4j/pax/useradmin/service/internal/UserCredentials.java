@@ -27,68 +27,61 @@ import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
  * A dictionary to manage user credentials and communicate changes.
- *
+ * 
  * @author Matthias Kuespert
- * @since  02.07.2009
+ * @since 02.07.2009
  */
-public class UserCredentials extends AbstractProperties {
+public class UserCredentials extends AbstractProperties<User> {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * Initializing constructor.
-     *
+     * 
      * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
-    protected UserCredentials(User user, UserAdminUtil util, Map<String, Object> properties) {
-        super(user, util, properties);
+    protected UserCredentials(User user, UserAdminUtil util) {
+        super(user, util, null);
     }
 
-    /**
-     * @return The owning role as user.
-     */
-    private User getUser() {
-        return (User) getRole();
-    }
-
-    /**
-     * @see AbstractProperties#checkGetPermission(String)
-     */
     @Override
     protected void checkGetPermission(String key) {
         getUtil().checkPermission(key, UserAdminPermission.GET_CREDENTIAL);
     }
 
-    /**
-     * @see AbstractProperties#store(StorageProvider, String, Object)
-     */
     @Override
-    protected Object store(StorageProvider storageProvider, String key, Object plainValue)
-        throws StorageException {
+    protected synchronized Object store(StorageProvider storageProvider, String key, Object plainValue) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-        Object encryptedValue = getUtil().encrypt(plainValue);
-        storageProvider.setUserCredential(getUser(), key, encryptedValue);
-        return encryptedValue;
+        storageProvider.getCredentialProvider().setUserCredential(null, getRole(), key, plainValue);
+        return plainValue;
+    }
+
+    @Override
+    protected synchronized void remove(StorageProvider storageProvider, String key) throws StorageException {
+        getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
+        storageProvider.getCredentialProvider().removeUserCredential(getRole(), key);
+    }
+
+    @Override
+    public synchronized Object get(Object key) {
+        //call super for security and param checks...
+        super.get(key);
+        return getUtil().getStorageProvider().getCredentialProvider().getUserCredential(null, getRole(), (String) key);
+    }
+
+    @Override
+    protected Object putInternal(String key, Object storedValue, Object oldValue) {
+        return oldValue;
     }
 
     /**
-     * @see AbstractProperties#remove(StorageProvider, String)
+     * @param key
+     * @param value
+     * @return
      */
-    @Override
-    protected void remove(StorageProvider storageProvider, String key) throws StorageException {
-        getUtil().checkPermission(key, UserAdminPermission.CHANGE_CREDENTIAL);
-        storageProvider.removeUserCredential(getUser(), key);
+    public boolean hasCredential(String key, Object value) {
+        checkKeyValid(key);
+        checkGetPermission(key);
+        return getUtil().getStorageProvider().getCredentialProvider().hasUserCredential(null, getRole(), key, value);
     }
-
-/*
- * Activate when OSGi finally moves to Map
- *
-    @Override
-    protected void clear(StorageProvider storageProvider) throws StorageException {
-        for (Object key : keySet()) {
-            getUtil().checkPermission((String) key, UserAdminPermission.CHANGE_CREDENTIAL);
-        }
-        storageProvider.clearUserCredentials(getUser());
-    }
-*/
 }
