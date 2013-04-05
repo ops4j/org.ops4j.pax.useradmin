@@ -46,12 +46,12 @@ public class DBUser extends DBRole {
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKey(name = "key")
     @CollectionTable(name = "osgi_service_useradmin_User_credentials", joinColumns = @JoinColumn(name = "cred_key_id"))
-    private final Map<String, DBProperty> credentials = new HashMap<String, DBProperty>();
+    private final Map<String, DBCredential> credentials = new HashMap<String, DBCredential>();
 
     /**
      * @return the current value of credentials
      */
-    public Map<String, DBProperty> getCredentials() {
+    public Map<String, DBCredential> getCredentials() {
         return credentials;
     }
 }

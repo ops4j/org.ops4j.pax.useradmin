@@ -17,7 +17,6 @@
 package org.ops4j.pax.useradmin.provider.jpa.internal.dao;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -98,45 +97,31 @@ public class DBProperty {
         return key;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(data);
+        int result = 1;
         result = prime * result + ((key == null) ? 0 : key.hashCode());
-        result = prime * result + type;
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        if (obj == null) {
             return false;
         }
         if (!(obj instanceof DBProperty)) {
             return false;
         }
         DBProperty other = (DBProperty) obj;
-        if (!Arrays.equals(data, other.data)) {
-            return false;
-        }
         if (key == null) {
             if (other.key != null) {
                 return false;
             }
         } else if (!key.equals(other.key)) {
-            return false;
-        }
-        if (type != other.type) {
             return false;
         }
         return true;

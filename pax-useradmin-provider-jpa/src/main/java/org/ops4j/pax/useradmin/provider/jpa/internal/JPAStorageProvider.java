@@ -35,6 +35,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.ops4j.pax.useradmin.provider.jpa.ConfigurationConstants;
+import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBCredential;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBGroup;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBProperty;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBRole;
@@ -43,6 +44,7 @@ import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBVersionedObject;
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.EncryptedValue;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -532,39 +534,42 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
             removeUserCredential(user, key);
             return;
         }
-        if (value instanceof String || value instanceof byte[]) {
-            final Map<String, DBRole> map = getRoleNamesMap();
-            final DBRole dbRole = map.get(user.getName());
-            if (dbRole instanceof DBUser) {
-                final DBUser dbUser = (DBUser) dbRole;
-                accessTransaction(new TransactionAccess<Void>() {
-
-                    @Override
-                    public Void doWork(EntityManager manager, EntityTransaction transaction) {
-                        DBProperty dbvalue = new DBProperty();
-                        dbvalue.setKey(key);
-                        if (value instanceof String) {
-                            dbvalue.setData((String) value);
-                        } else if (value instanceof byte[]) {
-                            dbvalue.setData((byte[]) value);
-                        }
-                        DBUser refreshItem = refreshItem(manager, dbUser);
-                        refreshItem.getCredentials().put(key, dbvalue);
-                        transaction.commit();
-                        map.put(refreshItem.getName(), refreshItem);
-                        return null;
-                    }
-
-                    @Override
-                    public String getProblemString() {
-                        return "the credential of user " + user.getName() + " can't be set";
-                    }
-                });
+        final Map<String, DBRole> map = getRoleNamesMap();
+        final DBRole dbRole = map.get(user.getName());
+        if (dbRole instanceof DBUser) {
+            final DBUser dbUser = (DBUser) dbRole;
+            final DBCredential dbvalue = new DBCredential();
+            EncryptedValue encrypt;
+            if (value instanceof String) {
+                encrypt = encryptor.encrypt(key, (String) value);
+            } else if (value instanceof byte[]) {
+                encrypt = encryptor.encrypt(key, (byte[]) value);
             } else {
-                throw new StorageException("invalid role specified as user: " + user.getName());
+                throw new StorageException("Invalid class type for value: " + value.getClass().getName() + " only String and byte[] is allowed!");
             }
+            dbvalue.setKey(key);
+            dbvalue.setParameter(encrypt.getAlgorithmParameter());
+            dbvalue.setSalt(encrypt.getSalt());
+            dbvalue.setVerificationBytes(encrypt.getVerificationBytes());
+            dbvalue.setData(encrypt.getEncryptedBytes());
+            accessTransaction(new TransactionAccess<Void>() {
+
+                @Override
+                public Void doWork(EntityManager manager, EntityTransaction transaction) {
+                    DBUser refreshItem = refreshItem(manager, dbUser);
+                    refreshItem.getCredentials().put(key, dbvalue);
+                    transaction.commit();
+                    map.put(refreshItem.getName(), refreshItem);
+                    return null;
+                }
+
+                @Override
+                public String getProblemString() {
+                    return "the credential of user " + user.getName() + " can't be set";
+                }
+            });
         } else {
-            throw new StorageException("Invalid class type for value: " + value.getClass().getName() + " only String and byte[] is allowed!");
+            throw new StorageException("invalid role specified as user: " + user.getName());
         }
     }
 
@@ -722,14 +727,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
             }
             if (!filter.match(properties)) {
                 return null;
-            }
-        }
-        Hashtable<String, Object> credentials = null;
-        if (dbRole instanceof DBUser) {
-            credentials = new Hashtable<String, Object>();
-            for (Entry<String, DBProperty> entry : ((DBUser) dbRole).getCredentials().entrySet()) {
-                DBProperty value = entry.getValue();
-                credentials.put(entry.getKey(), value.getType() == DBProperty.TYPE_STRING ? value.getDataAsString() : value.getData());
             }
         }
         Role role = null;
@@ -959,14 +956,31 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
         DBRole role = map.get(user.getName());
         if (role instanceof DBUser) {
             DBUser dbuser = (DBUser) role;
-            return dbuser.getCredentials().get(key);
+            DBCredential dbCredential = dbuser.getCredentials().get(key);
+            if (dbCredential != null) {
+                return decryptor.decrypt(dbCredential.getEncryptedBytes(), dbCredential.getVerificationBytes(), dbCredential.getSalt(), dbCredential.getAlgorithmParameter());
+            }
         }
         return null;
     }
 
     @Override
     public synchronized boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException {
-        return value.equals(getUserCredential(null, user, key));
+        final Map<String, DBRole> map = getRoleNamesMap();
+        DBRole role = map.get(user.getName());
+        if (role instanceof DBUser) {
+            DBUser dbuser = (DBUser) role;
+            DBCredential dbCredential = dbuser.getCredentials().get(key);
+            if (dbCredential != null) {
+                if (value instanceof String) {
+                    return decryptor.verify(key, (String) value, dbCredential.getVerificationBytes(), dbCredential.getSalt(), dbCredential.getAlgorithmParameter());
+                }
+                if (value instanceof byte[]) {
+                    return decryptor.verify(key, (byte[]) value, dbCredential.getVerificationBytes(), dbCredential.getSalt(), dbCredential.getAlgorithmParameter());
+                }
+            }
+        }
+        return false;
     }
 
     @Override

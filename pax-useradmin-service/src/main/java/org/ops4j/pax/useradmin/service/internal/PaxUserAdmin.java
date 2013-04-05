@@ -472,4 +472,12 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
             return encryptor;
         }
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + getStorageProvider() + "]";
+    }
 }
