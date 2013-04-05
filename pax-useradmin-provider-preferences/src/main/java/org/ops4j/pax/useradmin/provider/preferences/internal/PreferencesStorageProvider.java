@@ -342,7 +342,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     @Override
     public void removeRoleAttribute(Role role, String key) throws StorageException {
         try {
-            Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
+            Preferences node = getRootNode().node(role.getName() + PATH_SEPARATOR + PROPERTIES_NODE);
             node.remove(key);
             getRootNode().flush();
         } catch (IllegalStateException e) {
@@ -362,49 +362,6 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
             }
         } catch (BackingStoreException e) {
             throw new StorageException("Error clearing attributes of role '" + role.getName(), e);
-        }
-    }
-
-    @Override
-    public void setUserCredential(Encryptor encryptor, User user, String key, Object value) throws StorageException {
-        try {
-            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
-            if (value instanceof String) {
-                storeAttribute(node, key, (String) value);
-            } else if (value instanceof byte[]) {
-                storeAttribute(node, key, (byte[]) value);
-            } else {
-                throw new StorageException("Invalid value type '" + value.getClass().getName() + "' - only String or byte[] are allowed.");
-            }
-            node.flush();
-        } catch (BackingStoreException e) {
-            throw new StorageException("Error storing credential for user '" + user.getName(), e);
-        }
-    }
-
-    @Override
-    public void removeUserCredential(User user, String key) throws StorageException {
-        try {
-            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
-            node.remove(key);
-            getRootNode().flush();
-        } catch (IllegalStateException e) {
-            throw new StorageException("Error removing credential from user '" + user.getName(), e);
-        } catch (BackingStoreException e) {
-            throw new StorageException("Error removing credential from user '" + user.getName(), e);
-        }
-    }
-
-    @Override
-    public void clearUserCredentials(User user) throws StorageException {
-        try {
-            Preferences node = getRootNode().node(user.getName());
-            if (node.nodeExists(CREDENTIALS_NODE)) {
-                node.node(CREDENTIALS_NODE).removeNode();
-                node.flush();
-            }
-        } catch (BackingStoreException e) {
-            throw new StorageException("Error clearing credentials of user '" + user.getName(), e);
         }
     }
 
@@ -481,6 +438,49 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
             throw new IllegalStateException("This object is not registered!");
         }
         serviceRegistration.unregister();
+    }
+
+    @Override
+    public void setUserCredential(Encryptor encryptor, User user, String key, Object value) throws StorageException {
+        try {
+            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
+            if (value instanceof String) {
+                storeAttribute(node, key, (String) value);
+            } else if (value instanceof byte[]) {
+                storeAttribute(node, key, (byte[]) value);
+            } else {
+                throw new StorageException("Invalid value type '" + value.getClass().getName() + "' - only String or byte[] are allowed.");
+            }
+            node.flush();
+        } catch (BackingStoreException e) {
+            throw new StorageException("Error storing credential for user '" + user.getName(), e);
+        }
+    }
+
+    @Override
+    public void removeUserCredential(User user, String key) throws StorageException {
+        try {
+            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
+            node.remove(key);
+            getRootNode().flush();
+        } catch (IllegalStateException e) {
+            throw new StorageException("Error removing credential from user '" + user.getName(), e);
+        } catch (BackingStoreException e) {
+            throw new StorageException("Error removing credential from user '" + user.getName(), e);
+        }
+    }
+
+    @Override
+    public void clearUserCredentials(User user) throws StorageException {
+        try {
+            Preferences node = getRootNode().node(user.getName());
+            if (node.nodeExists(CREDENTIALS_NODE)) {
+                node.node(CREDENTIALS_NODE).removeNode();
+                node.flush();
+            }
+        } catch (BackingStoreException e) {
+            throw new StorageException("Error clearing credentials of user '" + user.getName(), e);
+        }
     }
 
     @Override
