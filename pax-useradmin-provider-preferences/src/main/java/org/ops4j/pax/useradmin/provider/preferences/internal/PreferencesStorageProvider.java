@@ -18,9 +18,11 @@
 package org.ops4j.pax.useradmin.provider.preferences.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +31,7 @@ import org.ops4j.pax.useradmin.provider.preferences.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
+import org.ops4j.pax.useradmin.service.spi.EncryptedValue;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -54,23 +57,43 @@ import org.osgi.service.useradmin.User;
  */
 public class PreferencesStorageProvider implements StorageProvider, CredentialProvider {
 
-    private static final String                  PATH_SEPARATOR         = "/";
+    /**
+     * 
+     */
+    private static final String                  KEY_VERIFICATION_BYTES  = "VerificationBytes";
 
-    private static final String                  PREFERENCE_USER        = "Pax UserAdmin";
+    /**
+     * 
+     */
+    private static final String                  KEY_SALT                = "Salt";
 
-    private static final String                  NODE_TYPE              = "type";
+    /**
+     * 
+     */
+    private static final String                  KEY_ENCRYPTED_BYTES     = "EncryptedBytes";
 
-    private static final String                  MEMBERS_NODE           = "members";
-    private static final String                  REQUIRED_MEMBER_STRING = "required";
-    private static final String                  BASIC_MEMBER_STRING    = "basic";
+    /**
+     * 
+     */
+    private static final String                  KEY_ALGORITHM_PARAMETER = "AlgorithmParameter";
 
-    private static final String                  PROPERTIES_NODE        = "properties";
-    private static final String                  CREDENTIALS_NODE       = "credentials";
-    private static final String                  TYPES_NODE             = "types";
+    private static final String                  PATH_SEPARATOR          = "/";
 
-    private PreferencesService                   m_preferencesService   = null;
+    private static final String                  PREFERENCE_USER         = "Pax UserAdmin";
 
-    private Preferences                          m_rootNode             = null;
+    private static final String                  NODE_TYPE               = "type";
+
+    private static final String                  MEMBERS_NODE            = "members";
+    private static final String                  REQUIRED_MEMBER_STRING  = "required";
+    private static final String                  BASIC_MEMBER_STRING     = "basic";
+
+    private static final String                  PROPERTIES_NODE         = "properties";
+    private static final String                  CREDENTIALS_NODE        = "credentials";
+    private static final String                  TYPES_NODE              = "types";
+
+    private PreferencesService                   m_preferencesService    = null;
+
+    private Preferences                          m_rootNode              = null;
 
     private final Long                           trackedServiceID;
 
@@ -99,16 +122,29 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     }
 
     private Map<String, Object> loadAttributes(Preferences node) throws BackingStoreException {
-        Preferences propertyTypes = node.node(TYPES_NODE);
         Map<String, Object> properties = new HashMap<String, Object>();
         for (String key : node.keys()) {
-            if (propertyTypes.getBoolean(key, true)) {
-                properties.put(key, node.get(key, ""));
-            } else {
-                properties.put(key, node.getByteArray(key, "".getBytes()));
-            }
+            properties.put(key, loadAttribute(node, key));
         }
         return properties;
+    }
+
+    private Object loadAttribute(Preferences node, String key) throws BackingStoreException {
+        Preferences propertyTypes = node.node(TYPES_NODE);
+        if (propertyTypes.getBoolean(key, true)) {
+            return node.get(key, "");
+        } else {
+            return node.getByteArray(key, "".getBytes());
+        }
+    }
+
+    private byte[] loadByteAttribute(Preferences node, String key) throws BackingStoreException {
+        Preferences propertyTypes = node.node(TYPES_NODE);
+        if (propertyTypes.getBoolean(key, true)) {
+            throw new IllegalArgumentException("the property is of type String");
+        } else {
+            return node.getByteArray(key, "".getBytes());
+        }
     }
 
     private void storeAttribute(Preferences node, String key, String value) throws BackingStoreException {
@@ -148,7 +184,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         //
         Set<String> credentials = null;
         if (node.nodeExists(CREDENTIALS_NODE)) {
-            credentials = loadAttributes(node.node(CREDENTIALS_NODE)).keySet();
+            credentials = new HashSet<String>(Arrays.asList(node.node(CREDENTIALS_NODE).childrenNames()));
         }
         //
         int type = new Integer(node.get(NODE_TYPE, "666"));
@@ -443,14 +479,20 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     @Override
     public void setUserCredential(Encryptor encryptor, User user, String key, Object value) throws StorageException {
         try {
-            Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
+            Preferences credNode = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
+            Preferences node = credNode.node(key);
+            EncryptedValue encrypt;
             if (value instanceof String) {
-                storeAttribute(node, key, (String) value);
+                encrypt = encryptor.encrypt(key, (String) value);
             } else if (value instanceof byte[]) {
-                storeAttribute(node, key, (byte[]) value);
+                encrypt = encryptor.encrypt(key, (byte[]) value);
             } else {
                 throw new StorageException("Invalid value type '" + value.getClass().getName() + "' - only String or byte[] are allowed.");
             }
+            storeAttribute(node, KEY_ALGORITHM_PARAMETER, encrypt.getAlgorithmParameter());
+            storeAttribute(node, KEY_ENCRYPTED_BYTES, encrypt.getEncryptedBytes());
+            storeAttribute(node, KEY_SALT, encrypt.getSalt());
+            storeAttribute(node, KEY_VERIFICATION_BYTES, encrypt.getVerificationBytes());
             node.flush();
         } catch (BackingStoreException e) {
             throw new StorageException("Error storing credential for user '" + user.getName(), e);
@@ -461,8 +503,10 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     public void removeUserCredential(User user, String key) throws StorageException {
         try {
             Preferences node = getRootNode().node(user.getName() + PATH_SEPARATOR + CREDENTIALS_NODE);
-            node.remove(key);
-            getRootNode().flush();
+            if (node.nodeExists(key)) {
+                node.node(key).removeNode();
+                getRootNode().flush();
+            }
         } catch (IllegalStateException e) {
             throw new StorageException("Error removing credential from user '" + user.getName(), e);
         } catch (BackingStoreException e) {
@@ -485,11 +529,12 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
 
     @Override
     public Object getUserCredential(Decryptor decryptor, User user, String key) throws StorageException {
-        Preferences node = getRootNode().node(user.getName());
+        Preferences userNode = getRootNode().node(user.getName());
         try {
-            if (node.nodeExists(CREDENTIALS_NODE)) {
-                //TODO: Just load the mentioned property
-                return loadAttributes(node.node(CREDENTIALS_NODE)).get(key);
+            if (userNode.nodeExists(CREDENTIALS_NODE)) {
+                Preferences credNode = userNode.node(CREDENTIALS_NODE);
+                Preferences node = credNode.node(key);
+                return decryptor.decrypt(loadByteAttribute(node, KEY_ENCRYPTED_BYTES), loadByteAttribute(node, KEY_VERIFICATION_BYTES), loadByteAttribute(node, KEY_SALT), loadByteAttribute(node, KEY_ALGORITHM_PARAMETER));
             }
         } catch (BackingStoreException e) {
             throw new StorageException("loading credentials failed", e);
@@ -499,7 +544,22 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
 
     @Override
     public boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException {
-        return value.equals(getUserCredential(null, user, key));
+        Preferences userNode = getRootNode().node(user.getName());
+        try {
+            if (userNode.nodeExists(CREDENTIALS_NODE)) {
+                Preferences credNode = userNode.node(CREDENTIALS_NODE);
+                Preferences node = credNode.node(key);
+                if (value instanceof String) {
+                    return decryptor.verify(key, (String) value, loadByteAttribute(node, KEY_VERIFICATION_BYTES), loadByteAttribute(node, KEY_SALT), loadByteAttribute(node, KEY_ALGORITHM_PARAMETER));
+                }
+                if (value instanceof byte[]) {
+                    return decryptor.verify(key, (byte[]) value, loadByteAttribute(node, KEY_VERIFICATION_BYTES), loadByteAttribute(node, KEY_SALT), loadByteAttribute(node, KEY_ALGORITHM_PARAMETER));
+                }
+            }
+        } catch (BackingStoreException e) {
+            throw new StorageException("loading credentials failed", e);
+        }
+        return false;
     }
 
     @Override
