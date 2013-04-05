@@ -33,8 +33,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.UserAdminListener;
@@ -55,23 +54,23 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
     /**
      * Maximum number of parralllel event threads
      */
-    private static final int                                       MAXIMUM_POOL_SIZE = 10;
+    private static final int                                     MAXIMUM_POOL_SIZE = 10;
 
-    private static final Logger                                    LOG               = LoggerFactory.getLogger(Activator.class);
+    private static final Logger                                  LOG               = LoggerFactory.getLogger(Activator.class);
 
-    private ServiceTracker<StorageProvider, PaxUserAdmin>          providerTracker;
+    private ServiceTracker<StorageProvider, PaxUserAdmin>        providerTracker;
 
-    private BundleContext                                          context;
+    private BundleContext                                        context;
 
-    private ServiceTracker<EventAdmin, EventAdmin>                 eventAdminTracker;
+    private ServiceTracker<EventAdmin, EventAdmin>               eventAdminTracker;
 
-    private ServiceTracker<LogService, LogService>                 logServiceTracker;
+    private ServiceTracker<LogService, LogService>               logServiceTracker;
 
-    private ServiceTracker<UserAdminListener, UserAdminListener>   listenerTracker;
+    private ServiceTracker<UserAdminListener, UserAdminListener> listenerTracker;
 
-    private final Map<String, ServiceRegistration<ManagedService>> managedServiceMap = new HashMap<String, ServiceRegistration<ManagedService>>();
+    private final Map<String, ConfigurationListener>             managedServiceMap = new HashMap<String, ConfigurationListener>();
 
-    private final ExecutorService                                  eventExecutor     = new ThreadPoolExecutor(0, MAXIMUM_POOL_SIZE, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    private final ExecutorService                                eventExecutor     = new ThreadPoolExecutor(0, MAXIMUM_POOL_SIZE, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     @Override
     public void start(BundleContext context) throws Exception {
@@ -96,8 +95,8 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
         logServiceTracker.close();
         listenerTracker.close();
         synchronized (managedServiceMap) {
-            Collection<ServiceRegistration<ManagedService>> values = managedServiceMap.values();
-            for (ServiceRegistration<ManagedService> serviceRegistration : values) {
+            Collection<ConfigurationListener> values = managedServiceMap.values();
+            for (ConfigurationListener serviceRegistration : values) {
                 serviceRegistration.unregister();
             }
             managedServiceMap.clear();
@@ -118,13 +117,20 @@ public class Activator implements BundleActivator, ServiceTrackerCustomizer<Stor
                 userAdminImpl.register(context, type, (Long) reference.getProperty(Constants.SERVICE_ID));
                 LOG.info("New UserAdmin for StorageProvider {} (service.id = {}) is now available.", type, reference.getProperty(Constants.SERVICE_ID));
                 synchronized (managedServiceMap) {
-                    String pid = PaxUserAdminConstants.SERVICE_PID + "." + type;
-                    if (!managedServiceMap.containsKey(pid)) {
+                    String pid = reference.getBundle().getSymbolicName();
+                    ConfigurationListener l = managedServiceMap.get(pid);
+                    if (l == null) {
+                        LOG.info("The configuration PID for StorageProviders of type {} is {}", type, pid);
                         Dictionary<String, Object> properties = new Hashtable<String, Object>();
                         properties.put(Constants.SERVICE_PID, pid);
-                        ConfigurationListener listener = new ConfigurationListener(type, providerTracker);
-                        ServiceRegistration<ManagedService> registerService = context.registerService(ManagedService.class, listener, properties);
-                        managedServiceMap.put(pid, registerService);
+                        ConfigurationListener listener = new ConfigurationListener(type, providerTracker, properties, context);
+                        managedServiceMap.put(pid, listener);
+                    } else {
+                        try {
+                            l.updateProvider(userAdminImpl);
+                        } catch (ConfigurationException e) {
+                            LOG.error("Can't update configuration: {}", e.getMessage(), e);
+                        }
                     }
                 }
                 return userAdminImpl;

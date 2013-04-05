@@ -21,8 +21,6 @@ package org.ops4j.pax.useradmin.provider.jpa;
  */
 public interface ConfigurationConstants {
 
-    public static final String SERVICE_PID          = "org.ops4j.pax.useradmin.jpa";
-
     public static final String TRACKED_SERVICE_ID   = "org.ops4j.pax.useradmin.tracked.service_id";
 
     public static final String STORAGEPROVIDER_TYPE = "Java Persistence API";

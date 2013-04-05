@@ -42,6 +42,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
@@ -175,11 +176,12 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     // ManagedService interface
 
-    public void configurationUpdated(Map<String, ?> properties) {
+    public void configurationUpdated(Map<String, ?> properties) throws ConfigurationException {
         synchronized (this) {
             this.properties = properties;
             encryptor = null;
         }
+        getStorageProvider().configurationUpdated(properties);
     }
 
     // UserAdmin interface

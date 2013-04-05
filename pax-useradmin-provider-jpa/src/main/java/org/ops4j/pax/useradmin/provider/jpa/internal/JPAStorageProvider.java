@@ -51,7 +51,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleReference;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
@@ -917,8 +916,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
         }
         //Propagate the properties of the EMF service...
         Dictionary<String, Object> properties = new Hashtable<String, Object>(entityManagerFactory.getProperties());
-        //Set service PID
-        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
         //Set stoarage provider type
         properties.put(PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //set the service id of the underlying service
@@ -993,5 +990,10 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
     @Override
     public CredentialProvider getCredentialProvider() {
         return this;
+    }
+
+    @Override
+    public void configurationUpdated(Map<String, ?> properties) {
+        LOG.info("Configuration updated: {}", properties);
     }
 }

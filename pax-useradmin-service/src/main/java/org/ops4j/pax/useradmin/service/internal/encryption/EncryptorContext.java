@@ -78,15 +78,13 @@ public class EncryptorContext {
         this.saltLength = saltLength;
         secureRandom = SecureRandom.getInstance(secureRandomAlgorith);
         messageDigest = MessageDigest.getInstance(hashAlgorith);
-        if (!CIPHER_PAX_EMPTY.equals(cipherAlgorithm)) {
-            if (CIPHER_PAX_PLAIN.equals(cipherAlgorithm) || new NullCipher().getAlgorithm().equals(cipherAlgorithm)) {
-                cipher = new NullCipher();
-            } else {
-                //Fetch a default one
-                cipher = Cipher.getInstance(cipherAlgorithm);
-            }
-        } else {
+        if (CIPHER_PAX_EMPTY.equals(cipherAlgorithm)) {
             cipher = null;
+        } else if (CIPHER_PAX_PLAIN.equals(cipherAlgorithm) || "null".equals(cipherAlgorithm)) {
+            cipher = new NullCipher();
+        } else {
+            //Fetch a default one
+            cipher = Cipher.getInstance(cipherAlgorithm);
         }
     }
 
@@ -113,7 +111,7 @@ public class EncryptorContext {
         sb.append("##");
         sb.append(saltLength);
         sb.append("##");
-        sb.append(cipher == null ? CIPHER_PAX_EMPTY : cipher.getAlgorithm());
+        sb.append(cipher == null ? CIPHER_PAX_EMPTY : ((cipher instanceof NullCipher) ? CIPHER_PAX_PLAIN : cipher.getAlgorithm()));
         return sb.toString();
     }
 

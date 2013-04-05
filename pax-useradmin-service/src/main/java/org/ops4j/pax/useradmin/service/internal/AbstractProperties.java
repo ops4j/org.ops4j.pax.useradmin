@@ -156,7 +156,12 @@ public abstract class AbstractProperties<R extends Role> extends Dictionary<Stri
         }
         try {
             StorageProvider storageProvider = m_util.getStorageProvider();
-            Object oldValue = get(key);
+            Object oldValue = null;
+            try {
+                oldValue = get(key);
+            } catch (RuntimeException e) {
+                //Ignore then..
+            }
             Object storedValue = store(storageProvider, key, value);
             m_util.fireEvent(UserAdminEvent.ROLE_CHANGED, m_role);
             return putInternal(key, storedValue, oldValue);

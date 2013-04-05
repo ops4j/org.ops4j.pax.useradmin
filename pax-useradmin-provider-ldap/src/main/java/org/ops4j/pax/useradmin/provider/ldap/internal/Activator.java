@@ -24,8 +24,6 @@ import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.service.cm.ManagedService;
 
 import com.novell.ldap.LDAPConnection;
 
@@ -52,12 +50,11 @@ public class Activator implements BundleActivator {
         // set service properties
         //
         Dictionary<String, String> properties = new Hashtable<String, String>();
-        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
         properties.put(org.ops4j.pax.useradmin.service.PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //
         // create & register service implementation
         //
-        context.registerService(new String[] { StorageProvider.class.getName(), ManagedService.class.getName() }, new StorageProviderImpl(connection), properties);
+        context.registerService(StorageProvider.class, new StorageProviderImpl(connection), properties);
     }
 
     /**

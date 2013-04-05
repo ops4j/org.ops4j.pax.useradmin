@@ -37,7 +37,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
@@ -460,8 +459,6 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         }
         //Propagate the properties of the EMF service...
         Dictionary<String, Object> properties = new Hashtable<String, Object>();
-        //Set service PID
-        properties.put(Constants.SERVICE_PID, ConfigurationConstants.SERVICE_PID);
         //Set stoarage provider type
         properties.put(PaxUserAdminConstants.STORAGEPROVIDER_TYPE, ConfigurationConstants.STORAGEPROVIDER_TYPE);
         //set the service id of the underlying service
@@ -565,5 +562,10 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
     @Override
     public CredentialProvider getCredentialProvider() {
         return this;
+    }
+
+    @Override
+    public void configurationUpdated(Map<String, ?> properties) {
+        // We don't care here...
     }
 }

@@ -20,7 +20,6 @@ package org.ops4j.pax.useradmin.provider.ldap.internal;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,7 +33,6 @@ import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.ops4j.pax.useradmin.service.spi.UserAdminFactory;
 import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
@@ -53,7 +51,7 @@ import com.novell.ldap.LDAPSearchResults;
  * @author Matthias Kuespert
  * @since 02.07.2009
  */
-public class StorageProviderImpl implements StorageProvider, ManagedService, CredentialProvider {
+public class StorageProviderImpl implements StorageProvider, CredentialProvider {
 
     private static final String DEFAULT_CREDENTIAL_NAME     = "default";
     private static final int    CREDENTIAL_VALUE_ARRAY_SIZE = 3;
@@ -104,45 +102,6 @@ public class StorageProviderImpl implements StorageProvider, ManagedService, Cre
             throw new IllegalArgumentException("Internal error: no LDAPConnection object specified when constructing the StorageProvider instance.");
         }
         m_connection = connection;
-    }
-
-    // ManagedService interface implementation
-
-    /**
-     * @see ManagedService#updated(Dictionary)
-     */
-    @Override
-    @SuppressWarnings(value = "unchecked")
-    public void updated(Dictionary properties) throws ConfigurationException {
-        if (null == properties) {
-            // ignore empty properties
-            return;
-        }
-        //
-        m_accessUser = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ACCESS_USER, "");
-        m_accessPassword = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ACCESS_PWD, "");
-        //
-        m_host = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_URL, ConfigurationConstants.DEFAULT_LDAP_SERVER_URL);
-        m_port = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_PORT, ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
-        //
-        m_rootDN = UserAdminTools.getMandatoryProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_DN);
-        m_rootUsersDN = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_USERS, ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS)
-                + "," + m_rootDN;
-        m_rootGroupsDN = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_GROUPS, ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS)
-                + "," + m_rootDN;
-
-        m_userObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_OBJECTCLASS, ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
-        m_userIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_ID, ConfigurationConstants.DEFAULT_USER_ATTR_ID);
-        m_userMandatoryAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_MANDATORY, ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY);
-
-        m_groupObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
-        m_groupIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
-        m_groupMandatoryAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY, ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
-        m_groupCredentialAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_CREDENTIAL, ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL);
-
-        m_groupEntryObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS);
-        m_groupEntryIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
-        m_groupEntryMemberAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER, ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
     }
 
     // StorageProvider interface implementation
@@ -1056,5 +1015,42 @@ public class StorageProviderImpl implements StorageProvider, ManagedService, Cre
     @Override
     public CredentialProvider getCredentialProvider() {
         return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.ops4j.pax.useradmin.service.spi.StorageProvider#configurationUpdated(java.util.Map)
+     */
+    @Override
+    public void configurationUpdated(Map<String, ?> properties) throws ConfigurationException {
+        if (null == properties) {
+            // ignore empty properties
+            return;
+        }
+        //
+        m_accessUser = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ACCESS_USER, "");
+        m_accessPassword = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ACCESS_PWD, "");
+        //
+        m_host = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_URL, ConfigurationConstants.DEFAULT_LDAP_SERVER_URL);
+        m_port = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_SERVER_PORT, ConfigurationConstants.DEFAULT_LDAP_SERVER_PORT);
+        //
+        m_rootDN = UserAdminTools.getMandatoryProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_DN);
+        m_rootUsersDN = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_USERS, ConfigurationConstants.DEFAULT_LDAP_ROOT_USERS)
+                + "," + m_rootDN;
+        m_rootGroupsDN = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_LDAP_ROOT_GROUPS, ConfigurationConstants.DEFAULT_LDAP_ROOT_GROUPS)
+                + "," + m_rootDN;
+
+        m_userObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_OBJECTCLASS, ConfigurationConstants.DEFAULT_USER_OBJECTCLASS);
+        m_userIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_ID, ConfigurationConstants.DEFAULT_USER_ATTR_ID);
+        m_userMandatoryAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_USER_ATTR_MANDATORY, ConfigurationConstants.DEFAULT_USER_ATTR_MANDATORY);
+
+        m_groupObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_OBJECTCLASS);
+        m_groupIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ATTR_ID);
+        m_groupMandatoryAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_MANDATORY, ConfigurationConstants.DEFAULT_GROUP_ATTR_MANDATORY);
+        m_groupCredentialAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ATTR_CREDENTIAL, ConfigurationConstants.DEFAULT_GROUP_ATTR_CREDENTIAL);
+
+        m_groupEntryObjectclass = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_OBJECTCLASS, ConfigurationConstants.DEFAULT_GROUP_ENTRY_OBJECTCLASS);
+        m_groupEntryIdAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_ID, ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_ID);
+        m_groupEntryMemberAttr = UserAdminTools.getOptionalProperty(properties, ConfigurationConstants.PROP_GROUP_ENTRY_ATTR_MEMBER, ConfigurationConstants.DEFAULT_GROUP_ENTRY_ATTR_MEMBER);
+
     }
 }

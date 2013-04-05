@@ -18,7 +18,9 @@
 package org.ops4j.pax.useradmin.service.spi;
 
 import java.util.Collection;
+import java.util.Map;
 
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
@@ -237,4 +239,12 @@ public interface StorageProvider {
      * @throws StorageException
      */
     Collection<Role> findRoles(UserAdminFactory factory, String filter) throws StorageException;
+
+    /**
+     * Called whenever a configuration is detected for this provider
+     * 
+     * @param properties
+     * @throws ConfigurationException
+     */
+    void configurationUpdated(Map<String, ?> properties) throws ConfigurationException;
 }

@@ -25,7 +25,9 @@ import java.util.SortedMap;
 
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
@@ -42,16 +44,24 @@ public class ConfigurationListener implements ManagedService {
     private final ServiceTracker<StorageProvider, PaxUserAdmin> providerTracker;
     private final String                                        type;
 
+    private Map<String, Object>                                 currentConfig;
+
+    private final ServiceRegistration<ManagedService>           service;
+
     /**
      * @param providerTracker
+     * @param context
+     * @param properties
      */
-    public ConfigurationListener(String type, ServiceTracker<StorageProvider, PaxUserAdmin> providerTracker) {
+    public ConfigurationListener(String type, ServiceTracker<StorageProvider, PaxUserAdmin> providerTracker, Dictionary<String, Object> properties,
+            BundleContext context) {
         this.type = type;
         this.providerTracker = providerTracker;
+        service = context.registerService(ManagedService.class, this, properties);
     }
 
     @Override
-    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
         Map<String, Object> config = new HashMap<String, Object>();
         if (properties != null) {
             Enumeration<String> keys = properties.keys();
@@ -60,18 +70,30 @@ public class ConfigurationListener implements ManagedService {
                 config.put(key, properties.get(key));
             }
         }
+        this.currentConfig = config;
         SortedMap<ServiceReference<StorageProvider>, PaxUserAdmin> tracked = providerTracker.getTracked();
         if (!tracked.isEmpty()) {
             LOG.info("Update Konfiguration for {} PaxUserAdmins of type {}...", tracked.size(), type);
             for (Entry<ServiceReference<StorageProvider>, PaxUserAdmin> entry : tracked.entrySet()) {
                 if (type.equals(entry.getKey().getProperty(PaxUserAdminConstants.STORAGEPROVIDER_TYPE))) {
-                    try {
-                        entry.getValue().configurationUpdated(config);
-                    } catch (RuntimeException e) {
-                        LOG.error("Configurationupdate failed for type {}", type, e);
-                    }
+                    updateProvider(entry.getValue());
                 }
             }
         }
+    }
+
+    public synchronized void updateProvider(PaxUserAdmin admin) throws ConfigurationException {
+        try {
+            admin.configurationUpdated(this.currentConfig);
+        } catch (RuntimeException e) {
+            LOG.error("Configurationupdate failed for type {}", type, e);
+        }
+    }
+
+    /**
+     * 
+     */
+    public void unregister() {
+        service.unregister();
     }
 }
