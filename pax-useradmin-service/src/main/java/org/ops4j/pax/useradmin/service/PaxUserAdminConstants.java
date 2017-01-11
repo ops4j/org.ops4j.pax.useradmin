@@ -22,25 +22,25 @@ public interface PaxUserAdminConstants {
     /**
      * The PID used to identify configuration data.
      */
-    final static String SERVICE_PID                                 = "org.ops4j.pax.useradmin";
+    String SERVICE_PID                                 = "org.ops4j.pax.useradmin";
 
     /**
      * The property that must be set by StorageProvider implementations.
      */
-    final static String STORAGEPROVIDER_TYPE                        = SERVICE_PID + ".storageprovider.type";
+    String STORAGEPROVIDER_TYPE                        = SERVICE_PID + ".storageprovider.type";
 
-    final static String STORAGEPROVIDER_SPI_SERVICE_ID              = SERVICE_PID + ".storageprovider.spi_service_id";
+    String STORAGEPROVIDER_SPI_SERVICE_ID              = SERVICE_PID + ".storageprovider.spi_service_id";
 
     /**
      * The prefix used for events sent by the UserAdmin service.
      */
-    final static String EVENT_TOPIC_PREFIX                          = "org/osgi/service/useradmin/UserAdmin/";
+    String EVENT_TOPIC_PREFIX                          = "org/osgi/service/useradmin/UserAdmin/";
 
     /**
      * (optional) Property that controls which hash algorithm is used, if not
      * given, an internal default is used
      */
-    final static String PROPERTY_ENCRYPTION_HASH_ALGORITHM          = "org.ops4j.pax.useradmin.encryption.hash.algorithm";
+    String PROPERTY_ENCRYPTION_HASH_ALGORITHM          = "org.ops4j.pax.useradmin.encryption.hash.algorithm";
 
     /**
      * (optional) Property that controls which cipher algorithm is used, if not
@@ -48,18 +48,18 @@ public interface PaxUserAdminConstants {
      * can be archived by specify the spceial value PAX_EMPTY. To store values
      * in plain text use the special value PAX_PLAIN
      */
-    final static String PROPERTY_ENCRYPTION_CIPHER_ALGORITHM        = "org.ops4j.pax.useradmin.encryption.cipher.algorithm";
+    String PROPERTY_ENCRYPTION_CIPHER_ALGORITHM        = "org.ops4j.pax.useradmin.encryption.cipher.algorithm";
 
     /**
      * (optional) property that controls which random number algorithm is used,
      * if not given, an internal default is used for encryption.
      */
-    final static String PROPERTY_ENCRYPTION_SECURERANDOM_ALGORITHM  = "org.ops4j.pax.useradmin.encryption.securerandom.algorithm";
+    String PROPERTY_ENCRYPTION_SECURERANDOM_ALGORITHM  = "org.ops4j.pax.useradmin.encryption.securerandom.algorithm";
 
     /**
      * (optional) property that controls which salt-length is used by the
      * random, if not given, an internal default is used number algorithm.
      */
-    final static String PROPERTY_ENCRYPTION_SECURERANDOM_SALTLENGTH = "org.ops4j.pax.useradmin.encryption.securerandom.saltlength";
+    String PROPERTY_ENCRYPTION_SECURERANDOM_SALTLENGTH = "org.ops4j.pax.useradmin.encryption.securerandom.saltlength";
 
 }
