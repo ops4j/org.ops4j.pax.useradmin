@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,19 @@
 
 package org.ops4j.pax.useradmin.provider.ldap.internal;
 
+import com.novell.ldap.LDAPAttribute;
+import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPModification;
+import com.novell.ldap.LDAPSearchResults;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
@@ -37,21 +43,11 @@ import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 
-import com.novell.ldap.LDAPAttribute;
-import com.novell.ldap.LDAPAttributeSet;
-import com.novell.ldap.LDAPConnection;
-import com.novell.ldap.LDAPEntry;
-import com.novell.ldap.LDAPException;
-import com.novell.ldap.LDAPModification;
-import com.novell.ldap.LDAPSearchResults;
-
 /**
  * A LDAP based implementation of the <code>StorageProvider</code> SPI.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
-public class StorageProviderImpl implements StorageProvider, CredentialProvider {
+public class StorageProviderImpl
+        implements StorageProvider, CredentialProvider {
 
     private static final String DEFAULT_CREDENTIAL_NAME     = "default";
     private static final int    CREDENTIAL_VALUE_ARRAY_SIZE = 3;
@@ -380,9 +376,8 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
      * 
      * @param connection
      *            The LDAP connection to use.
-     * @param isBasic
-     *            True if the initialMember should be added to the 'basic'
-     *            members - on false it is added to the 'required' members.
+     * @param entryName
+     *            Name of entry, typically the value of the "cn"
      * @param group
      *            The group to modify.
      * @param initialMember
@@ -391,7 +386,9 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
      * @throws LDAPException
      *             if an LDAP error occurs.
      */
-    private LDAPEntry createGroupEntry(LDAPConnection connection, String entryName, Group group, Role initialMember) throws LDAPException, StorageException {
+    private LDAPEntry createGroupEntry(LDAPConnection connection, String entryName, Group group, Role initialMember)
+            throws LDAPException, StorageException {
+
         // set objectclass attributes
         //
         LDAPAttributeSet attributes = new LDAPAttributeSet();
@@ -426,10 +423,7 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
      * @param factory
      *            The factory to use for object creation.
      * @param group
-     * @param subGroupDN
-     * @return
-     * @throws LDAPException
-     * @throws StorageException
+     *            The group to fetch from
      */
     @SuppressWarnings(value = "unchecked")
     private Collection<Role> getMembers(LDAPConnection connection, UserAdminFactory factory, Group group, String ext) throws LDAPException, StorageException {
@@ -446,9 +440,7 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
         //
         LDAPEntry subGroupEntry = getEntry(connection, getGroupDN(group.getName(), ext));
         if (null != subGroupEntry) {
-            Iterator<LDAPAttribute> it = subGroupEntry.getAttributeSet().iterator();
-            while (it.hasNext()) {
-                LDAPAttribute attribute = it.next();
+            for (LDAPAttribute attribute : (Iterable<LDAPAttribute>) subGroupEntry.getAttributeSet()) {
                 if (m_groupEntryMemberAttr.equals(attribute.getName())) {
                     for (String userDN : attribute.getStringValueArray()) {
                         LDAPEntry userEntry = getEntry(connection, userDN);
@@ -479,9 +471,7 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
         } else {
             // add role to group entry
             String roleDN = getRoleDN(member);
-            Iterator<LDAPAttribute> it = subGroupEntry.getAttributeSet().iterator();
-            while (it.hasNext()) {
-                LDAPAttribute attribute = it.next();
+            for (LDAPAttribute attribute : (Iterable<LDAPAttribute>) subGroupEntry.getAttributeSet()) {
                 if (m_groupEntryMemberAttr.equals(attribute.getName())) {
                     // check the member values
                     for (String memberDN : attribute.getStringValueArray()) {
@@ -517,9 +507,7 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
     @SuppressWarnings(value = "unchecked")
     private boolean removeGroupMember(LDAPConnection connection, LDAPEntry groupEntry, String memberDN) throws LDAPException {
         if (null != groupEntry) {
-            Iterator<LDAPAttribute> it = groupEntry.getAttributeSet().iterator();
-            while (it.hasNext()) {
-                LDAPAttribute attribute = it.next();
+            for (LDAPAttribute attribute : (Iterable<LDAPAttribute>) groupEntry.getAttributeSet()) {
                 if (m_groupEntryMemberAttr.equals(attribute.getName())) {
                     for (String userDN : attribute.getStringValueArray()) {
                         if (userDN.equals(memberDN)) {
@@ -540,9 +528,14 @@ public class StorageProviderImpl implements StorageProvider, CredentialProvider 
             throw new StorageException("Invalid type for credential value: " + value.getClass().getName());
         }
         boolean isString = value instanceof String;
-        String result = (isString ? "char" : "byte") + ";" + key + ";" + (isString ? value : new String((byte[]) value));
-        // System.err.println("------------ create credential: " + result);
-        return result;
+        if (isString)
+        {
+            return "char" + ";" + key + ";" + value;
+        }
+        else
+        {
+            return "byte" + ";" + key + ";" + new String((byte[]) value);
+        }
 
     }
 

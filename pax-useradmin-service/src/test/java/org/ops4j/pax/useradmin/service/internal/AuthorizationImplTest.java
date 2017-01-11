@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +30,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.useradmin.Authorization;
 import org.osgi.service.useradmin.Role;
 
-/**
- * @author Matthias Kuespert
- * @since 28.07.2009
- */
 public class AuthorizationImplTest {
 
     private static final String USER_NAME1  = "someRole1";

@@ -4,13 +4,12 @@
 Bundle-Activator: \
   org.ops4j.pax.useradmin.service.internal.Activator
 
-# Import-Package: \
-#  org.apache.commons.logging.*
+Import-Package: *
 
-#  org.apache.commons.logging.factory.*
+Export-Package: \
+  org.osgi.service.useradmin;version="1.1.0", \
+  org.ops4j.pax.useradmin.service.spi;version="${pom.version}", \
+  org.ops4j.pax.useradmin.service.spi;version="${pom.version}"
 
-#Export-Package: \
-#  !${bundle.namespace}.internal.*,\
-#  ${bundle.namespace}.*;version="${pom.version}"
 Private-Package: org.ops4j.pax.useradmin.service.internal,\
 	org.ops4j.pax.useradmin.service.internal.encryption

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,9 +28,6 @@ import org.osgi.service.useradmin.User;
  * An interface which provides methods to create implementation objects. This
  * interface is intended to be used only by implementations of the
  * <code>StorageProvider</code> interface.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public interface UserAdminFactory {
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,6 @@ import org.ops4j.pax.useradmin.command.CommandException;
 
 /**
  * Interface which abstracts reading UserAdmin data.
- * 
- * @author Matthias Kuespert
- * @since  05.08.2009
  */
 public interface UserAdminDataReader {
 

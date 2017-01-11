@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +30,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-/**
- * @author Matthias Kuespert
- * @since 04.08.2009
- */
 public class XMLContentImporter implements ContentHandler {
 
     /**

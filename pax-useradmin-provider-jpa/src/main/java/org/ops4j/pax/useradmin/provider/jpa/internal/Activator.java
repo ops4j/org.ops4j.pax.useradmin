@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,8 @@ import org.slf4j.LoggerFactory;
  * objects. For each {@link EntityManagerFactory} matching the filter
  * {@value #EMF_FILTER} a cosresponding {@link JPAStorageProvider} is registered
  */
-public class Activator implements BundleActivator, ServiceTrackerCustomizer<EntityManagerFactory, JPAStorageProvider> {
+public class Activator
+        implements BundleActivator, ServiceTrackerCustomizer<EntityManagerFactory, JPAStorageProvider> {
 
     /**
      * filter used to track down releveant EMF services

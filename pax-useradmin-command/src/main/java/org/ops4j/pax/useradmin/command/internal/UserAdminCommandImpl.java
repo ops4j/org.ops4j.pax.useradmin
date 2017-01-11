@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +31,6 @@ import org.osgi.framework.BundleContext;
 /**
  * Main UserAdmin command implementation. This should evolve to the main
  * interface to various OSGi frameworks.
- * 
- * @author Matthias Kuespert
- * @since 03.08.2009
  */
 public class UserAdminCommandImpl implements UserAdminCommand {
 

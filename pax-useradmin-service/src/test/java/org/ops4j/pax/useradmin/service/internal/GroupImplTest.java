@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +31,6 @@ import org.osgi.service.useradmin.Role;
 
 /**
  * Testing the GroupImpl class.
- * 
- * @author Matthias Kuespert
- * @since 12.07.2009
  */
 public class GroupImplTest {
 

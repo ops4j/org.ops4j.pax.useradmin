@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,11 +45,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Activator which starts a ServiceTracker for StorageProvider services.
  * UserAdmin services are started/stopped on adding/removing providers.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
-public class Activator implements BundleActivator, ServiceTrackerCustomizer<StorageProvider, PaxUserAdmin> {
+public class Activator
+        implements BundleActivator, ServiceTrackerCustomizer<StorageProvider, PaxUserAdmin> {
 
     /**
      * Maximum number of parralllel event threads

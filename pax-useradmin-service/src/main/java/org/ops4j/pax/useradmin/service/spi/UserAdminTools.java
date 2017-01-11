@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,6 @@ import org.osgi.service.cm.ConfigurationException;
 
 /**
  * Static methods that are used internally as well as by SPI implementations.
- * 
- * @author Matthias Kuespert
- * @since 25.11.2009
  */
 public final class UserAdminTools {
 

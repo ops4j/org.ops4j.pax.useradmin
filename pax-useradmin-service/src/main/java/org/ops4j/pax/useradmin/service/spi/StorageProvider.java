@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +29,6 @@ import org.osgi.service.useradmin.UserAdmin;
 /**
  * The StorageProvider interface defines the methods needed by a UserAdmin
  * implementation to maintain persistent UserAdmin data.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public interface StorageProvider {
 

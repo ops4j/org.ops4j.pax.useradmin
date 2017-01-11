@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +19,6 @@ package org.ops4j.pax.useradmin.provider.ldap;
 
 /**
  * Definition of constants and default values used for configuration.
- * 
- * @author Matthias Kuespert
- * @since 18.07.2009
  */
 public interface ConfigurationConstants {
 

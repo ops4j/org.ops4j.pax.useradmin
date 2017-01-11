@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +19,6 @@ package org.ops4j.pax.useradmin.service.spi;
 
 /**
  * The exception thrown by the StrorageProvider implementations.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public class StorageException extends RuntimeException {
 

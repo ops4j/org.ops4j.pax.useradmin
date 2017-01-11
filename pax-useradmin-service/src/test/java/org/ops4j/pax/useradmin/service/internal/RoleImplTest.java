@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,9 +37,6 @@ import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
  * Testing the RoleImpl and RoleProperties classes.
- * 
- * @author Matthias Kuespert
- * @since 11.07.2009
  */
 public class RoleImplTest {
 

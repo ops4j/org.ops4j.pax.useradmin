@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +29,6 @@ import com.novell.ldap.LDAPConnection;
 
 /**
  * Activator of the Pax UserAdmin LDAP StorageProvider bundle.
- * 
- * @author Matthias Kuespert
- * @since 08.07.2009
  */
 public class Activator implements BundleActivator {
 

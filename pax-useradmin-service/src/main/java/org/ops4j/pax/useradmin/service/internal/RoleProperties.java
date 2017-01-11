@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +26,6 @@ import org.osgi.service.useradmin.UserAdminPermission;
 
 /**
  * A dictionary to manage role properties and communicate changes.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public class RoleProperties extends AbstractProperties<Role> {
 

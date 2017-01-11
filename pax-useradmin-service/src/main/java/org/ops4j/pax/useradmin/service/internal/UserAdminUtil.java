@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,6 @@ import org.osgi.service.useradmin.Role;
 
 /**
  * Collection of utility methods.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public interface UserAdminUtil {
 

@@ -148,9 +148,6 @@ import org.springframework.ldap.core.support.LdapContextSource;
 
     /**
      * Inner class used to read node attributes into a Map<String, String>.
-     * 
-     * @author Matthias Kuespert
-     * @since  06.07.2009
      */
     protected class NodeAttributesMapper implements AttributesMapper {
         public Object mapFromAttributes(Attributes attributes) throws NamingException {

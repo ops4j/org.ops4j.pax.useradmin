@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,9 +39,6 @@ import org.osgi.service.useradmin.UserAdminPermission;
  * Testing the UserImpl and UserCredentials classes. Note: only successful calls
  * are tested here - failures of the AbstractProperties class are tested in the
  * RoleImplTest class
- * 
- * @author Matthias Kuespert
- * @since 11.07.2009
  */
 @Ignore
 public class UserImplTest {

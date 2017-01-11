@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +19,6 @@ package org.ops4j.pax.useradmin.command;
 
 /**
  * Exception used to communicate problems from this bundle.
- * 
- * @author Matthias Kuespert
- * @since  04.08.2009
  */
 public class CommandException extends Exception {
     

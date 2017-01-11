@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,6 @@ import org.apache.felix.shell.Command;
 import org.ops4j.pax.useradmin.command.CommandException;
 import org.osgi.framework.BundleContext;
 
-/**
- * @author Matthias Kuespert
- * @since  07.08.2009
- */
 public class FelixCommand implements Command {
 
     private BundleContext m_context = null;

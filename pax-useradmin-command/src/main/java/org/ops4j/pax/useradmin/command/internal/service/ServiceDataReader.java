@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,9 +35,6 @@ import org.osgi.service.useradmin.UserAdmin;
 
 /**
  * UserAdminDataReader implementation which reads data from an UserAdmin service.
- * 
- * @author Matthias Kuespert
- * @since  05.08.2009
  */
 public class ServiceDataReader implements UserAdminDataReader {
 

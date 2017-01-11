@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +31,6 @@ import org.osgi.service.useradmin.UserAdminEvent;
 /**
  * Abstract base class for properties that need to synchronize and communicate
  * changes.
- * 
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public abstract class AbstractProperties<R extends Role> extends Dictionary<String, Object> {
 

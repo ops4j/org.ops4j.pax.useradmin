@@ -1,0 +1,5 @@
+
+Bundle-Activator: org.ops4j.pax.useradmin.provider.jpa.internal.Activator
+
+Import-Package: *
+

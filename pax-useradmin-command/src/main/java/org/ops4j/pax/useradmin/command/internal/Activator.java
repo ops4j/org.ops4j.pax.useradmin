@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,6 @@ import org.apache.felix.shell.Command;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-/**
- * @author Matthias Kuespert
- * @since  07.08.2009
- */
 public class Activator implements BundleActivator {
 
     /**

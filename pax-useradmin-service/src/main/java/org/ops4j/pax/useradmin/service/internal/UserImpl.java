@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +31,6 @@ import org.osgi.service.useradmin.User;
  * 
  * @see <a
  *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html</a>
- * @author Matthias Kuespert
- * @since 02.07.2009
  */
 public class UserImpl extends RoleImpl implements User {
 

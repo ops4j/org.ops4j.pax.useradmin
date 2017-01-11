@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2009 OPS4J
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +26,6 @@ import org.junit.Test;
 import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 import org.osgi.service.cm.ConfigurationException;
 
-/**
- * @author Matthias Kuespert
- * @since 28.11.2009
- */
 public class UserAdminToolsTest {
 
     /**

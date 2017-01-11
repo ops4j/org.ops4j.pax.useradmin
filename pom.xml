@@ -92,7 +92,7 @@
         <module>${topProject.prefix}-${topProject.name}-service</module>
         <module>${topProject.prefix}-${topProject.name}-provider-preferences</module>
         <module>${topProject.prefix}-${topProject.name}-provider-ldap</module>
-	<module>${topProject.prefix}-${topProject.name}-provider-jpa</module>
+        <module>${topProject.prefix}-${topProject.name}-provider-jpa</module>
         <module>${topProject.prefix}-${topProject.name}-command</module>
     </modules>
 
@@ -133,6 +133,17 @@
                 <role>Developer</role>
             </roles>
             <timezone>UTC+1</timezone>
+        </developer>
+        <developer>
+            <id>niclas</id>
+            <name>Niclas Hedhman</name>
+            <email>niclas@hedhman.org</email>
+            <organization>CodeDragons (M) Sdn Bhd</organization>
+            <organizationUrl>http://codedragons.net</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>UTC+8</timezone>
         </developer>
     </developers>
 
