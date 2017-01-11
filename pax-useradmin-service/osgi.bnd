@@ -1,6 +1,4 @@
-##
-## Bnd instructions for building the bundle
-##
+
 Bundle-Activator: \
   org.ops4j.pax.useradmin.service.internal.Activator
 
@@ -8,7 +6,7 @@ Import-Package: *
 
 Export-Package: \
   org.osgi.service.useradmin;version="1.1.0", \
-  org.ops4j.pax.useradmin.service.spi;version="${pom.version}", \
+  org.ops4j.pax.useradmin.service;version="${pom.version}", \
   org.ops4j.pax.useradmin.service.spi;version="${pom.version}"
 
 Private-Package: org.ops4j.pax.useradmin.service.internal,\

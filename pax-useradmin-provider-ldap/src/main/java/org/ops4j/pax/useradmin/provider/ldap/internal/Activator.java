@@ -30,7 +30,8 @@ import com.novell.ldap.LDAPConnection;
 /**
  * Activator of the Pax UserAdmin LDAP StorageProvider bundle.
  */
-public class Activator implements BundleActivator {
+public class Activator
+        implements BundleActivator {
 
     /**
      * Create and register the <code>StorageProvider</code> service.

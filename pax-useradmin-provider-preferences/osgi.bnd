@@ -1,2 +1,10 @@
+
 Bundle-Activator: org.ops4j.pax.useradmin.provider.preferences.internal.Activator
 
+Export-Package: \
+                org.ops4j.pax.useradmin.provider.preferences;version="${pom.version}"
+
+Private-Package: \
+               org.ops4j.pax.useradmin.provider.preferences.internal
+
+Import-Package: *

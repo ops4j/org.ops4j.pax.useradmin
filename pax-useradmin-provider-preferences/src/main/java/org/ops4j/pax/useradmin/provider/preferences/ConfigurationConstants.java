@@ -19,7 +19,7 @@ package org.ops4j.pax.useradmin.provider.preferences;
 
 public interface ConfigurationConstants {
 
-    public static final String STORAGEPROVIDER_TYPE = "Preferences";
+    String STORAGEPROVIDER_TYPE = "Preferences";
 
-    public static final String TRACKED_SERVICE_ID   = "org.ops4j.pax.useradmin.tracked.service_id";
+    String TRACKED_SERVICE_ID   = "org.ops4j.pax.useradmin.tracked.service_id";
 }

@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Activator of the Pax UserAdmin Preferences StorageProvider bundle.
  */
-public class Activator implements BundleActivator, ServiceTrackerCustomizer<PreferencesService, PreferencesStorageProvider> {
+public class Activator
+        implements BundleActivator, ServiceTrackerCustomizer<PreferencesService, PreferencesStorageProvider> {
 
     private static final Logger                                            LOG = LoggerFactory.getLogger(Activator.class);
 

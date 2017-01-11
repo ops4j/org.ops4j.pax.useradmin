@@ -1,46 +1,7 @@
 
 Bundle-Activator: org.ops4j.pax.useradmin.provider.ldap.internal.Activator
+
 Embed-Dependency: *;scope=compile|runtime
-##Export-Package: 
-##Import-Package: org.openspml.client.*
 
-Import-Package: javax.servlet.http.*;resolution:=optional,\
-                javax.mail.*;resolution:=optional,\
-                javax.mail.internet.*;resolution:=optional,\
-                javax.net.*;resolution:=optional,\
-                javax.net.ssl.*;resolution:=optional,\
-                javax.security.auth.callback.*;resolution:=optional,\
-                javax.servlet.*;resolution:=optional,\
-                javax.swing.*;resolution:=optional,\
-                javax.swing.border.*;resolution:=optional,\
-                javax.swing.event.*;resolution:=optional,\
-                javax.swing.table.*;resolution:=optional,\
-                javax.swing.text.*;resolution:=optional,\
-                javax.swing.tree.*;resolution:=optional,\
-                javax.xml.parsers.*;resolution:=optional,\
-                org.apache.commons.httpclient.*;resolution:=optional,\
-                org.apache.commons.httpclient.methods.*;resolution:=optional,\
-                org.apache.soap.*;resolution:=optional,\
-                org.apache.soap.rpc.*;resolution:=optional,\
-                org.apache.soap.transport.*;resolution:=optional,\
-                org.apache.soap.util.*;resolution:=optional,\
-                org.apache.soap.util.net.*;resolution:=optional,\
-                org.ops4j.pax.useradmin.service.*,\
-                org.ops4j.pax.useradmin.service.spi.*,\
-                org.osgi.framework.*,\
-                org.osgi.service.cm.*,\
-                org.osgi.service.useradmin.*,\
-                org.w3c.dom.*,\
-                org.xml.sax.*,\
-                org.xml.sax.helpers.*
+Import-Package: *
 
-## !${bundle.namespace}.internal.*,${bundle.namespace}.*;version="${pom.version}"
-
-##Import-Package: org.ops4j.pax.useradmin.service.spi.*,\
-##                org.osgi.service.useradmin.*,\
-##                org.osgi.framework.*,\
-##                org.osgi.service.cm.*
-
-
-##                com.novell.ldap.*
- 
