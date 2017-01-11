@@ -26,9 +26,6 @@ import javax.persistence.EntityTransaction;
  */
 public interface TransactionAccess<T> {
 
-    /**
-     * @param transaction
-     */
     T doWork(EntityManager manager, EntityTransaction transaction);
 
     /**

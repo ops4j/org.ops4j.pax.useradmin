@@ -17,8 +17,8 @@
 package org.ops4j.pax.useradmin.provider.jpa.internal;
 
 /**
- * Enumeration that just distinguieshes between {@value #BASIC} and
- * {@value #REQUIRED} members
+ * Enumeration that just distinguieshes between {@link #BASIC} and
+ * {@link #REQUIRED} members
  */
 public enum MemberType {
     BASIC,

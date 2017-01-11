@@ -21,10 +21,10 @@ package org.ops4j.pax.useradmin.provider.jpa;
  */
 public interface ConfigurationConstants {
 
-    public static final String TRACKED_SERVICE_ID   = "org.ops4j.pax.useradmin.tracked.service_id";
+    String TRACKED_SERVICE_ID   = "org.ops4j.pax.useradmin.tracked.service_id";
 
-    public static final String STORAGEPROVIDER_TYPE = "Java Persistence API";
+    String STORAGEPROVIDER_TYPE = "Java Persistence API";
 
-    public static final String PUNIT_NAME           = "org.ops4j.pax.useradmin.jpa.punit";
+    String PUNIT_NAME           = "org.ops4j.pax.useradmin.jpa.punit";
 
 }

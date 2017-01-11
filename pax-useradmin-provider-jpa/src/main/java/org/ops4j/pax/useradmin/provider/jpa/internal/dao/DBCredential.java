@@ -29,10 +29,13 @@ public class DBCredential {
 
     @Column(name = "ckey")
     private String key;
+
     @Column(name = "params")
     private byte[] algorithmParameter;
+
     @Column(name = "salt")
     private byte[] salt;
+
     private byte[] verificationBytes;
     private byte[] encryptedBytes;
 
@@ -74,16 +77,10 @@ public class DBCredential {
         this.key = key;
     }
 
-    /**
-     * @param algorithmParameter
-     */
     public void setParameter(byte[] algorithmParameter) {
         this.algorithmParameter = algorithmParameter;
     }
 
-    /**
-     * @param salt
-     */
     public void setSalt(byte[] salt) {
         this.salt = salt;
     }
@@ -102,16 +99,10 @@ public class DBCredential {
         return algorithmParameter;
     }
 
-    /**
-     * @param verificationBytes
-     */
     public void setVerificationBytes(byte[] verificationBytes) {
         this.verificationBytes = verificationBytes;
     }
 
-    /**
-     * @param encryptedBytes
-     */
     public void setData(byte[] encryptedBytes) {
         this.encryptedBytes = encryptedBytes;
     }

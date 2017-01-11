@@ -71,12 +71,6 @@ public class DBVersionedObject {
             return false;
         }
         DBVersionedObject other = (DBVersionedObject) obj;
-        if (id != other.id) {
-            return false;
-        }
-        if (version != other.version) {
-            return false;
-        }
-        return true;
+        return id == other.id && version == other.version;
     }
 }

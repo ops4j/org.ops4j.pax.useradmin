@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Aktivates the JPA {@link StorageProvider} and tracks the underlying service
  * objects. For each {@link EntityManagerFactory} matching the filter
- * {@value #EMF_FILTER} a cosresponding {@link JPAStorageProvider} is registered
+ * {@link #EMF_FILTER} a cosresponding {@link JPAStorageProvider} is registered
  */
 public class Activator
         implements BundleActivator, ServiceTrackerCustomizer<EntityManagerFactory, JPAStorageProvider> {

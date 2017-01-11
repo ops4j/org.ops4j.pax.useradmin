@@ -32,7 +32,7 @@ public class DBProperty {
 
     public static final short TYPE_STRING = 1;
 
-    public static final short TYPE_BYTE   = 2;
+    private static final short TYPE_BYTE   = 2;
 
     @Column(name = "ckey")
     private String            key;

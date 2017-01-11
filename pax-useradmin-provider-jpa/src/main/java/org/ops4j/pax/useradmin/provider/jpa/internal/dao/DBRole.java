@@ -48,7 +48,7 @@ public class DBRole extends DBVersionedObject {
     @CollectionTable(name = "osgi_service_useradmin_Role_properties_table", joinColumns = @JoinColumn(name = "role_key_id"))
     private final Map<String, DBProperty> properties = new HashMap<String, DBProperty>();
 
-    protected void setType(int type) {
+    void setType(int type) {
         this.type = type;
     }
 

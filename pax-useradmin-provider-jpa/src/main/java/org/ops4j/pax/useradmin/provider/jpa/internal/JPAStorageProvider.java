@@ -26,14 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-
 import org.ops4j.pax.useradmin.provider.jpa.ConfigurationConstants;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBCredential;
 import org.ops4j.pax.useradmin.provider.jpa.internal.dao.DBGroup;
@@ -68,7 +66,8 @@ import org.slf4j.LoggerFactory;
  * long network delay and heavy use scenarios. A caching JPA Provider like
  * EclipseLink would help here in increasing performance.
  */
-public class JPAStorageProvider implements StorageProvider, CredentialProvider {
+public class JPAStorageProvider
+        implements StorageProvider, CredentialProvider {
 
     private static final Logger                  LOG = LoggerFactory.getLogger(JPAStorageProvider.class);
 
@@ -85,7 +84,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            the ID of the tracked service from the
      *            {@link EntityManagerFactory}
      */
-    public JPAStorageProvider(EntityManagerFactory entityManagerFactory, Long trackedServiceID) {
+    JPAStorageProvider(EntityManagerFactory entityManagerFactory, Long trackedServiceID) {
         this.entityManagerFactory = entityManagerFactory;
         this.trackedServiceID = trackedServiceID;
     }
@@ -262,7 +261,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * @param role
      *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
-     * @throws StorageException
      */
     @Override
     public synchronized boolean addMember(final Group group, final Role role) throws StorageException {
@@ -313,7 +311,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * @param role
      *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
-     * @throws StorageException
      */
     @Override
     public synchronized boolean addRequiredMember(final Group group, final Role role) throws StorageException {
@@ -359,10 +356,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * Removes a member from the given group.
      * 
      * @see Group#removeMember(Role)
-     * @param group
-     * @param role
-     * @return
-     * @throws StorageException
      */
     @Override
     public synchronized boolean removeMember(final Group group, final Role role) throws StorageException {
@@ -413,7 +406,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            The key of the attribute.
      * @param value
      *            The value of the attribute.
-     * @throws StorageException
      */
     @Override
     public synchronized void setRoleAttribute(final Role role, final String key, final Object value) throws StorageException {
@@ -432,7 +424,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                     dbvalue.setKey(key);
                     if (value instanceof String) {
                         dbvalue.setData((String) value);
-                    } else if (value instanceof byte[]) {
+                    } else /*if (value instanceof byte[])*/ {
                         dbvalue.setData((byte[]) value);
                     }
                     DBRole refreshItem = refreshItem(manager, dbRole);
@@ -459,7 +451,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            The <code>Role</code> to remove the attribute from.
      * @param key
      *            The key of the attribute.
-     * @throws StorageException
      */
     @Override
     public synchronized void removeRoleAttribute(final Role role, final String key) throws StorageException {
@@ -489,7 +480,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * 
      * @param role
      *            The <code>Role</code> to remove the attribute(s) from.
-     * @throws StorageException
      */
     @Override
     public synchronized void clearRoleAttributes(final Role role) throws StorageException {
@@ -523,7 +513,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            The key of the credential.
      * @param value
      *            The value of the credential.
-     * @throws StorageException
      */
     @Override
     public synchronized void setUserCredential(Encryptor encryptor, final User user, final String key, final Object value) throws StorageException {
@@ -602,7 +591,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * 
      * @param user
      *            The <code>User</code> to remove the credentials for.
-     * @throws StorageException
      */
     @Override
     public synchronized void clearUserCredentials(final User user) throws StorageException {
@@ -642,7 +630,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * @param name
      *            The role to find.
      * @return A <code>Role</code> implementation.
-     * @throws StorageException
      */
     @Override
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
@@ -661,7 +648,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * @param value
      *            The attribute value to search for.
      * @return The <code>User</code> object matching the query.
-     * @throws StorageException
      */
     @Override
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
@@ -690,9 +676,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      * @param factory
      *            The <code>UserAdminFactory</code> used to eventually create
      *            the implementation object.
-     * @param filterString
-     * @return
-     * @throws StorageException
+     * @param filterString The search filter for the roles to be retreived.
      */
     @Override
     public Collection<Role> findRoles(UserAdminFactory factory, String filterString) throws StorageException {
@@ -726,7 +710,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                 return null;
             }
         }
-        Role role = null;
         Set<String> keySet = null;
         if (dbRole instanceof DBUser) {
             Map<String, DBCredential> credentials = ((DBUser) dbRole).getCredentials();
@@ -734,6 +717,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                 keySet = credentials.keySet();
             }
         }
+        Role role;
         switch (dbRole.getType()) {
             case User.USER:
                 role = factory.createUser(name, properties, keySet);
@@ -749,15 +733,10 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
 
     /**
      * Fetch a given role by name in a syncronized fashion...
-     * 
-     * @param name
-     * @return
-     * @throws StorageException
      */
     private synchronized DBRole getRoleFromMap(String name) throws StorageException {
         Map<String, DBRole> roleNamesMap = getRoleNamesMap();
-        DBRole dbRole = roleNamesMap.get(name);
-        return dbRole;
+        return roleNamesMap.get(name);
     }
 
     private synchronized Collection<Role> loadRoles(UserAdminFactory factory, Filter filter) throws StorageException {
@@ -820,7 +799,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                     return loadedRoles;
                 }
 
-                protected <T> List<T> listItems(Class<T> type, EntityManager manager) {
+                <T> List<T> listItems(Class<T> type, EntityManager manager) {
                     final CriteriaBuilder builder = manager.getCriteriaBuilder();
                     final CriteriaQuery<T> query = builder.createQuery(type);
                     query.from(type);
@@ -828,7 +807,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
                     return typedQuery.getResultList();
                 }
 
-                protected <T extends DBRole> void addRoles(Collection<T> list, Map<String, DBRole> loadedRoles) {
+                <T extends DBRole> void addRoles(Collection<T> list, Map<String, DBRole> loadedRoles) {
                     for (T dbGroup : list) {
                         loadedRoles.put(dbGroup.getName(), dbGroup);
                     }
@@ -845,11 +824,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
 
     /**
      * Handles the (transactional) access to the database
-     * 
-     * @param <T>
-     * @param callable
-     * @return
-     * @throws StorageException
      */
     private synchronized <T> T accessTransaction(TransactionAccess<T> callable) throws StorageException {
         if (entityManager == null) {
@@ -905,10 +879,8 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
 
     /**
      * register this service under the given {@link BundleContext}
-     * 
-     * @param context
      */
-    public synchronized void register(BundleContext context) {
+    synchronized void register(BundleContext context) {
         if (serviceRegistration != null) {
             throw new IllegalStateException("This object is already registered under another bundle context!");
         }
@@ -934,7 +906,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
     /**
      * unregister the service again
      */
-    public synchronized void unregister() {
+    synchronized void unregister() {
         if (serviceRegistration == null) {
             throw new IllegalStateException("This object is not registered!");
         }
@@ -947,9 +919,7 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
     }
 
     private static void throwStorageException(String message, Throwable throwable) throws StorageException {
-        StorageException exception = new StorageException(message);
-        exception.initCause(throwable);
-        throw exception;
+        throw new StorageException(message, throwable);
     }
 
     @Override
