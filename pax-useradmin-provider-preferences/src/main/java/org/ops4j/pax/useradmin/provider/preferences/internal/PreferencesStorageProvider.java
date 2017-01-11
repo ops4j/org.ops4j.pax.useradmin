@@ -95,7 +95,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
 
     private ServiceRegistration<StorageProvider> serviceRegistration;
 
-    public PreferencesStorageProvider(PreferencesService preferencesService, Long trackedServiceID) throws StorageException {
+    PreferencesStorageProvider(PreferencesService preferencesService, Long trackedServiceID) throws StorageException {
         m_preferencesService = preferencesService;
         this.trackedServiceID = trackedServiceID;
 
@@ -184,7 +184,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         }
         //
         int type = new Integer(node.get(NODE_TYPE, "666"));
-        Role role = null;
+        Role role;
         switch (type) {
             case User.USER:
                 role = factory.createUser(name, properties, credentials);
@@ -210,7 +210,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         return roles;
     }
 
-    protected Collection<Role> loadMembers(UserAdminFactory factory, Group group, String memberType) throws BackingStoreException, StorageException {
+    private Collection<Role> loadMembers(UserAdminFactory factory, Group group, String memberType) throws BackingStoreException, StorageException {
         Collection<Role> members = new ArrayList<Role>();
         Preferences node = getRootNode().node(group.getName());
         if (node.nodeExists(MEMBERS_NODE)) {
@@ -308,28 +308,22 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
 
     @Override
     public boolean addMember(Group group, Role role) throws StorageException {
-        Preferences node = getRootNode().node(group.getName() + PATH_SEPARATOR + MEMBERS_NODE);
-        if (!"".equals(node.get(role.getName(), ""))) {
-            return false; // member already exists
-        }
-        //
-        node.put(role.getName(), BASIC_MEMBER_STRING);
-        try {
-            node.flush();
-        } catch (BackingStoreException e) {
-            throw new StorageException("Error flush()ing node '" + node.name(), e);
-        }
-        return true;
+        return addMember(group, role, BASIC_MEMBER_STRING);
     }
 
     @Override
     public boolean addRequiredMember(Group group, Role role) throws StorageException {
+        return addMember(group, role, REQUIRED_MEMBER_STRING);
+    }
+
+    private boolean addMember(Group group, Role role, String memberString)
+    {
         Preferences node = getRootNode().node(group.getName() + PATH_SEPARATOR + MEMBERS_NODE);
         if (!"".equals(node.get(role.getName(), ""))) {
             return false; // member already exists
         }
         //
-        node.put(role.getName(), REQUIRED_MEMBER_STRING);
+        node.put(role.getName(), memberString);
         try {
             node.flush();
         } catch (BackingStoreException e) {
@@ -425,8 +419,6 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
             throw new StorageException("Invalid filter '" + e.getFilter(), e);
         } catch (BackingStoreException e) {
             throw new StorageException("Error retrieving user with attribute '" + key + " = " + value, e);
-        } catch (StorageException e) {
-            throw e;
         }
         return null;
     }
@@ -438,8 +430,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
             if (null != filterString) {
                 filter = FrameworkUtil.createFilter(filterString);
             }
-            Collection<Role> roles = loadRoles(factory, filter);
-            return roles;
+            return loadRoles(factory, filter);
         } catch (InvalidSyntaxException e) {
             throw new StorageException("Invalid filter '" + e.getFilter(), e);
         } catch (BackingStoreException e) {
@@ -447,10 +438,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         }
     }
 
-    /**
-     * @param context
-     */
-    public synchronized void register(BundleContext context) {
+    synchronized void register(BundleContext context) {
         if (serviceRegistration != null) {
             throw new IllegalStateException("This object is already registered under another bundle context!");
         }
@@ -463,7 +451,7 @@ public class PreferencesStorageProvider implements StorageProvider, CredentialPr
         serviceRegistration = context.registerService(StorageProvider.class, this, properties);
     }
 
-    public synchronized void unregister() {
+    synchronized void unregister() {
         if (serviceRegistration == null) {
             throw new IllegalStateException("This object is not registered!");
         }
