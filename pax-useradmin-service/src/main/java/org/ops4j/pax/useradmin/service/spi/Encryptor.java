@@ -19,8 +19,6 @@ package org.ops4j.pax.useradmin.service.spi;
 /**
  * The {@link Encryptor} provides methods to encrypt sensitive informations for
  * credentials
- * 
- * @author Christoph Läubrich
  */
 public interface Encryptor {
 

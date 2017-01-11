@@ -28,7 +28,8 @@ import org.osgi.service.useradmin.Role;
  * 
  * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html</a>
  */
-public abstract class RoleImpl implements Role, SPIRole {
+public abstract class RoleImpl
+        implements Role, SPIRole {
 
     /**
      * The name of the role.

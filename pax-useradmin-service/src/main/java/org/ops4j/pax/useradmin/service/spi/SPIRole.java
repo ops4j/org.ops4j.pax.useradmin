@@ -27,9 +27,6 @@ import org.osgi.service.useradmin.User;
  * the default OSGi {@link Role} interface, which is required if SPI Provider
  * like to provide their own implementation of {@link User}s and {@link Group}s
  * instead of using the factory
- * 
- * @author Christoph Läubrich
- * @since 15.Jan.2012
  */
 public interface SPIRole extends Role {
 

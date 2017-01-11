@@ -27,8 +27,6 @@ import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
  * Most work is delegated to the {@link EncryptorContext}, this class just
  * caches the values and provides implementation of the {@link EncryptedValue}
  * interface.
- * 
- * @author Christoph Läubrich
  */
 public class PaxUserAdminEncryptedValue implements EncryptedValue {
 

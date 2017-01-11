@@ -19,8 +19,6 @@ package org.ops4j.pax.useradmin.service.spi;
 /**
  * The {@link Decryptor} allows to decryt and/or vaildate informations encrypted
  * with the {@link Encryptor}
- * 
- * @author Christoph Läubrich
  */
 public interface Decryptor {
 

@@ -19,9 +19,6 @@ package org.ops4j.pax.useradmin.service.internal.encryption;
 import org.ops4j.pax.useradmin.service.spi.Encryptor;
 import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
-/**
- * @author Christoph Läubrich
- */
 public class PaxUserAdminEncryptor implements Encryptor {
 
     private final EncryptorContext context;

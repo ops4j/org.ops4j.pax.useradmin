@@ -28,9 +28,6 @@ import javax.crypto.NullCipher;
 import org.ops4j.pax.useradmin.service.PaxUserAdminConstants;
 import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
-/**
- * @author Christoph Läubrich
- */
 public class EncryptorContext {
     /**
      * 
