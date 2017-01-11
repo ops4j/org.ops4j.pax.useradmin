@@ -28,7 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import org.ops4j.pax.useradmin.provider.ldap.ConfigurationConstants;
 import org.ops4j.pax.useradmin.service.spi.CredentialProvider;
@@ -46,6 +45,7 @@ import org.osgi.service.useradmin.User;
 /**
  * A LDAP based implementation of the <code>StorageProvider</code> SPI.
  */
+@SuppressWarnings("PackageAccessibility")
 public class StorageProviderImpl
         implements StorageProvider, CredentialProvider {
 
@@ -136,7 +136,6 @@ public class StorageProviderImpl
      * server.
      * 
      * @see StorageProviderImpl#openConnection()
-     * @throws StorageException
      */
     private void closeConnection() throws StorageException {
         try {
@@ -286,9 +285,7 @@ public class StorageProviderImpl
         // first determine the type from the objectclasses
         int type = getRoleType(entry);
         // then read additional attributes
-        Iterator<LDAPAttribute> it = entry.getAttributeSet().iterator();
-        while (it.hasNext()) {
-            LDAPAttribute attribute = it.next();
+        for (LDAPAttribute attribute : (Iterable<LDAPAttribute>) entry.getAttributeSet()) {
             /* if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(attribute.getName())) {
                 // ignore: we've read that already
                 // System.err.println("------------- ignore: " + attribute.getName());
@@ -310,8 +307,9 @@ public class StorageProviderImpl
                 //
                 // For now we always read string values ... see Jira issue PAXUSERADMIN-XXX
                 //
-                boolean isByteArray = false;
-                properties.put(attribute.getName(), isByteArray ? attribute.getByteValue() : attribute.getStringValue());
+//                boolean isByteArray = false;
+//                properties.put(attribute.getName(), isByteArray ? attribute.getByteValue() : attribute.getStringValue());
+                properties.put(attribute.getName(), attribute.getStringValue());
             }
         }
         switch (type) {
@@ -330,7 +328,6 @@ public class StorageProviderImpl
      * 
      * @param connection
      *            The LDAP connection to use.
-     * @param dn
      * @return The LDAP Entry that represents the given DN - null otherwise.
      * @throws LDAPException
      *             if an error occurs when accessing the LDAP server
@@ -541,9 +538,6 @@ public class StorageProviderImpl
 
     // - public <code>StorageProvider</code> interface implementation
 
-    /**
-     * @see StorageProvider#createUser(UserAdminFactory, String)
-     */
     @Override
     public User createUser(UserAdminFactory factory, String name) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -574,9 +568,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#createGroup(UserAdminFactory, String)
-     */
     @Override
     public Group createGroup(UserAdminFactory factory, String name) throws StorageException {
         // create ou as container for basic and required group objects
@@ -613,9 +604,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#deleteRole(Role)
-     */
     @Override
     public boolean deleteRole(Role role) throws StorageException {
         String dn = getRoleDN(role);
@@ -631,9 +619,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#getMembers(UserAdminFactory, Group)
-     */
     @Override
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -646,9 +631,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#getRequiredMembers(UserAdminFactory, Group)
-     */
     @Override
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -661,9 +643,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#addMember(Group, Role)
-     */
     @Override
     public boolean addMember(Group group, Role role) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -678,9 +657,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#addRequiredMember(Group, Role)
-     */
     @Override
     public boolean addRequiredMember(Group group, Role role) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -694,9 +670,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#removeMember(Group, Role)
-     */
     @Override
     public boolean removeMember(Group group, Role role) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -720,9 +693,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#setRoleAttribute(Role, String, Object)
-     */
     @Override
     public void setRoleAttribute(Role role, String key, Object value) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
@@ -755,9 +725,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#removeRoleAttribute(Role, String)
-     */
     @Override
     public void removeRoleAttribute(Role role, String key) throws StorageException {
         if (ConfigurationConstants.ATTR_OBJECTCLASS.equals(key)) {
@@ -873,9 +840,6 @@ public class StorageProviderImpl
         throw new IllegalStateException("credential handling is not yet implemented");
     }
 
-    /**
-     * @see StorageProvider#getRole(UserAdminFactory, String)
-     */
     @Override
     public Role getRole(UserAdminFactory factory, String name) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -889,9 +853,6 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#getUser(UserAdminFactory, String, String)
-     */
     @Override
     public User getUser(UserAdminFactory factory, String key, String value) throws StorageException {
         LDAPConnection connection = openConnection();
@@ -924,30 +885,15 @@ public class StorageProviderImpl
         }
     }
 
-    /**
-     * @see StorageProvider#findRoles(UserAdminFactory, String)
-     */
     @Override
     public Collection<Role> findRoles(UserAdminFactory factory, String filterString) throws StorageException {
         LDAPConnection connection = openConnection();
         Collection<Role> roles = new ArrayList<Role>();
         try {
             LDAPSearchResults result = connection.search(m_rootUsersDN, LDAPConnection.SCOPE_ONE, filterString, null, false);
-            while (result.hasMore()) {
-                LDAPEntry entry = result.next();
-                Role role = createRole(factory, entry);
-                if (null != role) {
-                    roles.add(role);
-                }
-            }
+            addResults(factory, roles, result);
             result = connection.search(m_rootGroupsDN, LDAPConnection.SCOPE_ONE, filterString, null, false);
-            while (result.hasMore()) {
-                LDAPEntry entry = result.next();
-                Role role = createRole(factory, entry);
-                if (null != role) {
-                    roles.add(role);
-                }
-            }
+            addResults(factory, roles, result);
             return roles;
         } catch (LDAPException e) {
             throw new StorageException("Error finding roles with filter '" + filterString + "': " + e.getMessage() + " / " + e.getLDAPErrorMessage());
@@ -956,9 +902,18 @@ public class StorageProviderImpl
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ops4j.pax.useradmin.service.spi.CredentialProvider#getUserCredential(org.osgi.service.useradmin.User, java.lang.String, java.lang.Object)
-     */
+    private void addResults(UserAdminFactory factory, Collection<Role> roles, LDAPSearchResults result)
+            throws LDAPException
+    {
+        while (result.hasMore()) {
+            LDAPEntry entry = result.next();
+            Role role = createRole(factory, entry);
+            if (null != role) {
+                roles.add(role);
+            }
+        }
+    }
+
     @Override
     public Object getUserCredential(Decryptor decryptor, User user, String key) throws StorageException {
         int type = user.getType();
@@ -994,25 +949,16 @@ public class StorageProviderImpl
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.ops4j.pax.useradmin.service.spi.CredentialProvider#hasUserCredential(org.osgi.service.useradmin.User, java.lang.String, java.lang.Object)
-     */
     @Override
     public boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException {
         return value.equals(getUserCredential(null, user, key));
     }
 
-    /* (non-Javadoc)
-     * @see org.ops4j.pax.useradmin.service.spi.StorageProvider#getCredentialProvider()
-     */
     @Override
     public CredentialProvider getCredentialProvider() {
         return this;
     }
 
-    /* (non-Javadoc)
-     * @see org.ops4j.pax.useradmin.service.spi.StorageProvider#configurationUpdated(java.util.Map)
-     */
     @Override
     public void configurationUpdated(Map<String, ?> properties) throws ConfigurationException {
         if (null == properties) {
