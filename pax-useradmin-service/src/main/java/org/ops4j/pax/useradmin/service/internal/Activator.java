@@ -50,7 +50,7 @@ public class Activator
         implements BundleActivator, ServiceTrackerCustomizer<StorageProvider, PaxUserAdmin> {
 
     /**
-     * Maximum number of parralllel event threads
+     * Maximum number of paralllel event threads
      */
     private static final int                                     MAXIMUM_POOL_SIZE = 10;
 
