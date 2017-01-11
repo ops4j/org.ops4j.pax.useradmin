@@ -61,8 +61,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * and group/role data using pluggable storage providers that connect to an
  * underlying datastore.
  * 
- * @see <a
- *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html</a>
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html</a>
  */
 public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory {
 
@@ -100,9 +99,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      * Constructor - creates and initializes a <code>UserAdminImpl</code>
      * instance.
      * 
-     * @param context
-     *            The <code>BundleContext</code>
-     * @param storageService
+     * @param storageProvider
      *            A <code>ServiceTracker</code> to locate the
      *            <code>StorageProvider</code> service to use.
      * @param logService
@@ -112,9 +109,12 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      *            A <code>ServiceTracker</code> to locate the
      *            <code>EventAdmin</code> service to use.
      */
-    protected PaxUserAdmin(StorageProvider storageProvider, ServiceTracker<LogService, LogService> logService,
-            ServiceTracker<EventAdmin, EventAdmin> eventService, ServiceTracker<UserAdminListener, UserAdminListener> listenerService,
-            ExecutorService eventExecutor) {
+    protected PaxUserAdmin(StorageProvider storageProvider,
+                           ServiceTracker<LogService, LogService> logService,
+                           ServiceTracker<EventAdmin, EventAdmin> eventService,
+                           ServiceTracker<UserAdminListener, UserAdminListener> listenerService,
+                           ExecutorService eventExecutor) {
+
         this.eventExecutor = eventExecutor;
         if (null == storageProvider) {
             throw new IllegalArgumentException("No StorageProvider ServiceTracker specified.");
@@ -158,7 +158,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
      *             if security is enabled, a security manager exists and the
      *             caller does not have the UserAdminPermission with name admin.
      */
-    protected void checkAdminPermission() {
+    void checkAdminPermission() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             UserAdminPermission pm;
@@ -174,6 +174,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     // ManagedService interface
 
+    @SuppressWarnings("WeakerAccess")
     public void configurationUpdated(Map<String, ?> properties) throws ConfigurationException {
         synchronized (this) {
             this.properties = properties;
@@ -414,7 +415,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     // UserAdminFactory interface
 
     /**
-     * @see UserAdminFactory#createUser(String, Map)
+     * @see UserAdminFactory#createUser(String, Map, Set)
      */
     @Override
     public User createUser(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
@@ -422,17 +423,14 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     }
 
     /**
-     * @see UserAdminFactory#createGroup(String, Map)
+     * @see UserAdminFactory#createGroup(String, Map, Set)
      */
     @Override
     public Group createGroup(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         return new GroupImpl(name, this, properties, initialCredentialKeys);
     }
 
-    /**
-     * @param context
-     */
-    public synchronized void register(BundleContext context, String type, Long spi_service_id) {
+    synchronized void register(BundleContext context, String type, Long spi_service_id) {
         if (userAdminRegistration != null) {
             throw new IllegalStateException("This object is already registered under another bundle context!");
         }
@@ -445,7 +443,7 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
     /**
      * 
      */
-    public synchronized void unregister() {
+    synchronized void unregister() {
         if (userAdminRegistration == null) {
             throw new IllegalStateException("This object is not registered!");
         }

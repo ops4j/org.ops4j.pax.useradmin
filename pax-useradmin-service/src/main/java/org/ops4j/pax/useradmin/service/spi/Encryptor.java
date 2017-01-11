@@ -28,8 +28,6 @@ public interface Encryptor {
      * Encrypts a value for a given key, the key might be used for salting
      * and/or verification
      * 
-     * @param key
-     * @param value
      * @return the encrypted value for the given key and Value
      */
     EncryptedValue encrypt(String key, String value);
@@ -38,8 +36,6 @@ public interface Encryptor {
      * Encrypts a value for a given key, the key might be used for salting
      * and/or verification
      * 
-     * @param key
-     * @param value
      * @return the encrypted value for the given key and Value
      */
     EncryptedValue encrypt(String key, byte[] value);

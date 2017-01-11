@@ -76,7 +76,7 @@ public interface UserAdminUtil {
     void fireEvent(int type, Role role);
 
     /**
-     * @returnthe {@link Decryptor} to use
+     * @return the {@link Decryptor} to use
      */
     Decryptor getDecryptor();
 

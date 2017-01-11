@@ -38,7 +38,6 @@ public interface CredentialProvider {
      *            The <code>User</code> to get the credential from.
      * @param key
      *            The key of the credential.
-     * @throws StorageException
      */
     Object getUserCredential(Decryptor decryptor, User user, String key) throws StorageException;
 
@@ -53,7 +52,6 @@ public interface CredentialProvider {
      * @param value
      *            The value of the credential.
      * 
-     * @throws StorageException
      */
     boolean hasUserCredential(Decryptor decryptor, User user, String key, Object value) throws StorageException;
 
@@ -68,7 +66,6 @@ public interface CredentialProvider {
      *            The key of the credential.
      * @param value
      *            The value of the credential.
-     * @throws StorageException
      */
     void setUserCredential(Encryptor encryptor, User user, String key, Object value) throws StorageException;
 
@@ -79,7 +76,6 @@ public interface CredentialProvider {
      *            The <code>User</code> to remove the credential from.
      * @param key
      *            The key of the credential.
-     * @throws StorageException
      */
     void removeUserCredential(User user, String key) throws StorageException;
 
@@ -88,7 +84,6 @@ public interface CredentialProvider {
      * 
      * @param user
      *            The <code>User</code> to remove the credentials for.
-     * @throws StorageException
      */
     void clearUserCredentials(User user) throws StorageException;
 }

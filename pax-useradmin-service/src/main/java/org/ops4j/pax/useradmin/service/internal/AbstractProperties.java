@@ -34,8 +34,6 @@ import org.osgi.service.useradmin.UserAdminEvent;
  */
 public abstract class AbstractProperties<R extends Role> extends Dictionary<String, Object> {
 
-    private static final long               serialVersionUID = 1L;
-
     /**
      * The role these properties belong to.
      */
@@ -101,7 +99,7 @@ public abstract class AbstractProperties<R extends Role> extends Dictionary<Stri
      * @param properties
      *            Initial data - maybe null
      */
-    protected AbstractProperties(R role, UserAdminUtil util, Map<String, Object> properties) {
+    AbstractProperties(R role, UserAdminUtil util, Map<String, Object> properties) {
         m_role = role;
         m_util = util;
         if (properties != null) {
@@ -130,7 +128,7 @@ public abstract class AbstractProperties<R extends Role> extends Dictionary<Stri
         return hashtable.get(key);
     }
 
-    protected void checkKeyValid(Object key) throws IllegalArgumentException {
+    void checkKeyValid(Object key) throws IllegalArgumentException {
         if (null == key) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_KEY);
         }

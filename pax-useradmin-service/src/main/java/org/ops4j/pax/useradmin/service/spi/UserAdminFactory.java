@@ -38,7 +38,7 @@ public interface UserAdminFactory {
      *            The name of the user.
      * @param properties
      *            The properties of the user.
-     * @param credentials
+     * @param initialCredentialKeys
      *            The credentials of the user.
      * @return A new <code>User</code> instance.
      */
@@ -51,7 +51,7 @@ public interface UserAdminFactory {
      *            The name of the group.
      * @param properties
      *            The properties of the group.
-     * @param credentials
+     * @param initialCredentialKeys
      *            The credentials of the group.
      * @return A new <code>Group</code> instance.
      */

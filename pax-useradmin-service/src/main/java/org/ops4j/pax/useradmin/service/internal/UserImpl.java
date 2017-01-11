@@ -29,10 +29,10 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the <code>User</code> interface.
  * 
- * @see <a
- *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html</a>
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/User.html</a>
  */
-public class UserImpl extends RoleImpl implements User {
+public class UserImpl extends RoleImpl
+        implements User {
 
     /**
      * The credentials stored for this user.
@@ -42,10 +42,8 @@ public class UserImpl extends RoleImpl implements User {
     /**
      * Constructor.
      * 
-     * @param initialCredentialKeys
      * @see RoleImpl#RoleImpl(String, PaxUserAdmin, Map)
-     * @param credentialKeys
-     *            The credentials of this user.
+     * @param initialCredentialKeys The credentials of this user.
      */
     protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         super(name, admin, properties);
@@ -74,10 +72,7 @@ public class UserImpl extends RoleImpl implements User {
         if (null == value) {
             throw new IllegalArgumentException(UserAdminMessages.MSG_INVALID_VALUE);
         }
-        if (value instanceof String || value instanceof byte[]) {
-            return m_credentials.hasCredential(key, value);
-        }
-        return false;
+        return (value instanceof String || value instanceof byte[]) && m_credentials.hasCredential(key, value);
     }
 
     /**

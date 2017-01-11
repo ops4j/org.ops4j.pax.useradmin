@@ -26,8 +26,7 @@ import org.osgi.service.useradmin.Role;
 /**
  * Implementation of the UserAdmin Role interface.
  * 
- * @see <a
- *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html</a>
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Role.html</a>
  */
 public abstract class RoleImpl implements Role, SPIRole {
 
@@ -58,7 +57,7 @@ public abstract class RoleImpl implements Role, SPIRole {
      *            A map containing the raw properties of this role as read by
      *            the StorageProvider.
      */
-    protected RoleImpl(String name, PaxUserAdmin userAdmin, Map<String, Object> properties) {
+    RoleImpl(String name, PaxUserAdmin userAdmin, Map<String, Object> properties) {
         if (name == null) {
             throw (new IllegalArgumentException(UserAdminMessages.MSG_INVALID_NAME));
         }
@@ -87,7 +86,7 @@ public abstract class RoleImpl implements Role, SPIRole {
     @Override
     public abstract int getType();
 
-    protected PaxUserAdmin getAdmin() {
+    PaxUserAdmin getAdmin() {
         return m_admin;
     }
 

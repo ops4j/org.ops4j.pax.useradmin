@@ -35,13 +35,11 @@ import org.osgi.service.useradmin.UserAdminPermission;
  */
 public class UserCredentials extends AbstractProperties<User> {
 
-    private static final long serialVersionUID = 1L;
     private final Set<String> credentialKeys;
 
     /**
      * Initializing constructor.
      * 
-     * @param initialCredentialKeys
      * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
      */
     protected UserCredentials(User user, UserAdminUtil util, Set<String> initialCredentialKeys) {
@@ -112,12 +110,7 @@ public class UserCredentials extends AbstractProperties<User> {
         return Collections.enumeration(list);
     }
 
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    public boolean hasCredential(String key, Object value) {
+    boolean hasCredential(String key, Object value) {
         checkKeyValid(key);
         checkGetPermission(key);
         UserAdminUtil util = getUtil();

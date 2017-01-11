@@ -92,7 +92,6 @@ public interface StorageProvider {
      *            The <code>Group</code> whose members are retrieved.
      * @return A collection of <code>Role</code> objects that are basic members
      *         of the given group.
-     * @throws StorageException
      */
     Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException;
 
@@ -107,7 +106,6 @@ public interface StorageProvider {
      *            The <code>Group</code> whose members are retrieved.
      * @return A collection of <code>Role</code> objects that are required
      *         members of the given group.
-     * @throws StorageException
      */
     Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException;
 
@@ -121,7 +119,6 @@ public interface StorageProvider {
      * @param role
      *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
-     * @throws StorageException
      */
     boolean addMember(Group group, Role role) throws StorageException;
 
@@ -135,7 +132,6 @@ public interface StorageProvider {
      * @param role
      *            The <code>Role</code> to add.
      * @return True if the given role was added - false otherwise.
-     * @throws StorageException
      */
     boolean addRequiredMember(Group group, Role role) throws StorageException;
 
@@ -143,10 +139,9 @@ public interface StorageProvider {
      * Removes a member from the given group.
      * 
      * @see Group#removeMember(Role)
-     * @param group
-     * @param role
-     * @return
-     * @throws StorageException
+     * @param group The group the member should be removed from.
+     * @param role The role to be removed.
+     * @return true if the removal was successful, false if the member could not be removed for semantic reasons.
      */
     boolean removeMember(Group group, Role role) throws StorageException;
 
@@ -161,7 +156,6 @@ public interface StorageProvider {
      *            The key of the attribute.
      * @param value
      *            The value of the attribute.
-     * @throws StorageException
      */
     void setRoleAttribute(Role role, String key, Object value) throws StorageException;
 
@@ -172,7 +166,6 @@ public interface StorageProvider {
      *            The <code>Role</code> to remove the attribute from.
      * @param key
      *            The key of the attribute.
-     * @throws StorageException
      */
     void removeRoleAttribute(Role role, String key) throws StorageException;
 
@@ -181,7 +174,6 @@ public interface StorageProvider {
      * 
      * @param role
      *            The <code>Role</code> to remove the attribute(s) from.
-     * @throws StorageException
      */
     void clearRoleAttributes(Role role) throws StorageException;
 
@@ -204,7 +196,6 @@ public interface StorageProvider {
      * @param name
      *            The role to find.
      * @return A <code>Role</code> implementation.
-     * @throws StorageException
      */
     Role getRole(UserAdminFactory factory, String name) throws StorageException;
 
@@ -220,7 +211,6 @@ public interface StorageProvider {
      * @param value
      *            The attribute value to search for.
      * @return The <code>User</code> object matching the query.
-     * @throws StorageException
      */
     User getUser(UserAdminFactory factory, String key, String value) throws StorageException;
 
@@ -231,17 +221,16 @@ public interface StorageProvider {
      * @param factory
      *            The <code>UserAdminFactory</code> used to eventually create
      *            the implementation object.
-     * @param filter
-     * @return
-     * @throws StorageException
+     * @param filter Search filter to use or finding the roles.
+     * @return A Collection of Roles that are matching the filter.
      */
     Collection<Role> findRoles(UserAdminFactory factory, String filter) throws StorageException;
 
     /**
      * Called whenever a configuration is detected for this provider
      * 
-     * @param properties
-     * @throws ConfigurationException
+     * @param properties New configuration properties for the StorageProvider
+     * @throws ConfigurationException If the configuration provided is incosistent, incomplete or in any other way can not be used.
      */
     void configurationUpdated(Map<String, ?> properties) throws ConfigurationException;
 }

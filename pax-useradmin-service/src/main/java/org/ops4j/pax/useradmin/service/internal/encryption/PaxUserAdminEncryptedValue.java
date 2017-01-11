@@ -35,11 +35,12 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
     /**
      * indicated, that the encrypted value was a byte[]
      */
-    public static final byte       BYTE_INDICATOR   = (byte) 'b';
+    private static final byte       BYTE_INDICATOR   = (byte) 'b';
+
     /**
      * indicates, that the encrypted value was a String
      */
-    public static final byte       STRING_INDICATOR = (byte) 's';
+    static final byte              STRING_INDICATOR = (byte) 's';
     private final String           key;
     private final byte[]           bytes;
     private final boolean          isString;
@@ -49,13 +50,7 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
     private byte[]                 hash;
     private byte[]                 encrypted;
 
-    /**
-     * @param key
-     * @param bytes
-     * @param isString
-     * @param context
-     */
-    public PaxUserAdminEncryptedValue(String key, byte[] bytes, boolean isString, EncryptorContext context) {
+    PaxUserAdminEncryptedValue(String key, byte[] bytes, boolean isString, EncryptorContext context) {
         this.key = key;
         this.bytes = bytes;
         this.isString = isString;
@@ -109,11 +104,8 @@ public class PaxUserAdminEncryptedValue implements EncryptedValue {
 
     /**
      * Unbuffered method to provide a salt value
-     * 
-     * @param preSalt
-     * @return
      */
-    public byte[] getVerificationBytes(byte[] preSalt) {
+    byte[] getVerificationBytes(byte[] preSalt) {
         return context.hashValues(UserAdminTools.stringToBytes(key), preSalt, bytes);
     }
 }

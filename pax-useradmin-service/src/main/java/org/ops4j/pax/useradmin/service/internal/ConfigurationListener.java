@@ -48,13 +48,8 @@ public class ConfigurationListener implements ManagedService {
 
     private final ServiceRegistration<ManagedService>           service;
 
-    /**
-     * @param providerTracker
-     * @param context
-     * @param properties
-     */
-    public ConfigurationListener(String type, ServiceTracker<StorageProvider, PaxUserAdmin> providerTracker, Dictionary<String, Object> properties,
-            BundleContext context) {
+    ConfigurationListener(String type, ServiceTracker<StorageProvider, PaxUserAdmin> providerTracker, Dictionary<String, Object> properties,
+                          BundleContext context) {
         this.type = type;
         this.providerTracker = providerTracker;
         service = context.registerService(ManagedService.class, this, properties);
@@ -82,7 +77,7 @@ public class ConfigurationListener implements ManagedService {
         }
     }
 
-    public synchronized void updateProvider(PaxUserAdmin admin) throws ConfigurationException {
+    synchronized void updateProvider(PaxUserAdmin admin) throws ConfigurationException {
         try {
             admin.configurationUpdated(this.currentConfig);
         } catch (RuntimeException e) {
@@ -93,7 +88,7 @@ public class ConfigurationListener implements ManagedService {
     /**
      * 
      */
-    public void unregister() {
+    void unregister() {
         service.unregister();
     }
 }

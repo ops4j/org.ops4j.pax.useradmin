@@ -36,7 +36,7 @@ public interface SPIRole extends Role {
     /**
      * States used as return value for isImpliedBy() calls.
      */
-    public enum ImplicationResult {
+    enum ImplicationResult {
         /**
          * given role is implied by this one
          */
@@ -48,8 +48,8 @@ public interface SPIRole extends Role {
         /**
          * detected a loop - e.g. a group containing itself.
          */
-        IMPLIEDBY_LOOPDETECTED;
-    };
+        IMPLIEDBY_LOOPDETECTED
+    }
 
     /**
      * Checks if this role is implied by the given one.
@@ -60,5 +60,5 @@ public interface SPIRole extends Role {
      *            Used for loop detection.
      * @return An <code>ImplicationResult</code>.
      */
-    public ImplicationResult isImpliedBy(SPIRole role, Collection<String> checkedRoles);
+    ImplicationResult isImpliedBy(SPIRole role, Collection<String> checkedRoles);
 }

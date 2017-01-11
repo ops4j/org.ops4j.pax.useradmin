@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
 import org.ops4j.pax.useradmin.service.spi.SPIRole;
 import org.ops4j.pax.useradmin.service.spi.StorageException;
 import org.ops4j.pax.useradmin.service.spi.StorageProvider;
@@ -37,15 +36,17 @@ import org.osgi.service.useradmin.Role;
  *      "http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Group.html"
  *      >Group</a>
  */
-public class GroupImpl extends UserImpl implements Group {
+public class GroupImpl extends UserImpl
+        implements Group {
+
+    private static final Role[] EMPTY_ROLES = new Role[0];
 
     /**
      * Constructor.
      * 
-     * @param initialCredentialKeys
-     * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Map)
+     * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Set)
      */
-    protected GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
+    GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         super(name, admin, properties, initialCredentialKeys);
     }
 
@@ -110,13 +111,14 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getMembers(getAdmin(), this);
-            if (roles == null || !roles.isEmpty()) {
-                return roles.toArray(new Role[roles.size()]);
+            if (roles == null || roles.isEmpty() ) {
+                return EMPTY_ROLES;
             }
+            return roles.toArray(new Role[roles.size()]);
         } catch (StorageException e) {
             getAdmin().logMessage(this, LogService.LOG_ERROR, "error when retrieving basic members of group '" + getName() + "':" + e.getMessage());
         }
-        return null;
+        return EMPTY_ROLES;
     }
 
     /**
@@ -127,13 +129,14 @@ public class GroupImpl extends UserImpl implements Group {
         try {
             StorageProvider storageProvider = getAdmin().getStorageProvider();
             Collection<Role> roles = storageProvider.getRequiredMembers(getAdmin(), this);
-            if (roles == null || !roles.isEmpty()) {
-                return roles.toArray(new Role[roles.size()]);
+            if (roles == null || roles.isEmpty() ) {
+                return EMPTY_ROLES;
             }
+            return roles.toArray(new Role[roles.size()]);
         } catch (StorageException e) {
             getAdmin().logMessage(this, LogService.LOG_ERROR, "error when retrieving required members of group '" + getName() + "':" + e.getMessage());
         }
-        return null;
+        return EMPTY_ROLES;
     }
 
     /**

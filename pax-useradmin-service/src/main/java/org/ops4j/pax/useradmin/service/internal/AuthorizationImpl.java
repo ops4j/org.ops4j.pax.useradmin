@@ -31,8 +31,7 @@ import org.osgi.service.useradmin.User;
 /**
  * Implementation of the Authorization interface.
  * 
- * @see <a
- *      href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html</a>
+ * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/Authorization.html</a>
  */
 public class AuthorizationImpl implements Authorization {
 
@@ -54,7 +53,7 @@ public class AuthorizationImpl implements Authorization {
      * @param user
      *            The <code>User</code> instance whose authorization is managed.
      */
-    protected AuthorizationImpl(PaxUserAdmin userAdmin, User user) {
+    AuthorizationImpl(PaxUserAdmin userAdmin, User user) {
         m_userAdmin = userAdmin;
         m_user = user;
     }
@@ -70,7 +69,7 @@ public class AuthorizationImpl implements Authorization {
     /**
      * @return the current value of m_userAdmin
      */
-    public PaxUserAdmin getAdmin() {
+    private PaxUserAdmin getAdmin() {
         return m_userAdmin;
     }
 
@@ -94,10 +93,8 @@ public class AuthorizationImpl implements Authorization {
                                     roleNames.add(name);
                                 }
                             } else {
-                                if (role != null) {
-                                    getAdmin().logMessage(AuthorizationImpl.class.getSimpleName(), LogService.LOG_WARNING, "getRoles(): role " + role.getName()
-                                            + " is ignored because " + role.getClass().getName() + " does not implement the SPIRole interface");
-                                }
+                                getAdmin().logMessage(AuthorizationImpl.class.getSimpleName(), LogService.LOG_WARNING, "getRoles(): role " + role.getName()
+                                        + " is ignored because " + role.getClass().getName() + " does not implement the SPIRole interface");
                             }
                         }
                     }

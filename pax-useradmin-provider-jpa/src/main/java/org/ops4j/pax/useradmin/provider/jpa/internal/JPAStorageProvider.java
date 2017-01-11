@@ -229,7 +229,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            The <code>Group</code> whose members are retrieved.
      * @return A collection of <code>Role</code> objects that are basic members
      *         of the given group.
-     * @throws StorageException
      */
     @Override
     public Collection<Role> getMembers(UserAdminFactory factory, Group group) throws StorageException {
@@ -247,7 +246,6 @@ public class JPAStorageProvider implements StorageProvider, CredentialProvider {
      *            The <code>Group</code> whose members are retrieved.
      * @return A collection of <code>Role</code> objects that are required
      *         members of the given group.
-     * @throws StorageException
      */
     @Override
     public Collection<Role> getRequiredMembers(UserAdminFactory factory, Group group) throws StorageException {

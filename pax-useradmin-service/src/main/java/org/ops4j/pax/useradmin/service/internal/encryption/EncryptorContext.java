@@ -42,16 +42,16 @@ public class EncryptorContext {
     /**
      * The default algorithm to use for random number generation.
      */
-    final static String         DEFAULT_ENCRYPTION_RANDOM_ALGORITHM  = "SHA1PRNG";
+    private final static String DEFAULT_ENCRYPTION_RANDOM_ALGORITHM  = "SHA1PRNG";
 
-    final static String         DEFAULT_ENCRYPTION_HASH_ALGORITHM    = "MD5";
+    private final static String DEFAULT_ENCRYPTION_HASH_ALGORITHM    = "MD5";
 
-    final static String         DEFAULT_ENCRYPTION_CIPHER_ALGORITHM  = CIPHER_PAX_EMPTY;
+    private final static String DEFAULT_ENCRYPTION_CIPHER_ALGORITHM  = CIPHER_PAX_EMPTY;
 
     /**
      * The default salt length to use by the random number algorithm.
      */
-    final static String         DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH = "32";
+    private final static String DEFAULT_ENCRYPTION_RANDOM_SALTLENGTH = "32";
 
     private final int           saltLength;
 
@@ -61,11 +61,6 @@ public class EncryptorContext {
 
     private final Cipher        cipher;
 
-    /**
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws NumberFormatException
-     */
     public EncryptorContext(Map<String, ?> properties) throws NoSuchAlgorithmException, NumberFormatException, NoSuchPaddingException {
         this(UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_HASH_ALGORITHM, DEFAULT_ENCRYPTION_HASH_ALGORITHM),//
         UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_SECURERANDOM_ALGORITHM, DEFAULT_ENCRYPTION_RANDOM_ALGORITHM), //
@@ -73,7 +68,7 @@ public class EncryptorContext {
         UserAdminTools.getOptionalProperty(properties, PaxUserAdminConstants.PROPERTY_ENCRYPTION_CIPHER_ALGORITHM, DEFAULT_ENCRYPTION_CIPHER_ALGORITHM));
     }
 
-    public EncryptorContext(String hashAlgorith, String secureRandomAlgorith, int saltLength, String cipherAlgorithm) throws NoSuchAlgorithmException,
+    private EncryptorContext(String hashAlgorith, String secureRandomAlgorith, int saltLength, String cipherAlgorithm) throws NoSuchAlgorithmException,
             NoSuchPaddingException {
         this.saltLength = saltLength;
         secureRandom = SecureRandom.getInstance(secureRandomAlgorith);
@@ -91,7 +86,7 @@ public class EncryptorContext {
     /**
      * @return the current value of cipher
      */
-    public Cipher getCipher(int encryptMode) {
+    Cipher getCipher(int encryptMode) {
         //FIXME: we need to init the cypher!
         //This depend on the choosen algorithm...
         //        SecretKeySpec key = new SecretKeySpec(keyBytes, "DES");
@@ -103,7 +98,7 @@ public class EncryptorContext {
     /**
      * @return a String representation of this {@link EncryptorContext}
      */
-    public String toStringValue() {
+    String toStringValue() {
         StringBuilder sb = new StringBuilder();
         sb.append(messageDigest.getAlgorithm());
         sb.append("##");
@@ -115,20 +110,13 @@ public class EncryptorContext {
         return sb.toString();
     }
 
-    /**
-     * @return
-     */
-    public synchronized byte[] generateRandomSalt() {
+    synchronized byte[] generateRandomSalt() {
         byte[] bytes = new byte[saltLength];
         secureRandom.nextBytes(bytes);
         return bytes;
     }
 
-    /**
-     * @param byteArray
-     * @return
-     */
-    public synchronized byte[] hashValues(byte[]... byteArray) {
+    synchronized byte[] hashValues(byte[]... byteArray) {
         messageDigest.reset();
         for (byte[] bs : byteArray) {
             messageDigest.update(bs);
@@ -136,7 +124,7 @@ public class EncryptorContext {
         return messageDigest.digest();
     }
 
-    public static EncryptorContext fromParams(String[] params) throws NumberFormatException, NoSuchAlgorithmException, NoSuchPaddingException {
+    static EncryptorContext fromParams(String[] params) throws NumberFormatException, NoSuchAlgorithmException, NoSuchPaddingException {
         return new EncryptorContext(params[0], params[1], Integer.parseInt(params[2]), params[3]);
     }
 

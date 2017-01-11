@@ -27,9 +27,6 @@ import javax.crypto.NoSuchPaddingException;
 import org.ops4j.pax.useradmin.service.spi.Decryptor;
 import org.ops4j.pax.useradmin.service.spi.UserAdminTools;
 
-/**
- * @author Christoph Läubrich
- */
 public class PaxUserAdminDecryptor implements Decryptor {
 
     @Override
@@ -69,12 +66,12 @@ public class PaxUserAdminDecryptor implements Decryptor {
         return MessageDigest.isEqual(encrypt.getVerificationBytes(salt), verificationBytes);
     }
 
-    protected PaxUserAdminEncryptor createEncryptor(byte[] algorithmParameter) {
+    private PaxUserAdminEncryptor createEncryptor(byte[] algorithmParameter) {
         EncryptorContext context = createContext(algorithmParameter);
         return new PaxUserAdminEncryptor(context);
     }
 
-    protected EncryptorContext createContext(byte[] algorithmParameter) {
+    private EncryptorContext createContext(byte[] algorithmParameter) {
         String[] param = UserAdminTools.bytesToString(algorithmParameter).split("##");
         EncryptorContext context;
         try {
