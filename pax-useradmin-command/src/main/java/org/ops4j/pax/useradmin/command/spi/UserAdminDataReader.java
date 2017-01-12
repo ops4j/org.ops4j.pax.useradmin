@@ -26,10 +26,7 @@ public interface UserAdminDataReader {
 
     /**
      * Copies data from the source using the given UserAdminDataWriter instance.
-     * 
-     * @param sourceId
-     * @param targetWriter
-     * @throws CommandException
      */
-    void copy(String sourceId, UserAdminDataWriter targetWriter) throws CommandException;
+    void copy(String sourceId, UserAdminDataWriter targetWriter)
+            throws CommandException;
 }

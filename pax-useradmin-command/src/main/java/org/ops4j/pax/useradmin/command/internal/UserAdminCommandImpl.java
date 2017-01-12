@@ -40,21 +40,14 @@ public class UserAdminCommandImpl implements UserAdminCommand {
 
     private BundleContext       m_context             = null;
     
-    public UserAdminCommandImpl(BundleContext context) {
+    UserAdminCommandImpl(BundleContext context) {
         m_context = context;
     }
 
-    /**
-     * @see UserAdminCommand#copyData(String, String)
-     * 
-     *      TODO: we should introduce a factory pattern (dynamic plugins?) to
-     *      manage UserAdminWriter/Reader implementations, shouldn't we?
-     */
+// TODO: we should introduce a factory pattern (dynamic plugins?) to manage UserAdminWriter/Reader implementations, shouldn't we?
     public void copyData(String sourceUri, String targetUri)  throws CommandException {
-        // create the writer
-        //
-//        System.out.println("copy from " + sourceUri + " to " + targetUri);
-        UserAdminDataWriter writer = null;
+
+        UserAdminDataWriter writer;
         if (targetUri.startsWith(PROTOCOL_USERADMIN)) {
             String targetId = targetUri.substring(PROTOCOL_USERADMIN.length());
             writer = new ServiceDataWriter(m_context, targetId);
@@ -64,11 +57,9 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         } else {
             throw new CommandException("Unsupported protocol in target URI: " + targetUri);
         }
-        //
-        // create the reader
-        //
-        UserAdminDataReader reader = null;
-        String sourceId = null;
+
+        UserAdminDataReader reader;
+        String sourceId;
         if (sourceUri.startsWith(PROTOCOL_USERADMIN)) {
             sourceId = sourceUri.substring(PROTOCOL_USERADMIN.length());
             reader = new ServiceDataReader(m_context);
@@ -78,9 +69,6 @@ public class UserAdminCommandImpl implements UserAdminCommand {
         } else {
             throw new CommandException("Unsupported protocol in source URI: " + sourceUri);
         }
-        //
-        // and copy the data
-        //
         reader.copy(sourceId, writer);
         writer.close();
     }

@@ -118,9 +118,6 @@ public abstract class AbstractProperties<R extends Role> extends Dictionary<Stri
      */
     protected abstract void checkGetPermission(String key);
 
-    /**
-     * @see Hashtable#get(Object)
-     */
     @Override
     public synchronized Object get(Object key) {
         checkKeyValid(key);

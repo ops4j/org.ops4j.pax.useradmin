@@ -25,7 +25,7 @@ import org.osgi.service.useradmin.UserAdmin;
 /**
  * Utility methods.
  */
-public class ServiceUtils {
+class ServiceUtils {
 
     /**
      * Retrieves a UserAdmin service that is provided by the bundle with the
@@ -36,9 +36,8 @@ public class ServiceUtils {
      *                   UserAdmin service.
      * @return A UserAdmin service provided by the given bundle or null if the
      *         bundle does not exist or does not provide such a service.
-     * @throws CommandException on internal errors only.
      */
-    protected static UserAdmin getUserAdminService(BundleContext context, String bundleName) {
+    static UserAdmin getUserAdminService(BundleContext context, String bundleName) {
         UserAdmin service = null;
         try {
             for (ServiceReference ref : context.getServiceReferences(UserAdmin.class.getName(),
@@ -48,12 +47,12 @@ public class ServiceUtils {
                 }
             }
         } catch (InvalidSyntaxException e) {
-            /** Just testing: PMD should report a warning - insert:
+            /* Just testing: PMD should report a warning - insert:
             // should never happen ...
             throw new IllegalStateException("Must not happen: null is an allowed filter - any more to check?");
 
-              * to fix it
-             **/
+             * to fix it
+             */
         }
         return service;
     }

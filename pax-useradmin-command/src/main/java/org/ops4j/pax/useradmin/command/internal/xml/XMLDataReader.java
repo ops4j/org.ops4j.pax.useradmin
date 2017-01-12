@@ -30,7 +30,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * UserAdminDataReader implementation which reads data from an XML file.
  */
-public class XMLDataReader implements UserAdminDataReader {
+public class XMLDataReader
+        implements UserAdminDataReader {
 
     /**
      * @see UserAdminDataReader#copy(String, UserAdminDataWriter)

@@ -30,6 +30,9 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.useradmin.Authorization;
 import org.osgi.service.useradmin.Role;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 public class AuthorizationImplTest {
 
     private static final String USER_NAME1  = "someRole1";
@@ -70,13 +73,15 @@ public class AuthorizationImplTest {
         Authorization authorization = new AuthorizationImpl(userAdmin, user);
         Assert.assertNotNull("Authorization object not created", authorization);
         try {
-            Assert.assertNull("Roles found after exception was thrown", authorization.getRoles());
+            assertThat(authorization.getRoles().length, equalTo(0));
         } catch (IllegalStateException e) {
             // expected
         }
         //
         EasyMock.verify(userAdmin, sp);
     }
+
+
 
     @Test
     public void getRolesOk() {
@@ -137,12 +142,10 @@ public class AuthorizationImplTest {
         Assert.assertEquals("Not exactly 2 authorized roles found", 2, roles.length);
         //
         authorization = new AuthorizationImpl(userAdmin, user2);
-        roles = authorization.getRoles();
-        Assert.assertNull(roles);
+        assertThat(authorization.getRoles().length, equalTo(0));
         //
         authorization = new AuthorizationImpl(userAdmin, group3);
-        roles = authorization.getRoles();
-        Assert.assertNull(roles);
+        assertThat(authorization.getRoles().length, equalTo(0));
         //
         EasyMock.verify(userAdmin, sp);
     }

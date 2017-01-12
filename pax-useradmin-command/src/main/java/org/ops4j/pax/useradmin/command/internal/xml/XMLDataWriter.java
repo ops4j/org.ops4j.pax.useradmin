@@ -38,7 +38,8 @@ import org.osgi.service.useradmin.Role;
 /**
  * UserAdminDataWriter implementation which writes data to an XML file.
  */
-public class XMLDataWriter implements UserAdminDataWriter {
+public class XMLDataWriter
+        implements UserAdminDataWriter {
 
     private static String LINE_FEED = System.getProperty("line.separator");
     

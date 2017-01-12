@@ -31,5 +31,6 @@ public interface UserAdminCommand {
      * @param targetUri The URI to which data is stored.
      * @throws CommandException If source-reading or target-writing is not available.
      */
-    public void copyData(String sourceUri, String targetUri)  throws CommandException;
+    public void copyData(String sourceUri, String targetUri)
+            throws CommandException;
 }

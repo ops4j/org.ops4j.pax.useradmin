@@ -46,11 +46,6 @@ public class ServiceDataReader implements UserAdminDataReader {
     
     /**
      * Creates the given role in the TargetWriter.
-     * 
-     * @param user
-     * @param targetWriter
-     * @return
-     * @throws CommandException
      */
     @SuppressWarnings(value = "unchecked")
     private Role createRole(User user, UserAdminDataWriter targetWriter) throws CommandException {
@@ -69,9 +64,6 @@ public class ServiceDataReader implements UserAdminDataReader {
         return targetWriter.createRole(user.getType(), user.getName(), properties, credentials);
     }
     
-    /**
-     * @see UserAdminDataReader#copy(String, UserAdminDataWriter)
-     */
     public void copy(String sourceId, UserAdminDataWriter targetWriter) throws CommandException {
         UserAdmin service = ServiceUtils.getUserAdminService(m_context, sourceId);
         if (null == service) {

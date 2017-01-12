@@ -356,6 +356,9 @@ public class JPAStorageProvider
      * Removes a member from the given group.
      * 
      * @see Group#removeMember(Role)
+     * @param group The group the member should be removed from.
+     * @param role The role to be removed.
+     * @return true if the removal was successful, false if the member could not be removed for semantic reasons.
      */
     @Override
     public synchronized boolean removeMember(final Group group, final Role role) throws StorageException {

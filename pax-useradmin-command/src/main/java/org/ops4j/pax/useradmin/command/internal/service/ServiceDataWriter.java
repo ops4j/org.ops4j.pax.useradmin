@@ -54,9 +54,6 @@ public class ServiceDataWriter implements UserAdminDataWriter {
         }
     }
 
-    /**
-     * @see UserAdminDataWriter#addMembers(Role, Collection, Collection)
-     */
     public void addMembers(Role role,
                            Collection<String> basicMembers,
                            Collection<String> requiredMembers) throws CommandException {
@@ -89,15 +86,9 @@ public class ServiceDataWriter implements UserAdminDataWriter {
         }
     }
 
-    /**
-     * @see UserAdminDataWriter#close()
-     */
     public void close() throws CommandException {
     }
 
-    /**
-     * @see UserAdminDataWriter#createRole(int, String, Map, Map)
-     */
     @SuppressWarnings(value = "unchecked")
     public Role createRole(int type,
                            String name,

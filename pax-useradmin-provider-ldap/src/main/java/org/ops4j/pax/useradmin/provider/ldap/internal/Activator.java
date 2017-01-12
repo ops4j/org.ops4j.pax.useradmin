@@ -55,9 +55,6 @@ public class Activator
         context.registerService(StorageProvider.class, new StorageProviderImpl(connection), properties);
     }
 
-    /**
-     * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-     */
     @Override
     public void stop(BundleContext context) throws Exception {
     }

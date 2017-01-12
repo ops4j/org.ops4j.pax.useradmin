@@ -33,6 +33,7 @@ public class DBProperty {
     public static final short TYPE_STRING = 1;
 
     private static final short TYPE_BYTE   = 2;
+    public static final byte[] EMPTY_ARRAY = new byte[0];
 
     @Column(name = "ckey")
     private String            key;
@@ -48,7 +49,7 @@ public class DBProperty {
      */
     public byte[] getData() {
         if (data == null) {
-            return new byte[0];
+            return EMPTY_ARRAY;
         }
         return data;
     }

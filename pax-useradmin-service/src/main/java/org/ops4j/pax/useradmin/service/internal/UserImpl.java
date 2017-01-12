@@ -39,28 +39,16 @@ public class UserImpl extends RoleImpl
      */
     private UserCredentials m_credentials = null;
 
-    /**
-     * Constructor.
-     * 
-     * @see RoleImpl#RoleImpl(String, PaxUserAdmin, Map)
-     * @param initialCredentialKeys The credentials of this user.
-     */
-    protected UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
+    UserImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         super(name, admin, properties);
         m_credentials = new UserCredentials(this, admin, initialCredentialKeys);
     }
 
-    /**
-     * @see User#getCredentials()
-     */
     @Override
     public Dictionary<String, Object> getCredentials() {
         return m_credentials;
     }
 
-    /**
-     * @see User#hasCredential(String, Object)
-     */
     @Override
     public boolean hasCredential(String key, Object value) {
         if (null == key) {
@@ -75,9 +63,6 @@ public class UserImpl extends RoleImpl
         return (value instanceof String || value instanceof byte[]) && m_credentials.hasCredential(key, value);
     }
 
-    /**
-     * @see User#getType()
-     */
     @Override
     public int getType() {
         return Role.USER;

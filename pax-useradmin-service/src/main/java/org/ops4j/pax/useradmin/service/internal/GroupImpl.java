@@ -41,18 +41,10 @@ public class GroupImpl extends UserImpl
 
     private static final Role[] EMPTY_ROLES = new Role[0];
 
-    /**
-     * Constructor.
-     * 
-     * @see UserImpl#UserImpl(String, PaxUserAdmin, Map, Set)
-     */
     GroupImpl(String name, PaxUserAdmin admin, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         super(name, admin, properties, initialCredentialKeys);
     }
 
-    /**
-     * @see Group#addMember(Role)
-     */
     @Override
     public boolean addMember(Role role) {
         if (role != null) {
@@ -69,9 +61,6 @@ public class GroupImpl extends UserImpl
         return false;
     }
 
-    /**
-     * @see Group#addRequiredMember(Role)
-     */
     @Override
     public boolean addRequiredMember(Role role) {
         if (role != null) {
@@ -86,9 +75,6 @@ public class GroupImpl extends UserImpl
         return false;
     }
 
-    /**
-     * @see Group#removeMember(Role)
-     */
     @Override
     public boolean removeMember(Role role) {
         if (role != null) {
@@ -103,9 +89,6 @@ public class GroupImpl extends UserImpl
         return false;
     }
 
-    /**
-     * @see Group#getMembers()
-     */
     @Override
     public Role[] getMembers() {
         try {
@@ -121,9 +104,6 @@ public class GroupImpl extends UserImpl
         return EMPTY_ROLES;
     }
 
-    /**
-     * @see Group#getRequiredMembers()
-     */
     @Override
     public Role[] getRequiredMembers() {
         try {
@@ -139,9 +119,6 @@ public class GroupImpl extends UserImpl
         return EMPTY_ROLES;
     }
 
-    /**
-     * @see Group#getType()
-     */
     @Override
     public int getType() {
         return Role.GROUP;

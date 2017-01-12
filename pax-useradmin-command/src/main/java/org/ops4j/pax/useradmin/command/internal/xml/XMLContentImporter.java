@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.ops4j.pax.useradmin.command.CommandException;
 import org.ops4j.pax.useradmin.command.spi.UserAdminDataWriter;
 import org.osgi.service.useradmin.Role;
@@ -37,7 +36,7 @@ public class XMLContentImporter implements ContentHandler {
      */
     private enum State {
         initial, readingUser, readingGroup
-    };
+    }
 
     private State               m_state                  = State.initial;
     private UserAdminDataWriter m_writer                 = null;
@@ -47,14 +46,13 @@ public class XMLContentImporter implements ContentHandler {
     private Collection<String>  m_currentBasicMembers    = new ArrayList<String>();
     private Collection<String>  m_currentRequiredMembers = new ArrayList<String>();
 
-    protected XMLContentImporter(UserAdminDataWriter writer) {
+    XMLContentImporter(UserAdminDataWriter writer) {
         m_writer = writer;
     }
 
-    /** 
-     * @see ContentHandler#startElement(String, String, String, Attributes)
-     */
-    public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes atts)
+            throws SAXException {
+
         if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
             m_state = State.readingGroup;
         } else if (XMLConstants.ELEMENT_USERS.equals(localName)) {
@@ -88,9 +86,6 @@ public class XMLContentImporter implements ContentHandler {
         }
     }
 
-    /** 
-     * @see ContentHandler#endElement(String, String, String)
-     */
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (XMLConstants.ELEMENT_GROUPS.equals(localName)) {
             m_state = State.initial;
@@ -119,48 +114,21 @@ public class XMLContentImporter implements ContentHandler {
 
     // not implemented ...
     
-    /**
-     * @see ContentHandler#endDocument()
-     */
     public void endDocument() throws SAXException {}
 
-    /** 
-     * @see ContentHandler#characters(char[], int, int)
-     */
     public void characters(char[] ch, int start, int length) throws SAXException {}
 
-    /** 
-     * @see ContentHandler#endPrefixMapping(String)
-     */
     public void endPrefixMapping(String prefix) throws SAXException {}
 
-    /** 
-     * @see ContentHandler#ignorableWhitespace(char[], int, int)
-     */
     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {}
 
-    /** 
-     * @see ContentHandler#processingInstruction(String, String)
-     */
     public void processingInstruction(String target, String data) throws SAXException {}
 
-    /** 
-     * @see ContentHandler#setDocumentLocator(Locator)
-     */
     public void setDocumentLocator(Locator locator) {}
 
-    /** 
-     * @see ContentHandler#skippedEntity(String)
-     */
     public void skippedEntity(String name) throws SAXException {}
 
-    /** 
-     * @see ContentHandler#startDocument()
-     */
     public void startDocument() throws SAXException {}
 
-    /** 
-     * @see ContentHandler#startPrefixMapping(String, String)
-     */
     public void startPrefixMapping(String prefix, String uri) throws SAXException {}
 }

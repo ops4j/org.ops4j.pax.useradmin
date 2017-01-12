@@ -27,13 +27,10 @@ public class FelixCommand implements Command {
 
     private BundleContext m_context = null;
     
-    public FelixCommand(BundleContext context) {
+    FelixCommand(BundleContext context) {
         m_context = context;
     }
 
-    /**
-     * @see Command#execute(String, PrintStream, PrintStream)
-     */
     public void execute(String commandLine, PrintStream out, PrintStream err) {
         String[] arguments = commandLine.split(" ");
         if (arguments.length <= 2) {
@@ -50,31 +47,20 @@ public class FelixCommand implements Command {
             } catch (CommandException e) {
                 err.println("CommandException caught: " + e.getMessage());
                 e.printStackTrace(err);
-                return;
             }
         } else {
             err.println("Unknown function for userAdmin command: " + arguments[1] + " in command-line " + commandLine);
-            return;
         }
     }
 
-    /**
-     * @see Command#getName()
-     */
     public String getName() {
         return "userAdmin";
     }
 
-    /**
-     * @see Command#getShortDescription()
-     */
     public String getShortDescription() {
         return "UserAdmin related commands";
     }
 
-    /**
-     * @see Command#getUsage()
-     */
     public String getUsage() {
         return "userAdmin copyData <source-uri> <target-uri>";
     }

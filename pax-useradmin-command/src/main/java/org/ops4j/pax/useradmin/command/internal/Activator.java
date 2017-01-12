@@ -23,17 +23,11 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 
-    /**
-     * @see BundleActivator#start(BundleContext)
-     */
     public void start(BundleContext context) throws Exception {
         // register the Felix shell command
         context.registerService(Command.class.getName(), new FelixCommand(context), null);
     }
 
-    /**
-     * @see BundleActivator#stop(BundleContext)
-     */
     public void stop(BundleContext context) throws Exception {
         // nothing to do
     }

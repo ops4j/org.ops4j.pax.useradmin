@@ -31,18 +31,10 @@ public class RoleProperties extends AbstractProperties<Role> {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Initializing constructor.
-     * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
-     */
     protected RoleProperties(Role role, UserAdminUtil util, Map<String, Object> properties) {
         super(role, util, properties);
     }
 
-    /**
-     * @see AbstractProperties#store(StorageProvider, String, Object)
-     */
     @Override
     protected Object store(StorageProvider storageProvider, String key, Object value) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);
@@ -50,9 +42,6 @@ public class RoleProperties extends AbstractProperties<Role> {
         return value;
     }
 
-    /**
-     * @see AbstractProperties#remove(StorageProvider, String)
-     */
     @Override
     protected void remove(StorageProvider storageProvider, String key) throws StorageException {
         getUtil().checkPermission(key, UserAdminPermission.CHANGE_PROPERTY);

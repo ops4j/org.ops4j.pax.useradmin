@@ -22,22 +22,22 @@ package org.ops4j.pax.useradmin.command.internal.xml;
  */
 public interface XMLConstants {
 
-    static String ELEMENT_ROOT                     = "UserAdminData";
+    String ELEMENT_ROOT                     = "UserAdminData";
 
-    static String ELEMENT_USERS                    = "Users";
-    static String ELEMENT_GROUPS                   = "Groups";
-    static String ELEMENT_ROLE                     = "Role";
-    static String ELEMENT_ATTRIBUTE                = "Attribute";
+    String ELEMENT_USERS                    = "Users";
+    String ELEMENT_GROUPS                   = "Groups";
+    String ELEMENT_ROLE                     = "Role";
+    String ELEMENT_ATTRIBUTE                = "Attribute";
 
-    static String ATTRIBUTE_NAME                   = "name";
-    static String ATTRIBUTE_TYPE                   = "type";
-    static String ATTRIBUTE_KEY                    = "key";
-    static String ATTRIBUTE_VALUE                  = "value";
+    String ATTRIBUTE_NAME                   = "name";
+    String ATTRIBUTE_TYPE                   = "type";
+    String ATTRIBUTE_KEY                    = "key";
+    String ATTRIBUTE_VALUE                  = "value";
 
-    static String ELEMENT_ATT_TYPE_PROPERTY        = "property";
-    static String ELEMENT_ATT_TYPE_CREDENTIAL      = "credential";
-    static String ELEMENT_ATT_TYPE_MEMBER          = "member";
+    String ELEMENT_ATT_TYPE_PROPERTY        = "property";
+    String ELEMENT_ATT_TYPE_CREDENTIAL      = "credential";
+    String ELEMENT_ATT_TYPE_MEMBER          = "member";
 
-    static String ELEMENT_ATT_TYPE_MEMBER_BASIC    = "basic";
-    static String ELEMENT_ATT_TYPE_MEMBER_REQUIRED = "required";
+    String ELEMENT_ATT_TYPE_MEMBER_BASIC    = "basic";
+    String ELEMENT_ATT_TYPE_MEMBER_REQUIRED = "required";
 }

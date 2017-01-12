@@ -34,31 +34,19 @@ public interface UserAdminDataWriter {
      * 
      * Writers cannot be re-opened.
      */
-    void close() throws CommandException;
+    void close()
+            throws CommandException;
 
     /**
      * Creates a role. Changes to the returned object may not be synchronized to
      * the underlying storage.
-     * 
-     * @param type
-     * @param name
-     * @param properties
-     * @param credentials
-     * @return
-     * @throws CommandException
      */
-    Role createRole(int type,
-                    String name,
-                    Map<String, Object> properties,
-                    Map<String, Object> credentials) throws CommandException;
+    Role createRole(int type, String name, Map<String, Object> properties, Map<String, Object> credentials)
+            throws CommandException;
 
     /**
      * Adds members to a role.
-     *  
-     * @param role
-     * @param basicMembers
-     * @param requiredMembers
-     * @throws CommandException
      */
-    void addMembers(Role role, Collection<String> basicMembers, Collection<String> requiredMembers) throws CommandException;
+    void addMembers(Role role, Collection<String> basicMembers, Collection<String> requiredMembers)
+            throws CommandException;
 }

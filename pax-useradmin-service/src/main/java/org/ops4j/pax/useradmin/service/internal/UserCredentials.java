@@ -37,11 +37,6 @@ public class UserCredentials extends AbstractProperties<User> {
 
     private final Set<String> credentialKeys;
 
-    /**
-     * Initializing constructor.
-     * 
-     * @see AbstractProperties#AbstractProperties(Role, UserAdminUtil, Map)
-     */
     protected UserCredentials(User user, UserAdminUtil util, Set<String> initialCredentialKeys) {
         super(user, util, null);
         if (initialCredentialKeys != null) {

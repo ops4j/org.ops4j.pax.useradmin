@@ -35,6 +35,7 @@ import org.osgi.service.useradmin.User;
  */
 public class AuthorizationImpl implements Authorization {
 
+    private static final String[] EMPTY_ROLES = new String[0];
     /**
      * The user <code>Role</code> we are managing.
      */
@@ -58,9 +59,6 @@ public class AuthorizationImpl implements Authorization {
         m_user = user;
     }
 
-    /**
-     * @see Authorization#getName()
-     */
     @Override
     public String getName() {
         return null != m_user ? m_user.getName() : null;
@@ -73,9 +71,6 @@ public class AuthorizationImpl implements Authorization {
         return m_userAdmin;
     }
 
-    /**
-     * @see Authorization#getRoles()
-     */
     @Override
     public String[] getRoles() {
         if (m_user instanceof SPIRole) {
@@ -111,12 +106,9 @@ public class AuthorizationImpl implements Authorization {
             getAdmin().logMessage(AuthorizationImpl.class.getSimpleName(), LogService.LOG_WARNING, "getRoles(): denoted user is ignored because "
                     + m_user.getClass().getName() + " does not implement the SPIRole interface");
         }
-        return null;
+        return EMPTY_ROLES;
     }
 
-    /**
-     * @see Authorization#hasRole(String)
-     */
     @Override
     public boolean hasRole(String name) {
         Role roleToCheck = getAdmin().getRole(name);

@@ -25,10 +25,10 @@ public interface CommandConstants {
     /**
      * Protocol used to access files.
      */
-    public static final String  PROTOCOL_FILE      = "file";
+    String  PROTOCOL_FILE      = "file";
     
     /**
      * Protocol used to access OSGi UserAdmin services.
      */
-    public static final String  PROTOCOL_USERADMIN = "userAdmin";
+    String  PROTOCOL_USERADMIN = "userAdmin";
 }

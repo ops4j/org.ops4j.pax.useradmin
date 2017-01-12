@@ -63,7 +63,8 @@ import org.osgi.util.tracker.ServiceTracker;
  * 
  * @see <a href="http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html">http://www.osgi.org/javadoc/r4v42/org/osgi/service/useradmin/UserAdmin.html</a>
  */
-public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory {
+public class PaxUserAdmin
+        implements UserAdmin, UserAdminUtil, UserAdminFactory {
 
     /**
      * The administrative permission used to verify access to restricted
@@ -185,9 +186,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     // UserAdmin interface
 
-    /**
-     * @see UserAdmin#createRole(String, int)
-     */
     @Override
     public Role createRole(String name, int type) {
         checkAdminPermission();
@@ -229,9 +227,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         return role;
     }
 
-    /**
-     * @see UserAdmin#getAuthorization(User)
-     */
     @Override
     public Authorization getAuthorization(User user) {
         if (null == user) {
@@ -240,9 +235,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         return new AuthorizationImpl(this, user);
     }
 
-    /**
-     * @see UserAdmin#getRole(String)
-     */
     @Override
     public Role getRole(String name) {
         if (null == name) {
@@ -261,9 +253,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         return null;
     }
 
-    /**
-     * @see UserAdmin#getRoles(String)
-     */
     @Override
     public Role[] getRoles(String filter) throws InvalidSyntaxException {
         try {
@@ -278,9 +267,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         return null;
     }
 
-    /**
-     * @see UserAdmin#getUser(String, String)
-     */
     @Override
     public User getUser(String key, String value) {
         if (null == key) {
@@ -298,9 +284,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         return null;
     }
 
-    /**
-     * @see UserAdmin#removeRole(String)
-     */
     @Override
     public boolean removeRole(String name) {
         if (null == name) {
@@ -332,17 +315,11 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     // UserAdminUtil interface
 
-    /**
-     * @see UserAdminUtil#getStorageProvider()
-     */
     @Override
     public StorageProvider getStorageProvider() throws StorageException {
         return storageProvider;
     }
 
-    /**
-     * @see UserAdminUtil#logMessage(Object, int, String)
-     */
     @Override
     public void logMessage(Object source, int level, String message) {
         LogService log = m_logService.getService();
@@ -351,9 +328,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
     }
 
-    /**
-     * @see UserAdminUtil#fireEvent(int, Role)
-     */
     @Override
     public void fireEvent(int type, Role role) {
         if (null == role) {
@@ -401,9 +375,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
     }
 
-    /**
-     * @see UserAdminUtil#checkPermission(String, String)
-     */
     @Override
     public void checkPermission(String name, String action) {
         SecurityManager sm = System.getSecurityManager();
@@ -414,17 +385,11 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
 
     // UserAdminFactory interface
 
-    /**
-     * @see UserAdminFactory#createUser(String, Map, Set)
-     */
     @Override
     public User createUser(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         return new UserImpl(name, this, properties, initialCredentialKeys);
     }
 
-    /**
-     * @see UserAdminFactory#createGroup(String, Map, Set)
-     */
     @Override
     public Group createGroup(String name, Map<String, Object> properties, Set<String> initialCredentialKeys) {
         return new GroupImpl(name, this, properties, initialCredentialKeys);
@@ -440,9 +405,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         userAdminRegistration = context.registerService(UserAdmin.class, this, properties);
     }
 
-    /**
-     * 
-     */
     synchronized void unregister() {
         if (userAdminRegistration == null) {
             throw new IllegalStateException("This object is not registered!");
@@ -478,9 +440,6 @@ public class PaxUserAdmin implements UserAdmin, UserAdminUtil, UserAdminFactory 
         }
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[" + getStorageProvider() + "]";

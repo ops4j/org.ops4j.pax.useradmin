@@ -29,6 +29,9 @@ import org.ops4j.pax.useradmin.service.spi.StorageProvider;
 import org.osgi.service.log.LogService;
 import org.osgi.service.useradmin.Role;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  * Testing the GroupImpl class.
  */
@@ -156,7 +159,7 @@ public class GroupImplTest {
         }
         EasyMock.replay(userAdmin, sp);
         //
-        Assert.assertNull("No null returned when no basic members", group.getMembers());
+        assertThat(group.getMembers().length, equalTo(0));
         //
         EasyMock.verify(userAdmin, sp);
     }
@@ -194,7 +197,7 @@ public class GroupImplTest {
         Assert.assertTrue("Member not added", group.addMember(role1));
         Assert.assertTrue("Member not added", group.addMember(role2));
         Assert.assertNotNull("Null returned for existing basic members", group.getMembers());
-        Assert.assertNull("Non null returned exception during retrieval of basic members", group.getMembers());
+        assertThat(group.getMembers().length, equalTo(0));
         //
         EasyMock.verify(userAdmin, sp);
     }
@@ -268,7 +271,7 @@ public class GroupImplTest {
         }
         EasyMock.replay(userAdmin, sp);
         //
-        Assert.assertNull("No null returned when no basic members", group.getRequiredMembers());
+        assertThat(group.getRequiredMembers().length, equalTo(0));
         //
         EasyMock.verify(userAdmin, sp);
     }
@@ -306,7 +309,7 @@ public class GroupImplTest {
         Assert.assertTrue("Member not added", group.addRequiredMember(role1));
         Assert.assertTrue("Member not added", group.addRequiredMember(role2));
         Assert.assertNotNull("Null returned for existing basic members", group.getRequiredMembers());
-        Assert.assertNull("Non null returned exception during retrieval of required members", group.getRequiredMembers());
+        assertThat(group.getRequiredMembers().length, equalTo(0));
         //
         EasyMock.verify(userAdmin, sp);
     }

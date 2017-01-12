@@ -35,6 +35,9 @@ import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.UserAdminEvent;
 import org.osgi.service.useradmin.UserAdminPermission;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  * Testing the RoleImpl and RoleProperties classes.
  */

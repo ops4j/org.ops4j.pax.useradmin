@@ -40,7 +40,7 @@ public class Activator
     private BundleContext                                                  context;
 
     /**
-     * Initialize servicetrackers
+     * Initialize service trackers
      * 
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
@@ -53,7 +53,7 @@ public class Activator
     }
 
     /**
-     * Close servicetrackers and clean up
+     * Close service trackers and clean up
      * 
      * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
      */
@@ -93,8 +93,7 @@ public class Activator
      * Called when a known {@link PreferencesService} modified registration
      * properties.
      * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(ServiceReference,
-     *      Object)
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(ServiceReference,Object)
      */
     @Override
     public void modifiedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {
@@ -104,8 +103,7 @@ public class Activator
     /**
      * Called when a known {@link PreferencesService} unregisters.
      * 
-     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(ServiceReference,
-     *      Object)
+     * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(ServiceReference,Object)
      */
     @Override
     public void removedService(ServiceReference<PreferencesService> reference, PreferencesStorageProvider service) {

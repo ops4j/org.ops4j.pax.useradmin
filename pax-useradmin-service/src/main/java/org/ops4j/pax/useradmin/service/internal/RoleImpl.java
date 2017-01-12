@@ -71,9 +71,6 @@ public abstract class RoleImpl
         m_properties = new RoleProperties(this, m_admin, properties);
     }
 
-    /**
-     * @see Role#getName()
-     */
     @Override
     public String getName() {
         return m_name;
