@@ -1,0 +1,110 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+			<artifactId>useradmin</artifactId>
+			<groupId>org.ops4j.pax</groupId>
+			<version>2.0.0-SNAPSHOT</version>
+	</parent>
+	<name>OPS4J Pax Useradmin - Features</name>
+
+	<groupId>org.ops4j.pax.useradmin</groupId>
+	<artifactId>pax-useradmin</artifactId>
+	<packaging>feature</packaging>
+	<description>
+    Pax Useradmin module creating a features xml file to deploy Pax Useradmin components as features in Apache Karaf.
+    To use this feature enter the following in your Karaf shell -
+    feature:repo-add mvn:org.ops4j.pax.useradmin/pax-useradmin/${project.version}/xml/features
+  </description>
+
+	<properties>
+		<dependency.karaf.version>4.0.8</dependency.karaf.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>framework</artifactId>
+			<version>${dependency.karaf.version}</version>
+			<type>kar</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.useradmin</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>org.ops4j.pax.useradmin.service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>org.ops4j.pax.useradmin.provider.jpa</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>org.ops4j.pax.useradmin.provider.ldap</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>org.ops4j.pax.useradmin.provider.preferences</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/feature</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<pluginManagement>
+					 <plugins>
+							 <plugin>
+									 <groupId>org.apache.karaf.tooling</groupId>
+									 <artifactId>karaf-maven-plugin</artifactId>
+									 <version>4.0.8</version>
+									 <extensions>true</extensions>
+							 </plugin>
+					 </plugins>
+			 </pluginManagement>
+			<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>filter</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>resources</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					 <plugin>
+							 <groupId>org.apache.karaf.tooling</groupId>
+							 <artifactId>karaf-maven-plugin</artifactId>
+							 <configuration>
+								 <descriptors>
+									 <!--
+									<descriptor>mvn:org.apache.karaf.features/framework/${dependency.karaf.version}/xml/features</descriptor>
+									<descriptor>mvn:org.apache.karaf.features/standard/${dependency.karaf.version}/xml/features</descriptor>
+									<descriptor>mvn:org.apache.karaf.features/enterprise/${dependency.karaf.version}/xml/features</descriptor>
+								-->
+									<descriptor>file:${project.build.directory}/classes/feature.xml</descriptor>
+								</descriptors>
+            			<includeTransitiveDependency>false</includeTransitiveDependency>
+          			</configuration>
+					 </plugin>
+			 </plugins>
+	</build>
+</project>

@@ -94,6 +94,8 @@
         <module>${topProject.prefix}-${topProject.name}-provider-ldap</module>
         <module>${topProject.prefix}-${topProject.name}-provider-jpa</module>
         <module>${topProject.prefix}-${topProject.name}-command</module>
+        <module>${topProject.prefix}-${topProject.name}-karaf-feature</module>
+
     </modules>
 
     <!-- Profiles to tailor custom executions
