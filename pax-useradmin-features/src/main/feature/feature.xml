@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <features name="${project.artifactId}-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" >
-	<feature name="pax-useradmin" version="${project.version}">
+	<feature name="pax-useradmin-service" version="${project.version}">
 		<feature dependency="true">scr</feature>
 		<bundle dependency="true">mvn:org.osgi/org.osgi.service.useradmin/1.1.0</bundle>
 		<bundle>mvn:${project.groupId}/org.ops4j.pax.useradmin.service/${project.version}</bundle>
 	</feature>
 	<feature name="pax-useradmin-ldap" version="${project.version}">
-		<feature dependency="true">pax-useradmin</feature>
+		<feature dependency="true">pax-useradmin-service</feature>
 		<bundle>mvn:${project.groupId}/org.ops4j.pax.useradmin.provider.ldap/${project.version}</bundle>
 	</feature>
 	<feature name="pax-useradmin-jpa" version="${project.version}">
-		<feature dependency="true">pax-useradmin</feature>
+		<feature dependency="true">pax-useradmin-service</feature>
 		<bundle>mvn:${project.groupId}/org.ops4j.pax.useradmin.provider.jpa/${project.version}</bundle>
 	</feature>
 	<feature name="pax-useradmin-preferences" version="${project.version}">
-		<feature dependency="true">pax-useradmin</feature>
+		<feature dependency="true">pax-useradmin-service</feature>
 		<bundle>mvn:${project.groupId}/org.ops4j.pax.useradmin.provider.preferences/${project.version}</bundle>
-	</feature>
-	<feature name="pax-useradmin-all" version="${project.version}">
-		<feature dependency="true">pax-useradmin-ldap</feature>
-		<feature dependency="true">pax-useradmin-jpa</feature>
-		<feature dependency="true">pax-useradmin-preferences</feature>
 	</feature>
 </features>
